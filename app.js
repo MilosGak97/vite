@@ -11,42 +11,42 @@ const zlib = require('zlib');
 
 const app = express();
 const port = process.env.PORT || 3000;
-
+// Use compression middleware
+app.use(compression());
 
 // Middleware to handle gzip encoded payloads
 app.use((req, res, next) => {
-    // Check if the request content is gzip encoded
     if (req.headers['content-encoding'] === 'gzip') {
-        // Create a buffer to collect the data chunks
-        req.rawBody = Buffer.alloc(0);
+        let chunks = [];
+        req.on('data', chunk => {
+            chunks.push(chunk);
+        });
 
-        // Stream to decompress the data
-        req.pipe(zlib.createGunzip())
-            .on('data', (chunk) => {
-                req.rawBody = Buffer.concat([req.rawBody, chunk]);
-            })
-            .on('end', () => {
-                try {
-                    // Attempt to parse the JSON data
-                    req.body = JSON.parse(req.rawBody.toString());
-                    next();
-                } catch (error) {
-                    console.error('Failed to parse JSON:', error);
-                    res.status(400).send('Invalid JSON');
+        req.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            zlib.gunzip(buffer, (err, decoded) => {
+                if (err) {
+                    console.error('Error decoding gzip data:', err);
+                    return res.status(400).send('Bad Request: Invalid gzip data');
                 }
-            })
-            .on('error', (error) => {
-                console.error('Error decoding gzip data:', error);
-                res.status(500).send('Internal Server Error');
+
+                try {
+                    req.body = JSON.parse(decoded.toString());
+                    next();
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    res.status(400).send('Bad Request: Invalid JSON');
+                }
             });
+        });
     } else {
-        next(); // Continue with regular body parsing
+        next();
     }
 });
 
+// Middleware to parse JSON bodies with a size limit of 1MB
+app.use(bodyParser.json({ limit: '1024mb' }));
 
-// Use compression middleware
-app.use(compression());
 
 require('dotenv').config();
 
