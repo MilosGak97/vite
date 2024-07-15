@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios'); // Import Axios for HTTP requests
 const { saveProperty } = require('./propertyModel'); // Adjust path as needed
 const { sendPostRequests2 } = require('./worker'); // Adjust the path if necessary
+const { sendPostRequest } = require('./worker'); // Adjust the path if necessary
 
 
 require('dotenv').config();
