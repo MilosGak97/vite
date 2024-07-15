@@ -14,35 +14,10 @@ const port = process.env.PORT || 3000;
 // Use compression middleware
 app.use(compression());
 
-// Middleware to handle gzip encoded payloads
 app.use((req, res, next) => {
-    if (req.headers['content-encoding'] === 'gzip') {
-        let chunks = [];
-        req.on('data', chunk => {
-            chunks.push(chunk);
-        });
-
-        req.on('end', () => {
-            const buffer = Buffer.concat(chunks);
-            zlib.gunzip(buffer, (err, decoded) => {
-                if (err) {
-                    console.error('Error decoding gzip data:', err);
-                    return res.status(400).send('Bad Request: Invalid gzip data');
-                }
-
-                try {
-                    req.body = JSON.parse(decoded.toString());
-                    next();
-                } catch (parseError) {
-                    console.error('Failed to parse JSON:', parseError);
-                    res.status(400).send('Bad Request: Invalid JSON');
-                }
-            });
-        });
-    } else {
-        next();
-    }
-});
+    // Log the incoming request headers
+    console.log('Incoming request headers:', req.headers);
+})
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1024mb' }));
