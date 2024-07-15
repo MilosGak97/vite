@@ -5,6 +5,10 @@ const { saveProperty } = require('./propertyModel'); // Adjust path as needed
 const { sendPostRequests2 } = require('./worker'); // Adjust the path if necessary
 const { sendPostRequest } = require('./worker'); // Adjust the path if necessary
 
+const compression = require('compression');
+
+// Use compression middleware
+app.use(compression());
 
 require('dotenv').config();
 
