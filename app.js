@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios'); // Import Axios for HTTP requests
-const { saveProperty } = require('./src/models/propertyModel'); // Adjust path as needed
+const { saveProperty } = require('./propertyModel'); // Adjust path as needed
 const sendPostRequests2 = require('./sendPostRequests2'); // Adjust the path if necessary
 
 
