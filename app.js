@@ -63,99 +63,43 @@ require('dotenv').config();
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1024mb' }));
 
-app.post('/webhook', (req, res) => {
+app.post('/webhook', async (req, res) => {
     try {
-        console.log("Runned Webhook Succesfully")
-        // Retrieve parsed JSON data from request body
         const dataArray = req.body; // Assuming req.body is an array of objects
 
-        // Iterate through each object in dataArray
-        dataArray.forEach((data) => {
-            // Log relevant data
-            const url = data.url;
-            const zpid = data.zpid;
+        for (let data of dataArray) {
+            // Extract and process data
+            const { url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price, /* other fields */ } = data;
 
-            const address = data.address?.streetAddress;
-            const city = data.address?.city;
-            const state = data.address?.state;
-            const zipcode = data.address?.zipcode;
-            const bedrooms = data.bedrooms;
-            const bathrooms = data.bathrooms;
-            const price = data.price;
-
-            const longitude = data.longitude;
-            const latitude = data.latitude;
-            const hasBadGeocode = data.hasBadGeocode;
-
-            const homeType = data.homeType;
-            const isNonOwnerOccupied = data.isNonOwnerOccupied;
-            const parcelId = data.parcelId;
-
-            const daysOnZillow = data.daysOnZillow;
-
-            const propertyTypeDimension = data.propertyTypeDimension;
-            const hdpTypeDimension = data.hdpTypeDimension;
-            const listingTypeDimension = data.listingTypeDimension;
-            const is_listed_by_management_company = data.is_listed_by_management_company;
-
-            // Ensure listing_provided_by is defined before accessing its properties
-            const listing_provided_by_name = data.listing_provided_by?.name;
-            const listing_provided_by_email = data.listing_provided_by?.email;
-            const listing_provided_by_company = data.listing_provided_by?.company;
-
-            const photoCount = data.photoCount;
-            const photos = data.photos;
-
-            // Prepare object to save to MongoDB (adjust as per your schema)
             const propertyToSave = {
-                url,
-                zpid,
-                address,
-                city,
-                state,
-                zipcode,
-                bedrooms,
-                bathrooms,
-                price,
-                longitude,
-                latitude,
-                hasBadGeocode,
-                homeType,
-                isNonOwnerOccupied,
-                parcelId,
-                daysOnZillow,
-                propertyTypeDimension,
-                hdpTypeDimension,
-                listingTypeDimension,
-                is_listed_by_management_company,
-                listing_provided_by_name,
-                listing_provided_by_email,
-                listing_provided_by_company,
-                photoCount,
-                photos
-                // Add more fields as needed
+                url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price // Add other fields as needed
             };
 
-
-            // Save property data to MongoDB
-            saveProperty(propertyToSave);
+            // Save property asynchronously (assuming saveProperty returns a promise)
+            await saveProperty(propertyToSave);
             console.log('Property saved to MongoDB:', propertyToSave);
-            console.log(photoCount)
-        });
+        }
 
-
-        // Log the received data (parsed JSON)
-        //console.log('Received webhook data:', dataArray);
-
-        // Optionally, process or store the data here
-
-        // Send success response
         res.status(200).send('Webhook received successfully');
     } catch (error) {
-        // Log and send error response if parsing fails
         console.error('Failed to handle webhook:', error);
         res.status(400).send('Bad Request: Invalid JSON');
     }
+});
+
+
+// Log the received data (parsed JSON)
+//console.log('Received webhook data:', dataArray);
+
+// Optionally, process or store the data here
+
+// Send success response
+res.status(200).send('Webhook received successfully');
+    } catch (error) {
+    // Log and send error response if parsing fails
+    console.error('Failed to handle webhook:', error);
+    res.status(400).send('Bad Request: Invalid JSON');
+}
 });
 
 
