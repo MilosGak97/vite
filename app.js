@@ -88,20 +88,6 @@ app.post('/webhook', async (req, res) => {
 });
 
 
-// Log the received data (parsed JSON)
-//console.log('Received webhook data:', dataArray);
-
-// Optionally, process or store the data here
-
-// Send success response
-res.status(200).send('Webhook received successfully');
-    } catch (error) {
-    // Log and send error response if parsing fails
-    console.error('Failed to handle webhook:', error);
-    res.status(400).send('Bad Request: Invalid JSON');
-}
-});
-
 
 
 //* END OF TESTING PHASE 
