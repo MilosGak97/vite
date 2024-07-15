@@ -7,6 +7,42 @@ const { sendPostRequest } = require('./worker'); // Adjust the path if necessary
 
 const compression = require('compression');
 
+const zlib = require('zlib');
+
+
+
+// Middleware to handle gzip encoded payloads
+app.use((req, res, next) => {
+    // Check if the request content is gzip encoded
+    if (req.headers['content-encoding'] === 'gzip') {
+        // Create a buffer to collect the data chunks
+        req.rawBody = Buffer.alloc(0);
+
+        // Stream to decompress the data
+        req.pipe(zlib.createGunzip())
+            .on('data', (chunk) => {
+                req.rawBody = Buffer.concat([req.rawBody, chunk]);
+            })
+            .on('end', () => {
+                try {
+                    // Attempt to parse the JSON data
+                    req.body = JSON.parse(req.rawBody.toString());
+                    next();
+                } catch (error) {
+                    console.error('Failed to parse JSON:', error);
+                    res.status(400).send('Invalid JSON');
+                }
+            })
+            .on('error', (error) => {
+                console.error('Error decoding gzip data:', error);
+                res.status(500).send('Internal Server Error');
+            });
+    } else {
+        next(); // Continue with regular body parsing
+    }
+});
+
+
 // Use compression middleware
 app.use(compression());
 
