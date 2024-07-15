@@ -9,6 +9,8 @@ const compression = require('compression');
 
 const zlib = require('zlib');
 
+const app = express();
+const port = process.env.PORT || 3000;
 
 
 // Middleware to handle gzip encoded payloads
@@ -48,8 +50,6 @@ app.use(compression());
 
 require('dotenv').config();
 
-const app = express();
-const port = process.env.PORT || 3000;
 
 
 // Middleware to parse JSON bodies with a size limit of 1MB
