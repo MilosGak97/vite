@@ -27,5 +27,5 @@ const saveProperty = async (propertyData) => {
 };
 
 module.exports = {
-    saveProperty,
+    saveProperty
 };
