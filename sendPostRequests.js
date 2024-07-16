@@ -37,7 +37,7 @@ async function sendPostRequests(req, res) {
                 'Authorization': `Bearer ${accessToken}`
             }
         });
-
+        console.log("Response2 URL: ", url2);
         console.log('Response data YEEEEEY:', response2.data);
 
 
