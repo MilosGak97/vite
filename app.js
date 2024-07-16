@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
+const compression = require('compression');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
 
 
 
@@ -33,6 +35,7 @@ connectDB();
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
+app.use(compression());
 
 // Middleware to log incoming requests
 app.use((req, res, next) => {
