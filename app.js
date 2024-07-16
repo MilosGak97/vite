@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const { zlibMiddleware } = require('./src/middleware/zlib');
-const { connectDB, client } = require('./src/config/mongodb');
-const { singleProperty } = require('./src/workers/singleProperty');
+const { connectDB } = require('./src/config/mongodb');
+const { singleProperty } = require('./src/handlers/webhookHandler');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -28,12 +28,11 @@ app.use(bodyParser.json({ limit: '1mb' }));
 // Use gzip decompression middleware
 app.use(zlibMiddleware);
 
-// Middleware to log incoming requests delete
+// Middleware to log incoming requests
 app.use((req, res, next) => {
     console.log('Incoming request headers:', req.headers);
     next();
 });
-
 
 // Webhook endpoint
 app.post('/webhook', singleProperty);
