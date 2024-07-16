@@ -11,8 +11,7 @@ const zlib = require('zlib');
 
 const app = express();
 const port = process.env.PORT || 3000;
-// Use compression middleware
-app.use(compression());
+
 
 app.use((req, res, next) => {
     // Log the incoming request headers
@@ -21,40 +20,6 @@ app.use((req, res, next) => {
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1024mb' }));
-
-// Middleware to handle gzip encoded payloads
-app.use((req, res, next) => {
-    // Log the incoming request headers
-    console.log('Incoming request headers:', req.headers);
-
-    if (req.headers['content-encoding'] === 'gzip') {
-        let chunks = [];
-        req.on('data', chunk => {
-            chunks.push(chunk);
-        });
-
-        req.on('end', () => {
-            const buffer = Buffer.concat(chunks);
-            zlib.gunzip(buffer, (err, decoded) => {
-                if (err) {
-                    console.error('Error decoding gzip data:', err);
-                    return res.status(400).send('Bad Request: Invalid gzip data');
-                }
-
-                try {
-                    req.body = JSON.parse(decoded.toString());
-                    console.log('Decoded and parsed body:', req.body);
-                    next();
-                } catch (parseError) {
-                    console.error('Failed to parse JSON:', parseError);
-                    res.status(400).send('Bad Request: Invalid JSON');
-                }
-            });
-        });
-    } else {
-        next();
-    }
-});
 
 require('dotenv').config();
 
