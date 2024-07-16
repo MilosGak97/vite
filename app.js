@@ -119,7 +119,7 @@ app.get('/sendrequestapi', async (req, res) => {
                 uncompressed_webhook: false
             },
             headers: {
-                'Authorization': `Bearer YOUR_BRIGHTDATA_API_TOKEN`,
+                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`,
                 'Content-Type': 'application/gzip', // Assuming the content type should be gzip
                 'Host': 'worker-847b6ac96356.herokuapp.com',
                 'Connection': 'close',
