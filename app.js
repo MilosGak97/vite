@@ -47,6 +47,7 @@ app.get('/', (req, res) => {
 // Endpoint to receive property URLs and trigger worker dyno
 app.post('/webhook2', async (req, res) => {
     try {
+        console.log("DA VIDIM:", req.body);
         const { propertyUrls } = req.body; // Assuming propertyUrls is an array of URLs
 
         // Trigger worker dyno function directly
