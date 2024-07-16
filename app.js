@@ -129,20 +129,27 @@ async function sendPostRequests2() {
             // Add more links as needed
         ];
 
-        const url = 'https://api.brightdata.com/datasets/v3/trigger';
+
+
         const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
-        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2';
+        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
         const format = 'json';
         const uncompressedWebhook = false;
         const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
+            'Content-Type': 'application/gzip',
+            'dca-filename': 's_lyokoc2y2led7hycvu.json.gz',
+            'dca-collection-id': 's_lyokoc2y2led7hycvu',
+            'content-encoding': 'gzip',
+            'dca-dataset': 'true',
+            'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306',
+            'X-Amz-Id-2': 'Edv8hYXMnbk2prneNHIg8xmymrsP5OjnoT3kN6yOLDyP3luiwSXPSAv/NC6gjkuPlADYLPZkfz8=',
+            'X-Amz-Request-Id': 'WKNVNQJGVCHMZEB9',
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept': '*/*',
-            'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive'
         };
+
 
         for (const link of links) {
             const body = [{ "url": link }]; // Wrap the link in an array
