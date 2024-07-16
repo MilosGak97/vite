@@ -129,10 +129,7 @@ app.get('/milionbucks', (req, res) => {
 async function sendPostRequests2() {
     try {
         // Example usage with multiple links
-        const body = [
-            'https://www.zillow.com/homedetails/987-Buxton-Rd-Bridgewater-NJ-08807/39863486_zpid/'
-            // Add more links as needed
-        ];
+        const body = [{ "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale" }]
 
 
 
