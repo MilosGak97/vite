@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
-const zlib = require('zlib');
-const { connectDB, client } = require('./src/config/mongodb');
+const { zlibMiddleware } = require('./src/middleware/zlib');
+const { connectDB } = require('./src/config/mongodb');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -27,7 +27,7 @@ app.use(bodyParser.json({ limit: '1mb' }));
 // Use gzip decompression middleware
 app.use(zlibMiddleware);
 
-// Middleware to log incoming requests
+// Middleware to log incoming requests delete
 app.use((req, res, next) => {
     console.log('Incoming request headers:', req.headers);
     next();
