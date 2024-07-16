@@ -2,7 +2,7 @@ const express = require('express');
 const zlib = require('zlib');
 const router = express.Router();
 
-router.post('/webhook2', (req, res) => {
+router.post('/webh', (req, res) => {
     let chunks = [];
 
     req.on('data', (chunk) => {
