@@ -123,11 +123,13 @@ async function sendPostRequests(links) {
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
-        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Encoding': 'gzip, deflate, br', // Include Accept-Encoding for gzip
         'Accept': '*/*',
         'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
+        'Connection': 'keep-alive',
+        'dca-collection-id': datasetId, // Replace with your actual dataset ID
+        'dca-dataset': 'true' // Indicate this is a dataset-related request
     };
 
     try {
