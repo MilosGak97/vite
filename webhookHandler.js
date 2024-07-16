@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.post('/webhook2', (req, res) => {
+router.post('/webh', (req, res) => {
     console.log('Incoming POST request headers:', req.headers);
     console.log('Incoming POST request body:', req.body);
     // Process the data as needed
