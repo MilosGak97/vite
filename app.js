@@ -150,8 +150,6 @@ async function sendPostRequests2() {
             'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39'
         };
 
-
-
         const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lfqkr8wm13ixtbd8f5&endpoint=https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2&format=json&uncompressed_webhook=false`;
 
         await axios.post(url2, body, { headers });

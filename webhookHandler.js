@@ -51,3 +51,21 @@ router.post('/webh', (req, res) => {
 });
 
 module.exports = router;
+
+/*
+
+curl -H "Authorization: Bearer API_TOKEN" "https://api.brightdata.com/datasets/v3/progress/snapshot_id"
+
+curl -k "https://api.brightdata.com/datasets/v3/snapshot/s_lyorbdie241nwhztkq?format=json" -H "Authorization: Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39"
+
+
+curl -X POST "https://api.brightdata.com/datasets/v3/trigger" \
+-H "Authorization: Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39" \
+-H "Content-Type: application/json" \
+-d '{
+  "dataset_id": "gd_lfqkr8wm13ixtbd8f5",
+  "endpoint": "https://worker-847b6ac96356.herokuapp.com//webh",
+  "format": "json",
+  "uncompressed_webhook": false
+}'
+*/
