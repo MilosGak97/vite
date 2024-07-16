@@ -58,9 +58,10 @@ app.post('/webhook2', async (req, res) => {
 
         // Logging individual items and inserting into MongoDB
         for (let i = 0; i < dataArray.length; i++) {
-            const listing = dataArray[i].input;
+            const listing = dataArray[i];
             console.log("URL: ", listing.url);
             console.log("ZPID: ", listing.zpid);
+            console.log("ZPID: ", listing.city);
             /*
                         try {
                             const response = await axios.get(propertyUrl);
