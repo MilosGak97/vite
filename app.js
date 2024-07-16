@@ -44,7 +44,6 @@ app.get('/', (req, res) => {
     res.send('Hello, this is the Property Listings Webhook Service.');
 });
 
-
 // Endpoint to receive property URLs and trigger worker dyno
 app.post('/process-properties', async (req, res) => {
     try {
@@ -59,6 +58,7 @@ app.post('/process-properties', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
 
 
 // Handle invalid JSON
