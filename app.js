@@ -114,50 +114,59 @@ const httpsAgent = new https.Agent({
     rejectUnauthorized: false,
 });
 
+// Function to send POST request to Bright Data API for multiple links
+async function sendPostRequests(links) {
+    const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
+    const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
+    const format = 'json';
+    const uncompressedWebhook = false;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept': '*/*',
+        'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    };
+
+    try {
+        // Map links to array of promises for concurrent execution
+        const promises = links.map(async (link) => {
+            const body = [{ "url": link }]; // Wrap the link in an array
+
+            const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${endpoint}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
+
+            const response = await axios.post(url, body, { headers });
+            console.log(`Response for ${link}:`, response.data);
+            return response.data;
+        });
+
+        // Wait for all requests to complete
+        const results = await Promise.all(promises);
+        return results;
+    } catch (error) {
+        console.error('Error sending POST requests:', error);
+        throw error; // Rethrow the error for the caller to handle
+    }
+}
+
 // Endpoint to trigger sending of POST request to webhook using Bright Data API
 app.get('/sendrequestapi', async (req, res) => {
+    try {
+        // Example usage with multiple links
+        const links = [
+            'https://www.zillow.com/homedetails/25-Philip-Dr-Princeton-NJ-08540/39012566_zpid/',
+            'https://www.zillow.com/homedetails/9-Farm-Meadows-Rd-Columbia-NJ-07832/40098282_zpid/'
+            // Add more links as needed
+        ];
 
+        const results = await sendPostRequests(links);
+        console.log('All requests completed successfully:', results);
 
-    // Function to send POST request to Bright Data API for multiple links
-    async function sendPostRequests2() {
-        try {
-            // Example usage with multiple links
-            const links = [
-                'https://www.zillow.com/homedetails/25-Philip-Dr-Princeton-NJ-08540/39012566_zpid/',
-                'https://www.zillow.com/homedetails/9-Farm-Meadows-Rd-Columbia-NJ-07832/40098282_zpid/'
-                // Add more links as needed
-            ];
-
-            const url = 'https://api.brightdata.com/datasets/v3/trigger';
-            const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
-            const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
-            const format = 'json';
-            const uncompressedWebhook = false;
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Accept': '*/*',
-                'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive'
-            };
-
-            for (const link of links) {
-                const body = [{ "url": link }]; // Wrap the link in an array
-
-                const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${endpoint}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
-
-                const response = await axios.post(url2, body, { headers });
-                console.log(`Response for ${link}:`, response.data);
-
-                // Optionally, add a delay between requests to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
-            }
-        } catch (error) {
-            console.error('Error sending POST request:', error);
-        }
+        res.status(200).send('Data retrieval triggered successfully');
+    } catch (error) {
+        console.error('Failed to trigger data retrieval:', error);
+        res.status(500).send('Failed to trigger data retrieval');
     }
-
-    sendPostRequests2();
-})
+});
