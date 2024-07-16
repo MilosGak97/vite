@@ -63,10 +63,34 @@ app.post('/webhook2', async (req, res) => {
             console.log("ZPID: ", listing.zpid);
             console.log("ZPID: ", listing.city);
             const propertyData = {
-                propertyId: listing.zpid,
+
+                url: listing.url,
+                zpid: listing.zpid,
+                address: listing.address,
                 city: listing.city,
                 state: listing.state,
-                // Add more fields as needed
+                zipcode: listing.zipcode,
+                bedrooms: listing.bedrooms,
+                bathrooms: listing.bathrooms,
+                price: listing.price,
+                longitude: listing.longitude,
+                latitude: listing.latitude,
+                hasBadGeocode: listing.hasBadGeocode,
+                homeType: listing.homeType,
+                isNonOwnerOccupied: listing.isNonOwnerOccupied,
+                parcelId: listing.parcelId,
+                daysOnZillow: listing.daysOnZillow,
+                propertyTypeDimension: listing.propertyTypeDimension,
+                hdpTypeDimension: listing.hdpTypeDimension,
+                listingTypeDimension: listing.listingTypeDimension,
+                is_listed_by_management_company: listing.is_listed_by_management_company,
+                listing_provided_by_name: listing.listing_provided_by_name,
+                listing_provided_by_email: listing.listing_provided_by_email,
+                listing_provided_by_company: listing.listing_provided_by_company,
+                photoCount: listing.photoCount,
+                photo: listing.photo
+
+
             };
 
             await collection.insertOne(propertyData);
