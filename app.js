@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const { zlibMiddleware } = require('./src/middleware/zlib');
 const { connectDB, client } = require('./src/config/mongodb');
+const { singleWebhook } = require('./src/handlers/singleWebhook');
 
 const app = express();
 const port = process.env.PORT || 3000;
