@@ -109,6 +109,9 @@ app.post('/webhook2', async (req, res) => {
 /* Testing phase */
 
 app.get('/sendrequestapi', async (req, res) => {
+    const httpsAgent = new https.Agent({
+        rejectUnauthorized: false,
+    });
     try {
         // Trigger data retrieval from Bright Data API
         const response = await axios.get('https://api.brightdata.com/datasets/v3/trigger', {
@@ -129,7 +132,8 @@ app.get('/sendrequestapi', async (req, res) => {
                 'Dca-Dataset': 'true',
                 'Snapshot-Id': 's_lyoi4dayl27vrx1ka',
                 'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306'
-            }
+            },
+            httpsAgent: httpsAgent // Include the https agent to handle SSL issues
         });
 
         console.log('Data retrieval triggered successfully:', response.data);
