@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const zlib = require('zlib');
-const { connectDB } = require('./src/config/mongodb');
+const { connectDB, client } = require('./src/config/mongodb');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,7 +11,12 @@ const port = process.env.PORT || 3000;
 
 
 
-connectDB();
+connectDB().then(() => {
+    console.log("MongoDB connected successfully");
+}).catch(err => {
+    console.error("Error connecting to MongoDB:", err);
+    process.exit(1); // Exit the process if connection fails
+});
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));

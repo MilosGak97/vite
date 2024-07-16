@@ -20,4 +20,4 @@ const connectDB = async () => {
     return db.collection('properties'); // Ensure correct case
 };
 
-module.exports = { connectDB };
+module.exports = { connectDB, client };
