@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { MongoClient } = require('mongodb');
 require('dotenv').config();
 const zlib = require('zlib');
+const { connectDB } = require('./src/config/mongodb');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,26 +10,6 @@ const port = process.env.PORT || 3000;
 
 
 
-// MongoDB URI
-const uri = "mongodb+srv://milo:TheDVTN2020!!!@propertylistings.tdecqcu.mongodb.net/propertyListings?retryWrites=true&w=majority";
-const client = new MongoClient(uri);
-
-let db;
-
-
-const connectDB = async () => {
-    if (!db) {
-        try {
-            await client.connect();
-            db = client.db('propertyListings'); // Ensure correct case
-            console.log("Connected to MongoDB");
-        } catch (error) {
-            console.error("Could not connect to MongoDB", error);
-            process.exit(1);
-        }
-    }
-    return db.collection('properties'); // Ensure correct case
-};
 
 connectDB();
 
