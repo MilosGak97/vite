@@ -31,7 +31,7 @@ app.use(bodyParser.json({ limit: '1024mb' }));
 app.post('/webhook', async (req, res) => {
     try {
         const dataArray = req.body; // Assuming req.body is an array of objects
-
+        console.log("DATA ARRAY: ", dataArray); // delete
         for (let data of dataArray) {
             // Extract and process data
             const { url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price, /* other fields */ } = data;
@@ -57,7 +57,7 @@ app.post('/webhook', async (req, res) => {
 
 //* END OF TESTING PHASE 
 
-
+/*
 // Define the route that will trigger the function
 app.get('/milionbucks', (req, res) => {
     sendPostRequests2()
@@ -69,19 +69,7 @@ app.get('/milionbucks', (req, res) => {
             res.status(500).send('Failed to send POST request');
         });
 });
-
-
-app.get('/milionbucks', (req, res) => {
-
-    sendPostRequests2()
-        .then(() => {
-            res.send('POST request sent successfully');
-        })
-        .catch((error) => {
-            console.error('Error sending POST request:', error);
-            res.status(500).send('Failed to send POST request');
-        });
-});
+*/
 
 
 // Endpoint to trigger the POST request with a specific link
@@ -101,6 +89,7 @@ app.get('/trigger-post-request', async (req, res) => {
 });
 
 // Endpoint to handle the input and generate JSON array
+/*
 app.get('/generate-json', (req, res) => {
     try {
         // Retrieve the 'urls' query parameter from the request
@@ -123,39 +112,9 @@ app.get('/generate-json', (req, res) => {
 
 });
 
+*/
 
 
-
-/* THIS IS TESTING PHASE */
-app.get('/searchscrape', async (req, res) => {
-    try {
-
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept': '*/*',
-            'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-        };
-        const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lfqkr8wm13ixtbd8f5&format=json&uncompressed_webhook=true&type=discover_new&discover_by=url`;
-        //*
-        // The body should be an array of objects
-        const body = [{ "url": "https://www.zillow.com/south-bend-in/houses/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-86.29675344700124%2C%22east%22%3A-86.19633154148366%2C%22south%22%3A41.673161055863744%2C%22north%22%3A41.723404617140616%7D%2C%22mapZoom%22%3A14%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A20555%2C%22regionType%22%3A6%7D%5D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22tow%22%3A%7B%22value%22%3Afalse%7D%2C%22mf%22%3A%7B%22value%22%3Afalse%7D%2C%22con%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22apa%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22apco%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%227%22%7D%7D%2C%22isListVisible%22%3Atrue%2C%22usersSearchTerm%22%3A%22South%20Bend%20IN%22%7D" }]; // Wrap the link in an array
-
-
-
-        const response = await axios.post(url2, body, { headers });
-
-        console.log('Response:', response.data);
-    } catch (error) {
-        console.error('Error sending POST request:', error);
-    }
-
-
-});
-/* END OF TESTING PHASE */
 
 
 const server = app.listen(port, () => {
