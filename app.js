@@ -7,8 +7,8 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // MongoDB URI
-const uri = "mongodb+srv://milo:TheDVTN2020!!!@propertylistings.tdecqcu.mongodb.net/?retryWrites=true&w=majority&appName=PropertyListings";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const uri = "mongodb+srv://milo:TheDVTN2020!!!@propertylistings.tdecqcu.mongodb.net/propertyListings?retryWrites=true&w=majority";
+const client = new MongoClient(uri);
 
 let db;
 
@@ -58,3 +58,19 @@ app.post('/webhook', async (req, res) => {
         res.status(400).send(`Bad Request: ${error.message}`);
     }
 });
+
+// Default route to handle other requests
+app.get('/', (req, res) => {
+    res.send('Hello, this is the Property Listings Webhook Service.');
+});
+
+// Handle invalid JSON
+app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError) {
+        res.status(400).send({ error: 'Invalid JSON' });
+    } else {
+        next();
+    }
+});
+
+module.exports = app;
