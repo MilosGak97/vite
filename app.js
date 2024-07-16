@@ -6,6 +6,7 @@ const { connectDB, client } = require('./src/config/mongodb');
 const { singleProperty } = require('./src/handlers/webhookHandler');
 const { workerProperty } = require('./src/handlers/webhookHandler3'); // Import worker function
 const axios = require('axios');
+const zlib = require('zlib');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -92,26 +93,6 @@ app.post('/webhook2', async (req, res) => {
             };
 
             await collection.insertOne(propertyData);
-            /*
-                        try {
-                            const response = await axios.get(propertyUrl);
-                            const propertyData = {
-                                propertyId: response.data.zpid,
-                                name: response.data.name,
-                                price: response.data.price,
-                                // Add more fields as needed
-                            };
-            
-                            await collection.insertOne(propertyData);
-                            console.log(`Property ${propertyData.propertyId} saved to MongoDB`);
-            
-                        } catch (error) {
-                            console.error(`Failed to fetch data from ${propertyUrl}:`, error);
-                        }
-                            */
-
-            // Delay for 1 second before processing the next URL
-
         }
 
         console.log('All properties processed');
@@ -122,6 +103,90 @@ app.post('/webhook2', async (req, res) => {
     }
 });
 
+
+
+
+/* Testing phase */
+
+// Endpoint to trigger sending of POST request to webhook
+app.get('/sendrequestapi', async (req, res) => {
+
+
+    // Function to gzip compress the JSON data
+    const gzipCompress = (data) => {
+        return new Promise((resolve, reject) => {
+            zlib.gzip(data, (err, buffer) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve(buffer);
+            });
+        });
+    };
+
+    // Sample data to send
+    const sampleData = [
+        {
+            input: {
+                url: 'https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale'
+            },
+            zpid: 77050198,
+            city: 'South Bend',
+            state: 'IN',
+            homeStatus: 'SOLD',
+            address: {
+                city: 'South Bend',
+                streetAddress: '2506 Gordon Cir',
+                zipcode: '46635',
+                state: 'IN'
+            }
+        },
+        {
+            input: {
+                url: 'https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/'
+            },
+            zpid: 38834410,
+            city: 'Califon',
+            state: 'NJ',
+            homeStatus: 'FOR_SALE',
+            address: {
+                city: 'Califon',
+                streetAddress: '76 Main St',
+                zipcode: '07830',
+                state: 'NJ'
+            }
+        }
+    ];
+
+    try {
+        // Convert sample data to JSON string
+        const jsonData = JSON.stringify(sampleData);
+
+        // Compress the JSON data
+        const compressedData = await gzipCompress(jsonData);
+
+        // Send the POST request
+        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/webhook2', compressedData, {
+            headers: {
+                'Content-Type': 'application/gzip',
+                'DCA-Filename': 's_lyohfjll2i8309fk1y.json.gz',
+                'DCA-Collection-ID': 's_lyohfjll2i8309fk1y',
+                'Content-Encoding': 'gzip',
+                'DCA-Dataset': 'true',
+                'Snapshot-ID': 's_lyohfjll2i8309fk1y',
+                'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306'
+            }
+        });
+
+        console.log('Data sent successfully:', response.data);
+        res.status(200).send('Data sent successfully');
+    } catch (error) {
+        console.error('Failed to send data:', error);
+        res.status(500).send('Failed to send data');
+    }
+});
+
+/* end of testing phase */
 
 // Handle invalid JSON
 app.use((error, req, res, next) => {
