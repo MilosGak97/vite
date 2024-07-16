@@ -1,11 +1,10 @@
+// src/config/mongodb.js
 const { MongoClient } = require('mongodb');
 
-// MongoDB URI
 const uri = "mongodb+srv://milo:TheDVTN2020!!!@propertylistings.tdecqcu.mongodb.net/propertyListings?retryWrites=true&w=majority";
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let db;
-
 
 const connectDB = async () => {
     if (!db) {
@@ -18,7 +17,7 @@ const connectDB = async () => {
             process.exit(1);
         }
     }
-    return db.collection('properties'); // Ensure correct case
+    return db; // Return the database client
 };
 
-module.exports(connectDB)
+module.exports = { client, connectDB };

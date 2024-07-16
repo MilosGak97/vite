@@ -7,20 +7,22 @@ const { connectDB, client } = require('./src/config/mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
 
-
-
-
-
-connectDB().then(() => {
-    console.log("MongoDB connected successfully");
-}).catch(err => {
-    console.error("Error connecting to MongoDB:", err);
-    process.exit(1); // Exit the process if connection fails
-});
+// Connect to MongoDB
+connectDB()
+    .then(() => {
+        console.log("MongoDB connected successfully");
+        // Start server after successful DB connection
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    })
+    .catch(err => {
+        console.error("Error connecting to MongoDB:", err);
+        process.exit(1); // Exit the process if connection fails
+    });
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
-
 
 // Middleware to handle gzip decompression
 app.use((req, res, next) => {
@@ -49,8 +51,6 @@ app.use((req, res, next) => {
     }
 });
 
-
-
 // Middleware to log incoming requests
 app.use((req, res, next) => {
     console.log('Incoming request headers:', req.headers);
@@ -67,7 +67,7 @@ app.post('/webhook', async (req, res) => {
         }
 
         const dataArray = req.body; // Assuming req.body is an array of objects
-        const collection = db.collection('properties'); // Use your collection name
+        const collection = client.db('propertyListings').collection('properties'); // Access collection through client
 
         // Save all properties to MongoDB
         await collection.insertMany(dataArray);
@@ -92,11 +92,4 @@ app.use((error, req, res, next) => {
     } else {
         next();
     }
-});
-
-
-
-// Start the server after successful DB connection
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
 });
