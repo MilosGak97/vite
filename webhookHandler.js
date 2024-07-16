@@ -5,7 +5,8 @@ const axios = require('axios');
 
 
 // Function to fetch data from Bright Data API
-async function fetchData(snapshotId) {
+async function fetchData() {
+    const snapshotId = 's_lyosox91fhcaktoor';
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
