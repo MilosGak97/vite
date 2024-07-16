@@ -108,84 +108,37 @@ app.post('/webhook2', async (req, res) => {
 
 /* Testing phase */
 
-// Endpoint to trigger sending of POST request to webhook
 app.get('/sendrequestapi', async (req, res) => {
-
-
-    // Function to gzip compress the JSON data
-    const gzipCompress = (data) => {
-        return new Promise((resolve, reject) => {
-            zlib.gzip(data, (err, buffer) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(buffer);
-            });
-        });
-    };
-
-    // Sample data to send
-    const sampleData = [
-        {
-            input: {
-                url: 'https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale'
-            },
-            zpid: 77050198,
-            city: 'South Bend',
-            state: 'IN',
-            homeStatus: 'SOLD',
-            address: {
-                city: 'South Bend',
-                streetAddress: '2506 Gordon Cir',
-                zipcode: '46635',
-                state: 'IN'
-            }
-        },
-        {
-            input: {
-                url: 'https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/'
-            },
-            zpid: 38834410,
-            city: 'Califon',
-            state: 'NJ',
-            homeStatus: 'FOR_SALE',
-            address: {
-                city: 'Califon',
-                streetAddress: '76 Main St',
-                zipcode: '07830',
-                state: 'NJ'
-            }
-        }
-    ];
-
     try {
-        // Convert sample data to JSON string
-        const jsonData = JSON.stringify(sampleData);
-
-        // Compress the JSON data
-        const compressedData = await gzipCompress(jsonData);
-
-        // Send the POST request
-        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/webhook2', compressedData, {
+        // Trigger data retrieval from Bright Data API
+        const response = await axios.get('https://api.brightdata.com/datasets/v3/trigger', {
+            params: {
+                dataset_id: 'gd_lfqkr8wm13ixtbd8f5',
+                endpoint: 'https://worker-847b6ac96356.herokuapp.com/webhook2',
+                format: 'json',
+                uncompressed_webhook: false
+            },
             headers: {
-                'Content-Type': 'application/gzip',
-                'DCA-Filename': 's_lyohfjll2i8309fk1y.json.gz',
-                'DCA-Collection-ID': 's_lyohfjll2i8309fk1y',
+                'Authorization': `Bearer YOUR_BRIGHTDATA_API_TOKEN`,
+                'Content-Type': 'application/gzip', // Assuming the content type should be gzip
+                'Host': 'worker-847b6ac96356.herokuapp.com',
+                'Connection': 'close',
+                'Dca-Filename': 's_lyoi4dayl27vrx1ka.json.gz',
+                'Dca-Collection-Id': 's_lyoi4dayl27vrx1ka',
                 'Content-Encoding': 'gzip',
-                'DCA-Dataset': 'true',
-                'Snapshot-ID': 's_lyohfjll2i8309fk1y',
+                'Dca-Dataset': 'true',
+                'Snapshot-Id': 's_lyoi4dayl27vrx1ka',
                 'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306'
             }
         });
 
-        console.log('Data sent successfully:', response.data);
-        res.status(200).send('Data sent successfully');
+        console.log('Data retrieval triggered successfully:', response.data);
+        res.status(200).send('Data retrieval triggered successfully');
     } catch (error) {
-        console.error('Failed to send data:', error);
-        res.status(500).send('Failed to send data');
+        console.error('Failed to trigger data retrieval:', error);
+        res.status(500).send('Failed to trigger data retrieval');
     }
 });
-
 /* end of testing phase */
 
 // Handle invalid JSON
