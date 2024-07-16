@@ -1,7 +1,7 @@
 // src/middleware/gzipMiddleware.js
 const zlib = require('zlib');
 
-const gzipMiddleware = (req, res, next) => {
+const zlibMiddleware = (req, res, next) => {
     if (req.headers['content-encoding'] === 'gzip') {
         let buf = Buffer.from('');
         req.on('data', (chunk) => {
@@ -27,4 +27,4 @@ const gzipMiddleware = (req, res, next) => {
     }
 };
 
-module.exports = gzipMiddleware;
+module.exports = { zlibMiddleware };
