@@ -15,7 +15,7 @@ const multiProperty = async (req, res) => {
 
         // Iterate through each property URL with a 1-second delay
         for (let i = 0; i < dataArray.length; i++) {
-            const propertyUrl = dataArray[i].url;
+            const propertyUrl = dataArray[i].input.url;
             const propertyData = await fetchDataFromAPI(propertyUrl);
 
             // Save each property to MongoDB
