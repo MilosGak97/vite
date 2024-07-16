@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 const { zlibMiddleware } = require('./src/middleware/zlib');
-const { connectDB } = require('./src/config/mongodb');
+const { connectDB, client } = require('./src/config/mongodb');
 const { singleProperty } = require('./src/handlers/webhookHandler');
 const { multiProperty } = require('./src/handlers/webhookHandler2');
 const { workerProperty } = require('./src/handlers/webhookHandler3'); // Import worker function
