@@ -132,7 +132,7 @@ async function sendPostRequests2() {
 
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
-        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
+        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2';
         const format = 'json';
         const uncompressedWebhook = false;
         const headers = {
@@ -152,13 +152,12 @@ async function sendPostRequests2() {
         for (const link of links) {
             const body = [{ "url": link }]; // Wrap the link in an array
 
-            const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${endpoint}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
+            const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lfqkr8wm13ixtbd8f5&endpoint=https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2&format=json&uncompressed_webhook=false`;
 
             const response = await axios.post(url2, body, { headers });
             console.log(`Response for ${link}:`, response.data);
 
-            // Optionally, add a delay between requests to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+
         }
     } catch (error) {
         console.error('Error sending POST request:', error);
