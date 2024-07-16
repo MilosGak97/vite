@@ -35,6 +35,7 @@ app.use(zlibMiddleware);
 // Middleware to log incoming requests
 app.use((req, res, next) => {
     console.log('Incoming request headers:', req.headers);
+    console.log('Incoming POST request headers2:', req.headers);
     next();
 });
 
