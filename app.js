@@ -89,8 +89,6 @@ app.post('/webhook2', async (req, res) => {
                 listing_provided_by_company: listing.listing_provided_by_company,
                 photoCount: listing.photoCount,
                 photo: listing.photo
-
-
             };
 
             await collection.insertOne(propertyData);
