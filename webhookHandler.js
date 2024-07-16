@@ -52,21 +52,7 @@ router.post('/webh', (req, res) => {
                     fetchData(body.snapshotId);
 
 
-                    /* test */
 
-                    const snapshotId = 's_lyosox91fhcaktoor';
-                    const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
-                    const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
-                    const response = axios.get(url, {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    });
-
-                    console.log('Response data YEEEEEY:', response.data);
-
-
-                    /* end test */
                     // Process the data as needed
                     res.status(200).send('Webhook received');
                 } catch (parseErr) {
