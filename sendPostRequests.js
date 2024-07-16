@@ -24,7 +24,7 @@ async function sendPostRequests(req, res) {
         const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
 
         const response = await axios.post(url, body, { headers });
-        console.log(`Response for ${body[0].url}:`, response.data);
+        console.log(`Response for ${body[0].zpid}:`, response.data);
 
         res.status(200).json(response.data);
     } catch (error) {
