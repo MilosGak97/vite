@@ -1,6 +1,7 @@
 const express = require('express');
 const zlib = require('zlib');
 const router = express.Router();
+const axios = require('axios');
 
 
 // Function to fetch data from Bright Data API
