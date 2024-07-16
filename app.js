@@ -34,6 +34,7 @@ app.use((req, res, next) => {
 });
 
 // Webhook endpoint
+/*
 app.post('/webhook', async (req, res) => {
     try {
         console.log('Request body:', req.body);
@@ -55,6 +56,11 @@ app.post('/webhook', async (req, res) => {
         res.status(400).send(`Bad Request: ${error.message}`);
     }
 });
+*/
+
+
+// Webhook endpoint
+app.post('/webhook', singleWebhook);
 
 // Default route to handle other requests
 app.get('/', (req, res) => {
