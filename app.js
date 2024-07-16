@@ -165,7 +165,7 @@ async function sendPostRequests2() {
 
 
             // Send the received data to your webhook
-            await axios.post(endpoint, response.data, { headers: { 'Content-Type': 'application/json' } });
+            await axios.post(endpoint, response.data, { headers });
 
             // Optionally, add a delay between requests to avoid rate limiting
             await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
