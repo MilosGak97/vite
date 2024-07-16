@@ -4,6 +4,7 @@ require('dotenv').config();
 const { zlibMiddleware } = require('./src/middleware/zlib');
 const { connectDB } = require('./src/config/mongodb');
 const { singleProperty } = require('./src/handlers/webhookHandler');
+const { multiProperty } = require('./src/handlers/webhookHandler2');
 
 const app = express();
 const port = process.env.PORT || 3000;
