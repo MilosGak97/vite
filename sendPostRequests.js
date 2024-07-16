@@ -50,10 +50,9 @@ async function sendPostRequests(req, res) {
 
 
         // Introducing a delay of 10 seconds
-        setTimeout(async () => {
-            const snapshotId = response.data.snapshot_id;
-            await fetchData(snapshotId);
-        }, 30000); // 10 seconds delay
+        const snapshotId = response.data.snapshot_id;
+        await fetchData(snapshotId);
+
         /* test */
 
         /* end test */
