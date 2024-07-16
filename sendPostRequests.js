@@ -49,8 +49,12 @@ async function sendPostRequests(req, res) {
         console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
 
 
+        // Introducing a delay of 10 seconds
+        setTimeout(async () => {
+            const snapshotId = response.data.snapshot_id;
+            await fetchData(snapshotId);
+        }, 10000); // 10 seconds delay
         /* test */
-        fetchData(response.data.snapshot_id);
 
         /* end test */
         res.status(200).json(response.data);
