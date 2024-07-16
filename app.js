@@ -147,7 +147,8 @@ async function sendPostRequests2() {
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept': '*/*',
             'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
+            'Connection': 'keep-alive',
+            'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39'
         };
 
 
