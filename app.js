@@ -109,10 +109,13 @@ app.post('/webhook2', async (req, res) => {
 
 /* Testing phase */
 
+// Disable SSL certificate verification (not recommended for production)
+const httpsAgent = new https.Agent({
+    rejectUnauthorized: false,
+});
+
+// Endpoint to trigger sending of POST request to webhook using Bright Data API
 app.get('/sendrequestapi', async (req, res) => {
-    const httpsAgent = new https.Agent({
-        rejectUnauthorized: false,
-    });
     try {
         // Trigger data retrieval from Bright Data API
         const response = await axios.get('https://api.brightdata.com/datasets/v3/trigger', {
@@ -123,8 +126,8 @@ app.get('/sendrequestapi', async (req, res) => {
                 uncompressed_webhook: false
             },
             headers: {
-                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`,
-                'Content-Type': 'application/gzip', // Assuming the content type should be gzip
+                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`, // Replace with your actual token
+                'Content-Type': 'application/gzip',
                 'Host': 'worker-847b6ac96356.herokuapp.com',
                 'Connection': 'close',
                 'Dca-Filename': 's_lyoi4dayl27vrx1ka.json.gz',
@@ -144,6 +147,7 @@ app.get('/sendrequestapi', async (req, res) => {
         res.status(500).send('Failed to trigger data retrieval');
     }
 });
+
 /* end of testing phase */
 
 // Handle invalid JSON
