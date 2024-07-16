@@ -62,6 +62,14 @@ app.post('/webhook2', async (req, res) => {
             console.log("URL: ", listing.url);
             console.log("ZPID: ", listing.zpid);
             console.log("ZPID: ", listing.city);
+            const propertyData = {
+                propertyId: listing.zpid,
+                city: listing.city,
+                state: listing.state,
+                // Add more fields as needed
+            };
+
+            await collection.insertOne(propertyData);
             /*
                         try {
                             const response = await axios.get(propertyUrl);
