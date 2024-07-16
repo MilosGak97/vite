@@ -129,8 +129,7 @@ app.get('/milionbucks', (req, res) => {
 async function sendPostRequests2() {
     try {
         // Example usage with multiple links
-        const links = [
-            'https://www.zillow.com/homedetails/3358-Route-94-Hardyston-NJ-07419/39936089_zpid/',
+        const body = [
             'https://www.zillow.com/homedetails/987-Buxton-Rd-Bridgewater-NJ-08807/39863486_zpid/'
             // Add more links as needed
         ];
@@ -155,21 +154,18 @@ async function sendPostRequests2() {
         };
 
 
-        for (const link of links) {
-            const body = [{ "url": link }]; // Wrap the link in an array
 
-            const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lfqkr8wm13ixtbd8f5&endpoint=https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2&format=json&uncompressed_webhook=false`;
+        const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=gd_lfqkr8wm13ixtbd8f5&endpoint=https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2&format=json&uncompressed_webhook=false`;
 
-            await axios.post(url2, body, { headers });
+        await axios.post(url2, body, { headers });
 
 
 
 
-            // Optionally, add a delay between requests to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+        // Optionally, add a delay between requests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
 
 
-        }
     } catch (error) {
         console.error('Error sending POST request:', error);
     }
