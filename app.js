@@ -38,8 +38,6 @@ app.use((req, res, next) => {
 
 // Webhook endpoint
 app.post('/webhook', singleProperty);
-// Webhook endpoint
-app.post('/webhook2', multiProperty);
 
 // Default route to handle other requests
 app.get('/', (req, res) => {
@@ -47,12 +45,12 @@ app.get('/', (req, res) => {
 });
 
 // Endpoint to receive property URLs and trigger worker dyno
-app.post('/process-properties', async (req, res) => {
+app.post('/webhook2', async (req, res) => {
     try {
         const { propertyUrls } = req.body; // Assuming propertyUrls is an array of URLs
 
         // Trigger worker dyno function directly
-        await workerProperty(propertyUrls);
+        await multiProperty(propertyUrls);
 
         res.status(200).send('DOBRO1 Property URLs processed successfully');
     } catch (error) {
