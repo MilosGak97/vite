@@ -29,6 +29,7 @@ const connectDB = async () => {
     return db.collection('properties'); // Ensure correct case
 };
 
+connectDB();
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
