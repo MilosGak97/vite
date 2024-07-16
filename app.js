@@ -38,6 +38,8 @@ app.use((req, res, next) => {
 
 // Webhook endpoint
 app.post('/webhook', singleProperty);
+// Webhook endpoint
+app.post('/webhook2', multiProperty);
 
 // Default route to handle other requests
 app.get('/', (req, res) => {
