@@ -53,24 +53,29 @@ app.post('/webhook2', async (req, res) => {
         }
 
         const dataArray = req.body;
+        const collection = client.db().collection('properties');
 
-        // Logging individual items
-        dataArray.forEach(item => {
-            console.log(`Processing URL: ${item.input.url}`);
-            console.log(`zpid: ${item.zpid}`);
-            // Access other properties as needed
-        });
+        // Logging individual items and inserting into MongoDB
+        for (let i = 0; i < dataArray.length; i++) {
+            const propertyUrl = dataArray[i].input.url;
+            const propertyData = await fetchDataFromAPI(propertyUrl);
 
-        // Pass the entire array to the multiProperty function
-        await multiProperty(dataArray);
+            await collection.insertOne(propertyData);
+            console.log(`Property ${propertyData.propertyId} saved to MongoDB`);
 
+            // Delay for 1 second before processing the next URL
+            if (i < dataArray.length - 1) {
+                await delay(1000); // 1000 milliseconds = 1 second
+            }
+        }
+
+        console.log('All properties saved to MongoDB');
         res.status(200).send('Property URLs processed successfully');
     } catch (error) {
         console.error('Failed to process property URLs:', error);
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 
 // Handle invalid JSON
