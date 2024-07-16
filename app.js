@@ -131,7 +131,7 @@ async function sendPostRequests2() {
 
         const url = 'https://api.brightdata.com/datasets/v3/trigger';
         const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
-        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
+        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook2';
         const format = 'json';
         const uncompressedWebhook = false;
         const headers = {
