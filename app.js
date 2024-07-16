@@ -78,9 +78,7 @@ app.post('/webhook2', async (req, res) => {
             }
 
             // Delay for 1 second before processing the next URL
-            if (i < dataArray.length - 1) {
-                await delay(1000); // 1000 milliseconds = 1 second
-            }
+
         }
 
         console.log('All properties processed');
