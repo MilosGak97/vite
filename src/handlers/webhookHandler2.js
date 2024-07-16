@@ -2,6 +2,13 @@
 const axios = require('axios');
 const { client } = require('../config/mongodb');
 
+const bodyParser = require('body-parser');
+
+
+// Middleware to parse JSON bodies with a size limit of 1MB
+app.use(bodyParser.json({ limit: '1mb' }));
+
+
 const multiProperty = async (req, res) => {
     try {
         console.log('Request body:', req.body);
