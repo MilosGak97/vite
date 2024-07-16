@@ -31,7 +31,7 @@ async function sendPostRequests(req, res) {
         const snapshotId = response.data.snapshotId;
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
         const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
-        const response2 = axios.get(url, {
+        const response2 = axios.get(url2, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
