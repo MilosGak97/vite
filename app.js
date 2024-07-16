@@ -44,21 +44,30 @@ app.get('/', (req, res) => {
     res.send('Hello, this is the Property Listings Webhook Service.');
 });
 
-// Endpoint to receive property URLs and trigger worker dyno
 app.post('/webhook2', async (req, res) => {
     try {
-        console.log("DA VIDIM:", req.body);
-        const { input } = req.body; // Assuming propertyUrls is an array of URLs
+        console.log("Request body222:", req.body);
 
+        if (!Array.isArray(req.body)) {
+            throw new Error('Request body is not an array');
+        }
 
-        console.log("TESTIRAM1: ", input[0].bedrooms);
-        // Trigger worker dyno function directly
-        await multiProperty(input);
+        const dataArray = req.body;
 
-        res.status(200).send('DOBRO1 Property URLs processed successfully');
+        // Logging individual items
+        dataArray.forEach(item => {
+            console.log(`Processing URL: ${item.input.url}`);
+            console.log(`zpid: ${item.zpid}`);
+            // Access other properties as needed
+        });
+
+        // Pass the entire array to the multiProperty function
+        await multiProperty(dataArray);
+
+        res.status(200).send('Property URLs processed successfully');
     } catch (error) {
-        console.error('MISTAKEN1 Failed to process property URLs:', error);
-        res.status(500).send('MISTAKEN2 Internal Server Error');
+        console.error('Failed to process property URLs:', error);
+        res.status(500).send('Internal Server Error');
     }
 });
 
