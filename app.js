@@ -25,8 +25,10 @@ client.connect(err => {
     app.listen(port, () => {
         console.log(`Server is running on http://localhost:${port}`);
     });
-});
 
+    // Log MongoDB connection status
+    console.log('MongoDB connection status:', client.isConnected());
+});
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
 
@@ -73,8 +75,4 @@ app.use((error, req, res, next) => {
     }
 });
 
-const server = app.listen(port, () => {
-    server.timeout = 7200000; // 120 minutes timeout (in milliseconds)
-    console.log(`Server is running on http://localhost:${port}`);
-});
 
