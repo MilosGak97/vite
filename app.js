@@ -58,24 +58,26 @@ app.post('/webhook2', async (req, res) => {
 
         // Logging individual items and inserting into MongoDB
         for (let i = 0; i < dataArray.length; i++) {
-            const propertyUrl = dataArray[i].input.url;
-            console.log(`Processing URL: ${propertyUrl}`);
-
-            try {
-                const response = await axios.get(propertyUrl);
-                const propertyData = {
-                    propertyId: response.data.zpid,
-                    name: response.data.name,
-                    price: response.data.price,
-                    // Add more fields as needed
-                };
-
-                await collection.insertOne(propertyData);
-                console.log(`Property ${propertyData.propertyId} saved to MongoDB`);
-
-            } catch (error) {
-                console.error(`Failed to fetch data from ${propertyUrl}:`, error);
-            }
+            const listing = dataArray[i].input;
+            console.log("URL: ", listing.url);
+            console.log("ZPID: ", listing.zpid);
+            /*
+                        try {
+                            const response = await axios.get(propertyUrl);
+                            const propertyData = {
+                                propertyId: response.data.zpid,
+                                name: response.data.name,
+                                price: response.data.price,
+                                // Add more fields as needed
+                            };
+            
+                            await collection.insertOne(propertyData);
+                            console.log(`Property ${propertyData.propertyId} saved to MongoDB`);
+            
+                        } catch (error) {
+                            console.error(`Failed to fetch data from ${propertyUrl}:`, error);
+                        }
+                            */
 
             // Delay for 1 second before processing the next URL
 
