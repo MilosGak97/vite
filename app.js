@@ -6,6 +6,8 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+
 // MongoDB URI
 const uri = "mongodb+srv://milo:TheDVTN2020!!!@propertylistings.tdecqcu.mongodb.net/propertyListings?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
@@ -20,11 +22,6 @@ client.connect(err => {
     }
     db = client.db('propertyListings');
     console.log('Connected to MongoDB');
-
-    // Start the server after successful DB connection
-    app.listen(port, () => {
-        console.log(`Server is running on http://localhost:${port}`);
-    });
 
     // Log MongoDB connection status
     console.log('MongoDB connection status:', client.isConnected());
@@ -76,3 +73,8 @@ app.use((error, req, res, next) => {
 });
 
 
+
+// Start the server after successful DB connection
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
