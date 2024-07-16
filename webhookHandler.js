@@ -48,7 +48,6 @@ router.post('/webh', (req, res) => {
                     const body = JSON.parse(decoded.toString());
                     console.log('Incoming POST request headers:', req.headers);
                     console.log('Incoming POST request body:', body);
-                    console.log('Incoming snapshot ID:', body.snapshotId);
 
 
                     // Process the data as needed
