@@ -49,6 +49,10 @@ app.get('/', (req, res) => {
 
 app.post('/webhook2', async (req, res) => {
     try {
+
+
+        console.log('Incoming POST request headers:', req.headers);
+        console.log('Incoming POST request body:', req.body);
         console.log("Request body:", req.body);
 
         if (!Array.isArray(req.body)) {
