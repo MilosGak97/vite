@@ -1,5 +1,27 @@
 const axios = require('axios');
 
+// Function to fetch data from Bright Data API
+async function fetchData(snapshotId) {
+    const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
+    const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        console.log('Response data:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error; // or handle gracefully
+    }
+}
+
+
+
 async function sendPostRequests(req, res) {
     try {
         const body = [{ "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale" }];
@@ -28,18 +50,7 @@ async function sendPostRequests(req, res) {
 
 
         /* test */
-
-        const snapshotId = response.data.snapshot_id;
-        const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
-        const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
-        const response2 = axios.get(url2, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-        console.log("Response2 URL: ", url2);
-        console.log('Response data YEEEEEY:', response2.data);
-
+        fetchData(response.data.snapshot_id);
 
         /* end test */
         res.status(200).json(response.data);
