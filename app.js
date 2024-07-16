@@ -1,47 +1,83 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios'); // Import Axios for HTTP requests
-const { saveProperty } = require('./propertyModel'); // Adjust path as needed
-const { sendPostRequests2 } = require('./worker'); // Adjust the path if necessary
-const { sendPostRequest } = require('./worker'); // Adjust the path if necessary
-
-const compression = require('compression');
-
+const mongoose = require('mongoose');
 const zlib = require('zlib');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 
+// Define a Mongoose schema and model for the properties
+const propertySchema = new mongoose.Schema({
+    url: String,
+    zpid: String,
+    address: String,
+    city: String,
+    state: String,
+    zipcode: String,
+    bedrooms: Number,
+    bathrooms: Number,
+    price: Number,
+    // Add more fields as needed
+});
+
+const Property = mongoose.model('Property', propertySchema);
+
+// Middleware to handle gzip encoded payloads
 app.use((req, res, next) => {
-    // Log the incoming request headers
-    console.log('Incoming request headers:', req.headers);
-})
+    if (req.headers['content-encoding'] === 'gzip') {
+        let chunks = [];
+        req.on('data', (chunk) => {
+            chunks.push(chunk);
+        });
+
+        req.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            zlib.gunzip(buffer, (err, decoded) => {
+                if (err) {
+                    console.error('Error decoding gzip data:', err);
+                    return res.status(400).send('Bad Request: Invalid gzip data');
+                }
+
+                try {
+                    req.body = JSON.parse(decoded.toString());
+                    console.log('Decoded and parsed body:', req.body);
+                    next();
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    res.status(400).send('Bad Request: Invalid JSON');
+                }
+            });
+        });
+    } else {
+        next();
+    }
+});
 
 // Middleware to parse JSON bodies with a size limit of 1MB
-app.use(bodyParser.json({ limit: '1024mb' }));
-
-require('dotenv').config();
-
-
-
-// Middleware to parse JSON bodies with a size limit of 1MB
-app.use(bodyParser.json({ limit: '1024mb' }));
+app.use(bodyParser.json({ limit: '1mb' }));
 
 app.post('/webhook', async (req, res) => {
     try {
         const dataArray = req.body; // Assuming req.body is an array of objects
-        console.log("DATA ARRAY: ", dataArray); // delete
+        console.log("DATA ARRAY: ", dataArray);
+
         for (let data of dataArray) {
             // Extract and process data
-            const { url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price, /* other fields */ } = data;
+            const { url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price } = data;
 
-            const propertyToSave = {
+            const propertyToSave = new Property({
                 url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price // Add other fields as needed
-            };
+            });
 
-            // Save property asynchronously (assuming saveProperty returns a promise)
-            await saveProperty(propertyToSave);
+            // Save property asynchronously
+            await propertyToSave.save();
             console.log('Property saved to MongoDB:', propertyToSave);
         }
 
@@ -52,72 +88,6 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-
-
-
-//* END OF TESTING PHASE 
-
-/*
-// Define the route that will trigger the function
-app.get('/milionbucks', (req, res) => {
-    sendPostRequests2()
-        .then(() => {
-            res.send('POST request sent successfully');
-        })
-        .catch((error) => {
-            console.error('Error sending POST request:', error);
-            res.status(500).send('Failed to send POST request');
-        });
-});
-*/
-
-
-// Endpoint to trigger the POST request with a specific link
-app.get('/trigger-post-request', async (req, res) => {
-    try {
-        const link = req.query.link; // Get the link from query parameter
-        if (!link) {
-            throw new Error('Link parameter is required');
-        }
-
-        const response = await sendPostRequest(link);
-        res.send('POST request sent successfully');
-    } catch (error) {
-        console.error('Error triggering POST request:', error);
-        res.status(500).send('Failed to send POST request');
-    }
-});
-
-// Endpoint to handle the input and generate JSON array
-/*
-app.get('/generate-json', (req, res) => {
-    try {
-        // Retrieve the 'urls' query parameter from the request
-        const urlsParam = req.query.urls;
-
-        // Split the input by comma to get individual URLs
-        const urls = urlsParam.split(',');
-
-        // Create an array of objects with 'url' property
-        const urlsArray = urls.map(url => ({ url }));
-
-
-        const response = sendPostRequest(urlsArray);
-        res.send('POST request sent successfully');
-    } catch (error) {
-        console.error('Failed to generate JSON:', error);
-        res.status(500).send('Failed to generate JSON');
-    }
-
-
-});
-
-*/
-
-
-
-
 const server = app.listen(port, () => {
-    server.timeout = 7200000; // 120 minutes timeout (in milliseconds)
     console.log(`Server is running on http://localhost:${port}`);
 });
