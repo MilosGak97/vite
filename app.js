@@ -1,86 +1,42 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const zlib = require('zlib');
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// MongoDB URI
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+let db;
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
-
-// Define a Mongoose schema and model for the properties
-const propertySchema = new mongoose.Schema({
-    url: String,
-    zpid: String,
-    address: String,
-    city: String,
-    state: String,
-    zipcode: String,
-    bedrooms: Number,
-    bathrooms: Number,
-    price: Number,
-    // Add more fields as needed
-});
-
-const Property = mongoose.model('Property', propertySchema);
-
-// Middleware to handle gzip encoded payloads
-app.use((req, res, next) => {
-    if (req.headers['content-encoding'] === 'gzip') {
-        let chunks = [];
-        req.on('data', (chunk) => {
-            chunks.push(chunk);
-        });
-
-        req.on('end', () => {
-            const buffer = Buffer.concat(chunks);
-            zlib.gunzip(buffer, (err, decoded) => {
-                if (err) {
-                    console.error('Error decoding gzip data:', err);
-                    return res.status(400).send('Bad Request: Invalid gzip data');
-                }
-
-                try {
-                    req.body = JSON.parse(decoded.toString());
-                    console.log('Decoded and parsed body:', req.body);
-                    next();
-                } catch (parseError) {
-                    console.error('Failed to parse JSON:', parseError);
-                    res.status(400).send('Bad Request: Invalid JSON');
-                }
-            });
-        });
-    } else {
-        next();
+client.connect(err => {
+    if (err) {
+        console.error('Failed to connect to MongoDB:', err);
+        process.exit(1);
     }
+    db = client.db('propertyListings');
+    console.log('Connected to MongoDB');
 });
 
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
 
+// Webhook endpoint
 app.post('/webhook', async (req, res) => {
     try {
         const dataArray = req.body; // Assuming req.body is an array of objects
         console.log("DATA ARRAY: ", dataArray);
 
-        for (let data of dataArray) {
-            // Extract and process data
-            const { url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price } = data;
+        const collection = db.collection('properties'); // Use your collection name
 
-            const propertyToSave = new Property({
-                url, zpid, address, city, state, zipcode, bedrooms, bathrooms, price // Add other fields as needed
-            });
+        // Save all properties to MongoDB
+        await collection.insertMany(dataArray);
 
-            // Save property asynchronously
-            await propertyToSave.save();
-            console.log('Property saved to MongoDB:', propertyToSave);
-        }
-
+        console.log('Properties saved to MongoDB');
         res.status(200).send('Webhook received successfully');
     } catch (error) {
         console.error('Failed to handle webhook:', error);
@@ -88,6 +44,7 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-const server = app.listen(port, () => {
+// Start the server
+app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
