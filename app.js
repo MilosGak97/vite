@@ -7,6 +7,7 @@ const { singleProperty } = require('./src/handlers/webhookHandler');
 const { workerProperty } = require('./src/handlers/webhookHandler3'); // Import worker function
 const axios = require('axios');
 const zlib = require('zlib');
+const https = require('https');
 
 const app = express();
 const port = process.env.PORT || 3000;
