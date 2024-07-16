@@ -51,7 +51,7 @@ app.post('/webhook2', async (req, res) => {
         const { input } = req.body; // Assuming propertyUrls is an array of URLs
 
 
-        console.log("TESTIRAM1: ", input.bedrooms);
+        console.log("TESTIRAM1: ", input[0].bedrooms);
         // Trigger worker dyno function directly
         await multiProperty(input);
 
