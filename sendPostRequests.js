@@ -12,7 +12,7 @@ async function fetchData(snapshotId) {
             }
         });
 
-        console.log('Response data:', response.data);
+        console.log('Response dataYEEEEEY:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching data:', error);
