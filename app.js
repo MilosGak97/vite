@@ -73,4 +73,8 @@ app.use((error, req, res, next) => {
     }
 });
 
-module.exports = app;
+const server = app.listen(port, () => {
+    server.timeout = 7200000; // 120 minutes timeout (in milliseconds)
+    console.log(`Server is running on http://localhost:${port}`);
+});
+
