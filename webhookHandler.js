@@ -5,6 +5,7 @@ const axios = require('axios');
 
 
 // Function to fetch data from Bright Data API
+/*
 async function fetchData() {
     const snapshotId = 's_lyosox91fhcaktoor';
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -24,6 +25,7 @@ async function fetchData() {
         throw error; // or handle gracefully
     }
 }
+*/
 
 
 
@@ -46,7 +48,7 @@ router.post('/webh', (req, res) => {
 
                 try {
                     const body = JSON.parse(decoded.toString());
-                    console.log('Incoming POST request headers:', req.headers);
+                    //console.log('Incoming POST request headers:', req.headers);
                     console.log('Incoming POST request bodyAAAAAAAAAAAA:', body);
 
 
