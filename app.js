@@ -137,13 +137,10 @@ async function sendPostRequests2() {
         const uncompressedWebhook = false;
         const headers = {
             'Content-Type': 'application/gzip',
-            'dca-filename': 's_lyokoc2y2led7hycvu.json.gz',
             'dca-collection-id': 's_lyokoc2y2led7hycvu',
             'content-encoding': 'gzip',
             'dca-dataset': 'true',
             'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306',
-            'X-Amz-Id-2': 'Edv8hYXMnbk2prneNHIg8xmymrsP5OjnoT3kN6yOLDyP3luiwSXPSAv/NC6gjkuPlADYLPZkfz8=',
-            'X-Amz-Request-Id': 'WKNVNQJGVCHMZEB9',
             'Accept-Encoding': 'gzip, deflate, br',
             'Accept': '*/*',
             'Cache-Control': 'no-cache',
