@@ -116,45 +116,48 @@ const httpsAgent = new https.Agent({
 
 // Endpoint to trigger sending of POST request to webhook using Bright Data API
 app.get('/sendrequestapi', async (req, res) => {
-    try {
-        // Trigger data retrieval from Bright Data API
-        const response = await axios.get('https://api.brightdata.com/datasets/v3/trigger', {
-            params: {
-                dataset_id: 'gd_lfqkr8wm13ixtbd8f5',
-                endpoint: 'https://worker-847b6ac96356.herokuapp.com/webhook2',
-                format: 'json',
-                uncompressed_webhook: false
-            },
-            headers: {
-                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`, // Replace with your actual token
-                'Content-Type': 'application/gzip',
-                'Host': 'worker-847b6ac96356.herokuapp.com',
-                'Connection': 'close',
-                'Dca-Filename': 's_lyoi4dayl27vrx1ka.json.gz',
-                'Dca-Collection-Id': 's_lyoi4dayl27vrx1ka',
-                'Content-Encoding': 'gzip',
-                'Dca-Dataset': 'true',
-                'Snapshot-Id': 's_lyoi4dayl27vrx1ka',
-                'User-Agent': 'BRD dca-ds-delivery-worker/1.473.306'
-            },
-            httpsAgent: httpsAgent // Include the https agent to handle SSL issues
-        });
 
-        console.log('Data retrieval triggered successfully:', response.data);
-        res.status(200).send('Data retrieval triggered successfully');
-    } catch (error) {
-        console.error('Failed to trigger data retrieval:', error);
-        res.status(500).send('Failed to trigger data retrieval');
+
+    // Function to send POST request to Bright Data API for multiple links
+    async function sendPostRequests2() {
+        try {
+            // Example usage with multiple links
+            const links = [
+                'https://www.zillow.com/homedetails/25-Philip-Dr-Princeton-NJ-08540/39012566_zpid/',
+                'https://www.zillow.com/homedetails/9-Farm-Meadows-Rd-Columbia-NJ-07832/40098282_zpid/'
+                // Add more links as needed
+            ];
+
+            const url = 'https://api.brightdata.com/datasets/v3/trigger';
+            const datasetId = "gd_lfqkr8wm13ixtbd8f5"; // Replace with your actual dataset ID
+            const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webhook';
+            const format = 'json';
+            const uncompressedWebhook = false;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39', // Replace with your actual token
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept': '*/*',
+                'User-Agent': 'MyPropertyApp/1.0.0', // Replace with your application's identifier
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive'
+            };
+
+            for (const link of links) {
+                const body = [{ "url": link }]; // Wrap the link in an array
+
+                const url2 = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${endpoint}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
+
+                const response = await axios.post(url2, body, { headers });
+                console.log(`Response for ${link}:`, response.data);
+
+                // Optionally, add a delay between requests to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+            }
+        } catch (error) {
+            console.error('Error sending POST request:', error);
+        }
     }
-});
 
-/* end of testing phase */
-
-// Handle invalid JSON
-app.use((error, req, res, next) => {
-    if (error instanceof SyntaxError) {
-        res.status(400).send({ error: 'Invalid JSON' });
-    } else {
-        next();
-    }
-});
+    sendPostRequests2();
+})
