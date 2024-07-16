@@ -14,18 +14,22 @@ const client = new MongoClient(uri);
 
 let db;
 
-// Connect to MongoDB
-client.connect(err => {
-    if (err) {
-        console.error('Failed to connect to MongoDB:', err);
-        process.exit(1);
-    }
-    db = client.db('propertyListings');
-    console.log('Connected to MongoDB');
 
-    // Log MongoDB connection status
-    console.log('MongoDB connection status:', client.isConnected());
-});
+const connectDB = async () => {
+    if (!db) {
+        try {
+            await client.connect();
+            db = client.db('propertyListings'); // Ensure correct case
+            console.log("Connected to MongoDB");
+        } catch (error) {
+            console.error("Could not connect to MongoDB", error);
+            process.exit(1);
+        }
+    }
+    return db.collection('properties'); // Ensure correct case
+};
+
+
 // Middleware to parse JSON bodies with a size limit of 1MB
 app.use(bodyParser.json({ limit: '1mb' }));
 
