@@ -49,6 +49,7 @@ app.get('/', (req, res) => {
 
 
 app.post('/webhook2', async (req, res) => {
+    console.log('Incoming POST request headers5:', req.headers);
     try {
 
 
