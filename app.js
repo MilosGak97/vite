@@ -154,9 +154,6 @@ async function sendPostRequests2() {
 
         await axios.post(url2, body, { headers });
 
-
-
-
         // Optionally, add a delay between requests to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
 

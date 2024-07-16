@@ -2,6 +2,29 @@ const express = require('express');
 const zlib = require('zlib');
 const router = express.Router();
 
+
+// Function to fetch data from Bright Data API
+async function fetchData(snapshotId) {
+    const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
+    const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
+
+    try {
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        console.log('Response data YEEEEEY:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error; // or handle gracefully
+    }
+}
+
+
+
 router.post('/webh', (req, res) => {
     let chunks = [];
 
@@ -23,6 +46,8 @@ router.post('/webh', (req, res) => {
                     const body = JSON.parse(decoded.toString());
                     console.log('Incoming POST request headers:', req.headers);
                     console.log('Incoming POST request body:', body);
+                    console.log('Incoming snapshot ID:', body.snapshotId);
+                    fetchData(body.snapshotId);
                     // Process the data as needed
                     res.status(200).send('Webhook received');
                 } catch (parseErr) {
