@@ -22,9 +22,9 @@ const workerProperty = async (dataArray) => {
             }
         }
 
-        console.log('All properties saved to MongoDB');
+        console.log('DOBRO2 All properties saved to MongoDB');
     } catch (error) {
-        console.error('Failed to handle properties:', error);
+        console.error('MISTAKEN3 Failed to handle properties:', error);
         throw error; // Rethrow error to handle at higher level if needed
     }
 };
@@ -44,7 +44,7 @@ const fetchDataFromAPI = async (propertyUrl) => {
 
         return propertyData;
     } catch (error) {
-        console.error(`Failed to fetch data from ${propertyUrl}:`, error);
+        console.error(`MISTAKEN4 Failed to fetch data from ${propertyUrl}:`, error);
         throw error; // Rethrow error to handle at higher level if needed
     }
 };

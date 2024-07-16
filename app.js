@@ -52,10 +52,10 @@ app.post('/process-properties', async (req, res) => {
         // Trigger worker dyno function directly
         await workerProperty(propertyUrls);
 
-        res.status(200).send('Property URLs processed successfully');
+        res.status(200).send('DOBRO1 Property URLs processed successfully');
     } catch (error) {
-        console.error('Failed to process property URLs:', error);
-        res.status(500).send('Internal Server Error');
+        console.error('MISTAKEN1 Failed to process property URLs:', error);
+        res.status(500).send('MISTAKEN2 Internal Server Error');
     }
 });
 
