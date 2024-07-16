@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 require('dotenv').config();
 const { zlibMiddleware } = require('./src/middleware/zlib');
 const { connectDB, client } = require('./src/config/mongodb');
-const { singleWebhook } = require('./src/handlers/singleWebhook');
+const { singleProperty } = require('./src/workers/singleProperty');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -34,34 +34,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// Webhook endpoint
-/*
-app.post('/webhook', async (req, res) => {
-    try {
-        console.log('Request body:', req.body);
-
-        if (!Array.isArray(req.body)) {
-            throw new Error('Request body is not an array');
-        }
-
-        const dataArray = req.body; // Assuming req.body is an array of objects
-        const collection = client.db('propertyListings').collection('properties'); // Access collection through client
-
-        // Save all properties to MongoDB
-        await collection.insertMany(dataArray);
-
-        console.log('Properties saved to MongoDB');
-        res.status(200).send('Webhook received successfully');
-    } catch (error) {
-        console.error('Failed to handle webhook:', error);
-        res.status(400).send(`Bad Request: ${error.message}`);
-    }
-});
-*/
-
 
 // Webhook endpoint
-app.post('/webhook', singleWebhook);
+app.post('/webhook', singleProperty);
 
 // Default route to handle other requests
 app.get('/', (req, res) => {

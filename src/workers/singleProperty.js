@@ -1,7 +1,7 @@
 // src/handlers/webhookHandler.js
 const { client } = require('../config/mongodb');
 
-const singleWebhook = async (req, res) => {
+const singleProperty = async (req, res) => {
     try {
         console.log('Request body:', req.body);
 
@@ -26,4 +26,4 @@ const singleWebhook = async (req, res) => {
     }
 };
 
-module.exports = { singleWebhook };
+module.exports = { singleProperty };
