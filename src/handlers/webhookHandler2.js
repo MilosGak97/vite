@@ -13,6 +13,7 @@ const multiProperty = async (req, res) => {
         const dataArray = req.body;
         const collection = client.db().collection('properties');
 
+        // Iterate through each property URL with a 1-second delay
         for (let i = 0; i < dataArray.length; i++) {
             const propertyUrl = dataArray[i].url;
             const propertyData = await fetchDataFromAPI(propertyUrl);
@@ -21,6 +22,11 @@ const multiProperty = async (req, res) => {
             await collection.insertOne(propertyData);
 
             console.log(`Property ${propertyData.propertyId} saved to MongoDB`);
+
+            // Delay for 1 second before processing the next URL
+            if (i < dataArray.length - 1) {
+                await delay(1000); // 1000 milliseconds = 1 second
+            }
         }
 
         console.log('All properties saved to MongoDB');
@@ -51,4 +57,1552 @@ const fetchDataFromAPI = async (propertyUrl) => {
     }
 };
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 module.exports = { multiProperty };
+
+
+
+/* URL FORMATION
+[
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },
+      {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+        ,  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    },  {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/76-Main-St-Califon-NJ-07830/38834410_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/122-Market-St-Bangor-PA-18013/10090342_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/107-Cortland-Ln-Bedminster-NJ-07921/39835158_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/19-Pine-Woods-Ct-Reading-PA-19607/8872791_zpid/"
+    }
+]
+    */
