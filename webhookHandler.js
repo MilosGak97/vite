@@ -47,9 +47,9 @@ router.post('/webh', (req, res) => {
                 }
 
                 try {
-                    /*
+
                     const body = JSON.parse(decoded.toString());
-                    */
+
                     //console.log('Incoming POST request headers:', req.headers);
                     console.log('Incoming POST request bodyAAAAAAAAAAAA:', body);
                     console.log('ZPIDA:', body[0].zpid);
