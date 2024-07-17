@@ -154,3 +154,6 @@ curl -X POST "https://api.brightdata.com/datasets/v3/trigger" \
   "uncompressed_webhook": false
 }'
 */
+
+
+// curl -k "https://api.brightdata.com/datasets/v3/snapshot/s_lyqcle8xcffyidjcs?format=json" -H "Authorization: Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39"
