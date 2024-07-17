@@ -113,7 +113,7 @@ async function sendPostRequests(req, res) {
         } catch (error) {
             res.status(500).json({ error: 'Error fetching data' });
         } finally {
-            await client.close();
+            console.log("Bravo, gotovo je!")
         }
     } catch (error) {
         console.error('Error sending POST request:', error);
