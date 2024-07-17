@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Function to fetch data from Bright Data API
-/*
+
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
@@ -20,7 +20,7 @@ async function fetchData(snapshotId) {
         throw error; // or handle gracefully
     }
 }
-*/
+
 
 
 async function sendPostRequests(req, res) {
@@ -28,7 +28,7 @@ async function sendPostRequests(req, res) {
         const body = [{ "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale" }];
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
-        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh2';
+        const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
         const uncompressedWebhook = false;
         const headers = {
@@ -52,9 +52,9 @@ async function sendPostRequests(req, res) {
 
         // Introducing a delay of 10 seconds
         const snapshotId = response.data.snapshot_id;
-        /*
+
         await fetchData(snapshotId);
-*/
+
         /* test */
 
         /* end test */
