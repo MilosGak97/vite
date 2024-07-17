@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use('/', webhookHandler);
 
 // Endpoint to trigger sendPostRequests
-app.get('/trigger', sendPostRequests);
+app.post('/trigger', sendPostRequests);
 
 
 app.listen(port, () => {
