@@ -56,6 +56,8 @@ async function sendPostRequests(req, res) {
         await fetchData(snapshotId);
         */
 
+        console.log(snapshotId);
+
 
         const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
         const response2 = await axios.get(url2, {
