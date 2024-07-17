@@ -85,11 +85,23 @@ async function sendPostRequests(req, res) {
         try {
 
             await client.connect();
-            const collection = client.db().collection('properties');
+
+
+
             async function listAllListings(data) {
                 if (Array.isArray(data)) {
-                    data.forEach(listing => {
+
+                    const dataArray = data;
+                    const collection = client.db().collection('properties');
+
+                    // Logging individual items and inserting into MongoDB
+                    for (let i = 0; i < dataArray.length; i++) {
+                        const listing = dataArray[i];
+                        console.log("URL: ", listing.url);
+                        console.log("ZPID: ", listing.zpid);
+                        console.log("ZPID: ", listing.city);
                         const propertyData = {
+
                             url: listing.url,
                             zpid: listing.zpid,
                             address: listing.address,
@@ -114,10 +126,12 @@ async function sendPostRequests(req, res) {
                             listing_provided_by_email: listing.listing_provided_by_email,
                             listing_provided_by_company: listing.listing_provided_by_company,
                             photoCount: listing.photoCount,
-                            photos: listing.photos
-                        }
-                    });
-                    await collection.insertOne(propertyData);
+                            photo: listing.photo
+                        };
+
+                        await collection.insertOne(propertyData);
+                    }
+
 
                 } else {
                     console.log('Data is not in expected array format');
