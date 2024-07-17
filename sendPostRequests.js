@@ -58,20 +58,32 @@ async function sendPostRequests(req, res) {
 
         console.log(snapshotId);
 
+        async function fetchData(snapshotId) {
+            const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
+            const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
-        const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
-        const response2 = await axios.get(url2, {
-            headers: {
-                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`
+            try {
+                const response = await axios.get(url2, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                console.log('Response dataYEEEEEY:', response.data);
+                return response.data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                throw error; // or handle gracefully
             }
-        });
+        }
 
-        console.log('Response dataYEEEEEY:', response2.data);
-        return response2.data;
-        /* test */
+        try {
+            const data = await fetchData();
+            res.status(200).json(data);
+        } catch (error) {
+            res.status(500).json({ error: 'Error fetching data' });
+        }
 
-        /* end test */
-        res.status(200).json(response.data);
     } catch (error) {
         console.error('Error sending POST request:', error);
         res.status(500).json({ error: 'Failed to send POST request' });
