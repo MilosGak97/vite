@@ -88,16 +88,51 @@ async function sendPostRequests(req, res) {
             }
         }
 
-        function listAllListings(data) {
-            if (Array.isArray(data)) {
-                data.forEach(listing => {
-                    console.log(`Listing ZPID: ${listing.zpid}`);
-                    console.log(`City: ${listing.city}`);
-                    console.log(`State: ${listing.state}`);
-                });
-            } else {
-                console.log('Data is not in expected array format');
+        try {
+
+            await client.connect();
+            const collection = client.db().collection('properties');
+            async function listAllListings(data) {
+                if (Array.isArray(data)) {
+                    data.forEach(listing => {
+                        const propertyData = [
+                            listing.url,
+                            listing.zpid,
+                            listing.address,
+                            listing.city,
+                            listing.state,
+                            listing.zipcode,
+                            listing.bedrooms,
+                            listing.bathrooms,
+                            listing.price,
+                            listing.longitude,
+                            listing.latitude,
+                            listing.hasBadGeocode,
+                            listing.homeType,
+                            listing.isNonOwnerOccupied,
+                            listing.parcelId,
+                            listing.daysOnZillow,
+                            listing.propertyTypeDimension,
+                            listing.hdpTypeDimension,
+                            listing.listingTypeDimension,
+                            listing.is_listed_by_management_company,
+                            listing.listing_provided_by_name,
+                            listing.listing_provided_by_email,
+                            listing.listing_provided_by_company,
+                            listing.photoCount,
+                            listing.photos
+                        ]
+                    });
+                    await collection.insertOne(propertyData);
+
+                } else {
+                    console.log('Data is not in expected array format');
+                }
             }
+        } catch (error) {
+            console.error('Error inserting data:', error);
+        } finally {
+            await client.close();
         }
 
 
