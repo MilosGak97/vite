@@ -47,27 +47,32 @@ async function sendPostRequests(req, res) {
         const response = await axios.post(url, body, { headers });
         console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
 
-        // Introducing a delay of 10 seconds
         const snapshotId = response.data.snapshot_id;
         console.log(snapshotId);
 
         async function fetchData(snapshotId) {
-            console.log("SNAPSHOT IN FUNCTION: ", snapshotId);
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
             const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
-            try {
-                const response = await axios.get(url2, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
+            while (true) {
+                try {
+                    const response = await axios.get(url2, {
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`
+                        }
+                    });
 
-                console.log('Response dataYEEEEEY:', response.data);
-                return response.data;
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                throw error; // or handle gracefully
+                    if (response.data.status === 'running') {
+                        console.log('Snapshot is not ready yet, trying again in 10 seconds...');
+                        await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+                    } else {
+                        console.log('Response dataYEEEEEY:', response.data);
+                        return response.data;
+                    }
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                    throw error; // or handle gracefully
+                }
             }
         }
 
@@ -83,6 +88,7 @@ async function sendPostRequests(req, res) {
         res.status(500).json({ error: 'Failed to send POST request' });
     }
 }
+
 
 
 module.exports = sendPostRequests;
