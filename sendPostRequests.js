@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Function to fetch data from Bright Data API
-
+/*
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
@@ -20,7 +20,7 @@ async function fetchData(snapshotId) {
         throw error; // or handle gracefully
     }
 }
-
+*/
 
 
 async function sendPostRequests(req, res) {
@@ -59,6 +59,7 @@ async function sendPostRequests(req, res) {
         console.log(snapshotId);
 
         async function fetchData(snapshotId) {
+            console.log("SNAPSHOT IN FUNCTION: ", snapshotId)
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
             const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
