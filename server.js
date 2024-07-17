@@ -17,7 +17,8 @@ app.use('/', webhookHandler);
 // Endpoint to trigger sendPostRequests
 app.post('/trigger', sendPostRequests);
 
-app.get('/pull', (req, res) => {
+
+app.get('/pull', async (req, res) => {
     async function fetchData() {
         const snapshotId = 's_lyq9dteux7tpuvxui';
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -37,8 +38,15 @@ app.get('/pull', (req, res) => {
             throw error; // or handle gracefully
         }
     }
-    fetchData();
-})
+
+    try {
+        const data = await fetchData();
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
