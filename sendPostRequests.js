@@ -21,19 +21,13 @@ async function fetchData(snapshotId) {
     }
 }
 */
+
+const { connectDB, client } = require('./src/config/mongodb');
 async function sendPostRequests(req, res) {
     try {
         const body = [
             { "url": "https://www.zillow.com/homedetails/12-Hamilton-Ct-Lawrence-Township-NJ-08648/39004401_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/58-Montague-Ave-Ewing-NJ-08628/52622353_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/16-Brooktree-Rd-East-Windsor-NJ-08520/38956212_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/15-Woosamonsa-Rd-Pennington-NJ-08534/38994390_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/7-Brandywine-Way-Hamilton-NJ-08690/38976552_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/1516-Cornell-Ave-Hamilton-NJ-08619/38972282_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/143-Lakedale-Dr-Lawrence-Township-NJ-08648/38999646_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/75-Athens-Ave-South-Amboy-NJ-08879/39120959_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/9-La-Jolla-Ct-Old-Bridge-NJ-08857/114473412_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/25-Philip-Dr-Princeton-NJ-08540/39012566_zpid/" }
+            { "url": "https://www.zillow.com/homedetails/58-Montague-Ave-Ewing-NJ-08628/52622353_zpid/" }
         ]
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
