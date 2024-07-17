@@ -95,33 +95,33 @@ async function sendPostRequests(req, res) {
             async function listAllListings(data) {
                 if (Array.isArray(data)) {
                     data.forEach(listing => {
-                        const propertyData = [
-                            listing.url,
-                            listing.zpid,
-                            listing.address,
-                            listing.city,
-                            listing.state,
-                            listing.zipcode,
-                            listing.bedrooms,
-                            listing.bathrooms,
-                            listing.price,
-                            listing.longitude,
-                            listing.latitude,
-                            listing.hasBadGeocode,
-                            listing.homeType,
-                            listing.isNonOwnerOccupied,
-                            listing.parcelId,
-                            listing.daysOnZillow,
-                            listing.propertyTypeDimension,
-                            listing.hdpTypeDimension,
-                            listing.listingTypeDimension,
-                            listing.is_listed_by_management_company,
-                            listing.listing_provided_by_name,
-                            listing.listing_provided_by_email,
-                            listing.listing_provided_by_company,
-                            listing.photoCount,
-                            listing.photos
-                        ]
+                        const propertyData = {
+                            url: listing.url,
+                            zpid: listing.zpid,
+                            address: listing.address,
+                            city: listing.city,
+                            state: listing.state,
+                            zipcode: listing.zipcode,
+                            bedrooms: listing.bedrooms,
+                            bathrooms: listing.bathrooms,
+                            price: listing.price,
+                            longitude: listing.longitude,
+                            latitude: listing.latitude,
+                            hasBadGeocode: listing.hasBadGeocode,
+                            homeType: listing.homeType,
+                            isNonOwnerOccupied: listing.isNonOwnerOccupied,
+                            parcelId: listing.parcelId,
+                            daysOnZillow: listing.daysOnZillow,
+                            propertyTypeDimension: listing.propertyTypeDimension,
+                            hdpTypeDimension: listing.hdpTypeDimension,
+                            listingTypeDimension: listing.listingTypeDimension,
+                            is_listed_by_management_company: listing.is_listed_by_management_company,
+                            listing_provided_by_name: listing.listing_provided_by_name,
+                            listing_provided_by_email: listing.listing_provided_by_email,
+                            listing_provided_by_company: listing.listing_provided_by_company,
+                            photoCount: listing.photoCount,
+                            photos: listing.photos
+                        }
                     });
                     await collection.insertOne(propertyData);
 
