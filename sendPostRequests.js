@@ -21,8 +21,6 @@ async function fetchData(snapshotId) {
     }
 }
 */
-
-
 async function sendPostRequests(req, res) {
     try {
         const body = [{ "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale" }];
@@ -49,17 +47,12 @@ async function sendPostRequests(req, res) {
         const response = await axios.post(url, body, { headers });
         console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
 
-
         // Introducing a delay of 10 seconds
         const snapshotId = response.data.snapshot_id;
-        /*
-        await fetchData(snapshotId);
-        */
-
         console.log(snapshotId);
 
         async function fetchData(snapshotId) {
-            console.log("SNAPSHOT IN FUNCTION: ", snapshotId)
+            console.log("SNAPSHOT IN FUNCTION: ", snapshotId);
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
             const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
@@ -79,7 +72,7 @@ async function sendPostRequests(req, res) {
         }
 
         try {
-            const data = await fetchData();
+            const data = await fetchData(snapshotId);
             res.status(200).json(data);
         } catch (error) {
             res.status(500).json({ error: 'Error fetching data' });
@@ -90,5 +83,6 @@ async function sendPostRequests(req, res) {
         res.status(500).json({ error: 'Failed to send POST request' });
     }
 }
+
 
 module.exports = sendPostRequests;
