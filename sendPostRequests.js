@@ -77,7 +77,8 @@ async function sendPostRequests(req, res) {
                         console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
-                        console.log('Response dataYEEEEEY:', response.data);
+                        //console.log('Response dataYEEEEEY:', response.data);
+                        listAllListings(response.data);
                         return response.data;
                     }
                 } catch (error) {
@@ -86,6 +87,19 @@ async function sendPostRequests(req, res) {
                 }
             }
         }
+
+        function listAllListings(data) {
+            if (Array.isArray(data)) {
+                data.forEach(listing => {
+                    console.log(`Listing ZPID: ${listing.zpid}`);
+                    console.log(`City: ${listing.city}`);
+                    console.log(`State: ${listing.state}`);
+                });
+            } else {
+                console.log('Data is not in expected array format');
+            }
+        }
+
 
         try {
             const data = await fetchData(snapshotId);
