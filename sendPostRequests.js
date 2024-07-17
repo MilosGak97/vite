@@ -52,9 +52,20 @@ async function sendPostRequests(req, res) {
 
         // Introducing a delay of 10 seconds
         const snapshotId = response.data.snapshot_id;
-
+        /*
         await fetchData(snapshotId);
+        */
 
+
+        const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
+        const response2 = await axios.get(url2, {
+            headers: {
+                'Authorization': `Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39`
+            }
+        });
+
+        console.log('Response dataYEEEEEY:', response2.data);
+        return response2.data;
         /* test */
 
         /* end test */
