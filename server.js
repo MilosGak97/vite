@@ -19,6 +19,7 @@ app.post('/trigger', sendPostRequests);
 
 
 app.get('/pull', async (req, res) => {
+    console.log("PULL REQUEST START HERE");
     async function fetchData() {
         const snapshotId = 's_lyqc3q52p9qgunwyd';
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
