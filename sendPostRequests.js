@@ -72,10 +72,15 @@ async function sendPostRequests(req, res) {
                     const listing = dataArray[i];
                     const photos = dataArray[i].photos;
                     console.log("PHOTOS DATA IS HERE: ", photos)
+
                     const extractPhotoUrls = (photos) => {
+                        if (!photos || !Array.isArray(photos)) {
+                            return [];
+                        }
+
                         return photos.flatMap(photo =>
                             photo.mixedSources.jpeg
-                                .filter(jpeg => jpeg.size === 576)
+                                .filter(jpeg => jpeg.width === 576)
                                 .map(jpeg => jpeg.url)
                         );
                     };
