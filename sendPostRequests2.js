@@ -63,6 +63,7 @@ async function sendPostRequests2(req, res) {
             }
         }
 
+
         async function listAllListings(data) {
             if (Array.isArray(data)) {
                 const dataArray = data;
@@ -71,12 +72,17 @@ async function sendPostRequests2(req, res) {
                 // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
-                    const photos = dataArray[i].photo;
+                    const photos = dataArray[i].photos;
+                    console.log("PHOTOS DATA IS HERE: ", photos)
 
                     const extractPhotoUrls = (photos) => {
+                        if (!photos || !Array.isArray(photos)) {
+                            return [];
+                        }
+
                         return photos.flatMap(photo =>
                             photo.mixedSources.jpeg
-                                .filter(jpeg => jpeg.size === 576)
+                                .filter(jpeg => jpeg.width === 576)
                                 .map(jpeg => jpeg.url)
                         );
                     };
@@ -108,7 +114,8 @@ async function sendPostRequests2(req, res) {
                         listing_provided_by_email: listing.listing_provided_by.email,
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: photoUrls
+                        photo: photoUrls,
+                        photo2: listing.photos
                     };
 
                     await collection.insertOne(propertyData);
@@ -117,6 +124,7 @@ async function sendPostRequests2(req, res) {
                 console.log('Data is not in expected array format');
             }
         }
+
 
         try {
             await client.connect();
