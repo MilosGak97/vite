@@ -4,10 +4,7 @@ const { connectDB, client } = require('./src/config/mongodb');
 async function sendPostRequests2(req, res) {
     try {
         const body = [{
-            "url": "https://www.zillow.com/mercer-county-nj/?searchQueryState=%7B%22mapBounds%22%3A%7B%22north%22%3A40.84567812635663%2C%22south%22%3A39.99045155841231%2C%22east%22%3A-73.61060925585937%2C%22west%22%3A-75.21735974414062%7D%2C%22isMapVisible%22%3Atrue%2C%22filterState%22%3A%7B%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1201%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2802%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2441%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2552%2C%22regionType%22%3A4%7D%5D%2C%22pagination%22%3A%7B%7D%7D"
-        },
-        {
-            "url": "https://www.zillow.com/hunterdon-county-nj/?searchQueryState=%7B%22mapBounds%22%3A%7B%22north%22%3A41.637589845154565%2C%22south%22%3A39.93667172853597%2C%22east%22%3A-73.2717172109317%2C%22west%22%3A-76.4852181874942%7D%2C%22isMapVisible%22%3Atrue%2C%22filterState%22%3A%7B%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A2729%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1478%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1241%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A771%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A504%2C%22regionType%22%3A4%7D%5D%2C%22pagination%22%3A%7B%7D%2C%22mapZoom%22%3A9%7D"
+            "url": "https://www.zillow.com/mercer-county-nj/?searchQueryState=%7B%22mapBounds%22%3A%7B%22north%22%3A40.84567812635663%2C%22south%22%3A39.99045155841231%2C%22east%22%3A-73.61060925585937%2C%22west%22%3A-75.21735974414062%7D%2C%22isMapVisible%22%3Atrue%2C%22filterState%22%3A%7B%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22sf%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1201%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2802%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2441%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2552%2C%22regionType%22%3A4%7D%5D%2C%22pagination%22%3A%7B%7D%7D"
         }
         ];
 
@@ -74,6 +71,19 @@ async function sendPostRequests2(req, res) {
                 // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
+                    const photos = dataArray[i].photo;
+
+                    const extractPhotoUrls = (photos) => {
+                        return photos.flatMap(photo =>
+                            photo.mixedSources.jpeg
+                                .filter(jpeg => jpeg.size === 576)
+                                .map(jpeg => jpeg.url)
+                        );
+                    };
+
+                    const photoUrls = extractPhotoUrls(photos);
+
+
                     console.log("URL: ", listing.url);
                     console.log("ZPID: ", listing.zpid);
                     console.log("City: ", listing.city);
@@ -98,11 +108,11 @@ async function sendPostRequests2(req, res) {
                         hdpTypeDimension: listing.hdpTypeDimension,
                         listingTypeDimension: listing.listingTypeDimension,
                         is_listed_by_management_company: listing.is_listed_by_management_company,
-                        listing_provided_by_name: listing.listing_provided_by_name,
-                        listing_provided_by_email: listing.listing_provided_by_email,
-                        listing_provided_by_company: listing.listing_provided_by_company,
+                        listing_provided_by_name: listing.listing_provided_by.name,
+                        listing_provided_by_email: listing.listing_provided_by.email,
+                        listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: listing.photo
+                        photo: listing.photoUrls
                     };
 
                     await collection.insertOne(propertyData);
