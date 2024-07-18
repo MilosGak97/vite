@@ -70,7 +70,7 @@ async function sendPostRequests(req, res) {
                 // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
-                    const photos = dataArray[i].photo;
+                    const photos = dataArray[i].photos;
                     console.log("PHOTOS DATA IS HERE: ", photos)
                     const extractPhotoUrls = (photos) => {
                         return photos.flatMap(photo =>
