@@ -116,7 +116,7 @@ async function sendPostRequests(req, res) {
                     let notes;
 
                     if (hdpTypeDimension === "ForSale") {
-
+                        for_sale = "Yes";
                     }
 
                     const propertyData = {
