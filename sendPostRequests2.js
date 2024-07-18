@@ -83,10 +83,6 @@ async function sendPostRequests2(req, res) {
 
                     const photoUrls = extractPhotoUrls(photos);
 
-
-                    console.log("URL: ", listing.url);
-                    console.log("ZPID: ", listing.zpid);
-                    console.log("City: ", listing.city);
                     const propertyData = {
                         url: listing.url,
                         zpid: listing.zpid,
@@ -112,7 +108,7 @@ async function sendPostRequests2(req, res) {
                         listing_provided_by_email: listing.listing_provided_by.email,
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: listing.photoUrls
+                        photo: photoUrls
                     };
 
                     await collection.insertOne(propertyData);
