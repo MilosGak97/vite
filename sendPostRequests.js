@@ -4,8 +4,8 @@ const { connectDB, client } = require('./src/config/mongodb');
 async function sendPostRequests(req, res) {
     try {
         const body = [
-            { "url": "https://www.zillow.com/homedetails/12-Hamilton-Ct-Lawrence-Township-NJ-08648/39004401_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/58-Montague-Ave-Ewing-NJ-08628/52622353_zpid/" }
+            { "url": "https://www.zillow.com/homedetails/33-Daly-Ct-Old-Bridge-NJ-08857/124182759_zpid/" },
+            { "url": "https://www.zillow.com/homedetails/705-W-31st-St-APT-3-Chicago-IL-60616/2078787333_zpid/" }
 
         ];
 
