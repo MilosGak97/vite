@@ -18,13 +18,16 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 
 // Use the webhook handler
 app.use('/', webhookHandler);
-
 // Endpoint to trigger sendPostRequests
 app.post('/trigger', sendPostRequests);
 
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
 
+// Define a route for the homepage
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'src/public', 'index.html'));
+});
 
 app.get('/pull', async (req, res) => {
     console.log("PULL REQUEST START HERE");
