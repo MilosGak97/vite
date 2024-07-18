@@ -157,6 +157,18 @@ async function sendPostRequests(req, res) {
                 // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
+                    const photos = dataArray[i].photo;
+
+                    const extractPhotoUrls = (photos) => {
+                        return photos.flatMap(photo =>
+                            photo.mixedSources.jpeg
+                                .filter(jpeg => jpeg.size === 576)
+                                .map(jpeg => jpeg.url)
+                        );
+                    };
+
+                    const photoUrls = extractPhotoUrls(photos);
+
                     const propertyData = {
                         url: listing.url,
                         zpid: listing.zpid,
@@ -178,11 +190,11 @@ async function sendPostRequests(req, res) {
                         hdpTypeDimension: listing.hdpTypeDimension,
                         listingTypeDimension: listing.listingTypeDimension,
                         is_listed_by_management_company: listing.is_listed_by_management_company,
-                        listing_provided_by_name: listing.listing_provided_by_name,
-                        listing_provided_by_email: listing.listing_provided_by_email,
-                        listing_provided_by_company: listing.listing_provided_by_company,
+                        listing_provided_by_name: listing.listing_provided_by.name,
+                        listing_provided_by_email: listing.listing_provided_by.email,
+                        listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: listing.photo
+                        photo: photoUrls
                     };
 
                     await collection.insertOne(propertyData);
