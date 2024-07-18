@@ -13,6 +13,8 @@ const port = process.env.PORT || 3000;
 // Use body-parser for JSON
 app.use(bodyParser.json());
 
+app.use(express.static(path.join(__dirname, 'src/public')));
+
 // Use the webhook handler
 app.use('/', webhookHandler);
 
