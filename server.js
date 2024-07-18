@@ -18,6 +18,9 @@ app.use('/', webhookHandler);
 // Endpoint to trigger sendPostRequests
 app.post('/trigger', sendPostRequests);
 
+// Endpoint to trigger sendPostRequests
+app.post('/trigger2', sendPostRequests2);
+
 
 app.get('/pull', async (req, res) => {
     console.log("PULL REQUEST START HERE");

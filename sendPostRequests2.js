@@ -101,6 +101,8 @@ async function sendPostRequests2(req, res) {
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
         const uncompressedWebhook = false;
+        const type = 'discover_new';
+        const discover_by = 'url'
         const headers = {
             'Content-Type': 'application/gzip',
             'dca-collection-id': 's_lyokoc2y2led7hycvu',
@@ -114,7 +116,7 @@ async function sendPostRequests2(req, res) {
             'Authorization': 'Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39'
         };
 
-        const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
+        const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}&type=${type}&discover_by=${discover_by}`;
 
         const response = await axios.post(url, body, { headers });
         console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
