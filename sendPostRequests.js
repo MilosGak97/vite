@@ -83,9 +83,9 @@ async function sendPostRequests(req, res) {
 
 
                     const exists = await checkIfZpidExists(listing.zpid);
-
                     if (exists) {
                         // Handle the case where the property already exists
+                        continue;
                     } else {
                         // Handle the case where the property does not exist
 
