@@ -105,27 +105,27 @@ async function sendPostRequests(req, res) {
                         const photoUrls = extractPhotoUrls(photos);
 
                         const hdpTypeDimension = listing.hdpTypeDimension;
-                        let for_sale;
-                        let for_sale_date;
-                        let for_sale_reachout;
+                        let for_sale; //
+                        let for_sale_date; //
+                        let for_sale_reachout;//
 
-                        let coming_soon;
-                        let coming_soon_date;
-                        let coming_soon_reachout;
+                        let coming_soon;//
+                        let coming_soon_date;//
+                        let coming_soon_reachout;//
 
-                        let pending;
-                        let pending_date;
-                        let pending_reachout;
+                        let pending;//
+                        let pending_date;//
+                        let pending_reachout;//
 
-                        let verified;
+                        let verified;//
 
-                        let customer_first_name;
-                        let customer_last_name;
-                        let company_owned;
+                        let customer_first_name;//
+                        let customer_last_name;//
+                        let company_owned;//
 
-                        let current_status;
+                        let current_status;//
 
-                        let notes;
+                        let notes;//
 
 
                         if (hdpTypeDimension === "ForSale") {
@@ -133,13 +133,15 @@ async function sendPostRequests(req, res) {
                             for_sale_date = new Date();
                         }
                         if (hdpTypeDimension === "Pending") {
-                            for_sale = "Yes";
-                            for_sale_date = new Date();
+                            pending = "Yes";
+                            pending_date = new Date();
                         }
                         if (hdpTypeDimension === "ComingSoon") {
-                            for_sale = "Yes";
-                            for_sale_date = new Date();
+                            coming_soon = "Yes";
+                            coming_soon_date = new Date();
                         }
+                        current_status = hdpTypeDimension;
+
 
 
                         const propertyData = {
