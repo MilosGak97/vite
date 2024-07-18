@@ -108,7 +108,7 @@ async function sendPostRequests(req, res) {
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
                         photo: photoUrls,
-                        photo2: listing.photo
+                        photo2: listing.photos
                     };
 
                     await collection.insertOne(propertyData);
