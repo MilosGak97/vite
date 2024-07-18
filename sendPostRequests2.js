@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 
-async function sendPostRequests(req, res) {
+async function sendPostRequests2(req, res) {
     try {
         const body = [
             { "url": "https://www.zillow.com/homedetails/12-Hamilton-Ct-Lawrence-Township-NJ-08648/39004401_zpid/" },
@@ -138,7 +138,7 @@ async function sendPostRequests(req, res) {
                         console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
-                        //console.log('Response data:', response.data);
+                        console.log('Response data:', response.data);
                         listAllListings(response.data);
                         return response.data;
                     }
@@ -157,6 +157,9 @@ async function sendPostRequests(req, res) {
                 // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
+                    console.log("URL: ", listing.url);
+                    console.log("ZPID: ", listing.zpid);
+                    console.log("City: ", listing.city);
                     const propertyData = {
                         url: listing.url,
                         zpid: listing.zpid,
@@ -207,4 +210,4 @@ async function sendPostRequests(req, res) {
     }
 }
 
-module.exports = sendPostRequests;
+module.exports = sendPostRequests2;

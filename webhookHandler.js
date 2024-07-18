@@ -51,8 +51,8 @@ router.post('/webh', (req, res) => {
                     const body = JSON.parse(decoded.toString());
 
                     //console.log('Incoming POST request headers:', req.headers);
-                    console.log('Incoming POST request bodyAAAAAAAAAAAA:', body);
-                    console.log('ZPIDA:', body[0].zpid);
+                    //console.log('Incoming POST request bodyAAAAAAAAAAAA:', body);
+                    // console.log('ZPIDA:', body[0].zpid);
                     /* OVDE SI STAO, SVE JE SUPER, SADA CEPAJ U BAZU !!!!!!!!!!! */
 
                     // Process the data as needed
@@ -104,11 +104,6 @@ router.post('/webh2', (req, res) => {
                     console.log('Incoming POST request headers:', req.headers);
                     console.log('Incoming POST request body:', body);
                     console.log('Incoming snapshot ID:', body.snapshotId);
-                    /*
-                    fetchData(body.snapshotId);
-*/
-
-
                     // Process the data as needed
                     res.status(200).send('Webhook received');
                 } catch (parseErr) {
@@ -157,3 +152,4 @@ curl -X POST "https://api.brightdata.com/datasets/v3/trigger" \
 
 
 // curl -k "https://api.brightdata.com/datasets/v3/snapshot/s_lyqcle8xcffyidjcs?format=json" -H "Authorization: Bearer a3a53d23-02a3-4b70-93b6-09cd3eda8f39"
+
