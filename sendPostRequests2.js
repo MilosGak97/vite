@@ -73,6 +73,8 @@ async function sendPostRequests2(req, res) {
 
         async function listAllListings(data) {
             if (Array.isArray(data)) {
+
+
                 const dataArray = data;
                 const collection = client.db().collection('properties');
 
@@ -80,50 +82,117 @@ async function sendPostRequests2(req, res) {
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
                     const photos = dataArray[i].photos;
-                    console.log("PHOTOS DATA IS HERE: ", photos)
 
-                    const extractPhotoUrls = (photos) => {
-                        if (!photos || !Array.isArray(photos)) {
-                            return [];
+
+                    const exists = await checkIfZpidExists(listing.zpid);
+                    if (exists) {
+                        // Handle the case where the property already exists
+                        continue;
+                    } else {
+                        // Handle the case where the property does not exist
+
+                        const extractPhotoUrls = (photos) => {
+                            if (!photos || !Array.isArray(photos)) {
+                                return [];
+                            }
+
+                            return photos.flatMap(photo =>
+                                photo.mixedSources.jpeg
+                                    .filter(jpeg => jpeg.width === 576)
+                                    .map(jpeg => jpeg.url)
+                            );
+                        };
+
+                        const photoUrls = extractPhotoUrls(photos);
+
+                        const hdpTypeDimension = listing.hdpTypeDimension;
+                        let for_sale; //
+                        let for_sale_date; //
+                        let for_sale_reachout;//
+
+                        let coming_soon;//
+                        let coming_soon_date;//
+                        let coming_soon_reachout;//
+
+                        let pending;//
+                        let pending_date;//
+                        let pending_reachout;//
+
+                        let verified;//
+
+                        let customer_first_name;//
+                        let customer_last_name;//
+                        let company_owned;//
+
+                        let current_status;//
+
+                        let notes;//
+
+
+                        if (hdpTypeDimension === "ForSale") {
+                            for_sale = "Yes";
+                            for_sale_date = new Date();
                         }
+                        if (hdpTypeDimension === "Pending") {
+                            pending = "Yes";
+                            pending_date = new Date();
+                        }
+                        if (hdpTypeDimension === "ComingSoon") {
+                            coming_soon = "Yes";
+                            coming_soon_date = new Date();
+                        }
+                        current_status = hdpTypeDimension;
 
-                        return photos.flatMap(photo =>
-                            photo.mixedSources.jpeg
-                                .filter(jpeg => jpeg.width === 576)
-                                .map(jpeg => jpeg.url)
-                        );
-                    };
 
-                    const photoUrls = extractPhotoUrls(photos);
 
-                    const propertyData = {
-                        url: listing.url,
-                        zpid: listing.zpid,
-                        address: listing.address,
-                        city: listing.city,
-                        state: listing.state,
-                        zipcode: listing.zipcode,
-                        bedrooms: listing.bedrooms,
-                        bathrooms: listing.bathrooms,
-                        price: listing.price,
-                        longitude: listing.longitude,
-                        latitude: listing.latitude,
-                        hasBadGeocode: listing.hasBadGeocode,
-                        homeType: listing.homeType,
-                        isNonOwnerOccupied: listing.isNonOwnerOccupied,
-                        parcelId: listing.parcelId,
-                        daysOnZillow: listing.daysOnZillow,
-                        propertyTypeDimension: listing.propertyTypeDimension,
-                        hdpTypeDimension: listing.hdpTypeDimension,
-                        listingTypeDimension: listing.listingTypeDimension,
-                        is_listed_by_management_company: listing.is_listed_by_management_company,
-                        listing_provided_by_name: listing.listing_provided_by.name,
-                        listing_provided_by_email: listing.listing_provided_by.email,
-                        listing_provided_by_company: listing.listing_provided_by.company,
-                        photoCount: listing.photoCount,
-                        photo: photoUrls
-                    };
-                    await collection.insertOne(propertyData);
+                        const propertyData = {
+                            url: listing.url,
+                            zpid: listing.zpid,
+                            address: listing.address,
+                            city: listing.city,
+                            state: listing.state,
+                            zipcode: listing.zipcode,
+                            bedrooms: listing.bedrooms,
+                            bathrooms: listing.bathrooms,
+                            sqft: listing.livingArea,
+                            price: listing.price,
+                            longitude: listing.longitude,
+                            latitude: listing.latitude,
+                            hasBadGeocode: listing.hasBadGeocode,
+                            homeType: listing.homeType,
+                            isNonOwnerOccupied: listing.isNonOwnerOccupied,
+                            parcelId: listing.parcelId,
+                            daysOnZillow: listing.daysOnZillow,
+                            propertyTypeDimension: listing.propertyTypeDimension,
+                            hdpTypeDimension: listing.hdpTypeDimension,
+                            listingTypeDimension: listing.listingTypeDimension,
+                            is_listed_by_management_company: listing.is_listed_by_management_company,
+                            listing_provided_by_name: listing.listing_provided_by.name,
+                            listing_provided_by_email: listing.listing_provided_by.email,
+                            listing_provided_by_company: listing.listing_provided_by.company,
+                            photoCount: listing.photoCount,
+                            photo: photoUrls,
+
+                            for_sale: for_sale,
+                            for_sale_date: for_sale_date,
+                            for_sale_reachout: for_sale_reachout,
+                            coming_soon: coming_soon,
+                            coming_soon_date: coming_soon_date,
+                            coming_soon_reachout: coming_soon_reachout,
+                            pending: pending,
+                            pending_date: pending_date,
+                            pending_reachout: pending_reachout,
+                            verified: verified,
+                            customer_first_name: customer_first_name,
+                            customer_last_name: customer_last_name,
+                            company_owned: company_owned,
+                            current_status: current_status,
+                            notes: notes
+                        };
+
+                        await collection.insertOne(propertyData);
+                    }
+
                 }
             } else {
                 console.log('Data is not in expected array format');
