@@ -114,8 +114,7 @@ async function sendPostRequests2(req, res) {
                         listing_provided_by_email: listing.listing_provided_by.email,
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: photoUrls,
-                        photo2: listing.photos
+                        photo: photoUrls
                     };
                     await collection.insertOne(propertyData);
                 }
