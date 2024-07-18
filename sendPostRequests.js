@@ -107,7 +107,8 @@ async function sendPostRequests(req, res) {
                         listing_provided_by_email: listing.listing_provided_by.email,
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: photoUrls
+                        photo: photoUrls,
+                        photo2: listing.photo
                     };
 
                     await collection.insertOne(propertyData);
