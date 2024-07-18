@@ -35,6 +35,13 @@ async function sendPostRequests2(req, res) {
 
         const snapshotId = response.data.snapshot_id;
         console.log(snapshotId);
+        const collection = client.db().collection('snapshots');
+
+        const shapshotData = {
+            snapshot_id: snapshotId,
+            requested_time: new Date()
+        }
+        await collection.insertOne(shapshotData);
 
         async function fetchData(snapshotId) {
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
