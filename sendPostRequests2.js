@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
+const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function sendPostRequests2(req, res) {
     try {
@@ -148,7 +149,7 @@ async function sendPostRequests2(req, res) {
                         const propertyData = {
                             url: listing.url,
                             zpid: listing.zpid,
-                            address: listing.address,
+                            address: listing.address.streetAddress,
                             city: listing.city,
                             state: listing.state,
                             zipcode: listing.zipcode,

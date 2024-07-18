@@ -147,7 +147,7 @@ async function sendPostRequests(req, res) {
                         const propertyData = {
                             url: listing.url,
                             zpid: listing.zpid,
-                            address: listing.address,
+                            address: listing.address.streetAddress,
                             city: listing.city,
                             state: listing.state,
                             zipcode: listing.zipcode,

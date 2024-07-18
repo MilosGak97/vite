@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listings</title>
+    <link href="output.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!----------------- START OF MENU --------------------->
+
+    <%- include('partials/menu') %>
+
+
+        <div class="flex mx-20 flex-col p-4">
+            <div class="bg-slate-50 p-8 w-full">
+                <div class="flex flex-row">
+                    <form action="/listings" method="get" class="flex flex-row">
+                        <div class="flex flex-col">
+                            <label class="text-xs font-bold">State</label>
+                            <select name="state" class="px-4 h-12 border rounded-2xl rounded-tl-none border-primary">
+                                <option value="">Select State</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+
+                        <div class="mx-4 flex flex-col">
+                            <label class="text-xs font-bold">Starting Date</label>
+                            <input type="date" name="date_start"
+                                class="px-4 h-12 border rounded-2xl rounded-tl-none border-primary">
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label class="text-xs font-bold">Ending Date</label>
+                            <input type="date" name="date_end"
+                                class="px-4 h-12 border rounded-2xl rounded-tl-none border-primary">
+                        </div>
+
+                        <div class="flex flex-row items-center mx-4 mt-4">
+                            <div class="flex flex-row bg-primary px-2 py-1 rounded-md font-bold text-white">
+                                <input type="checkbox" id="forsale" name="forsale" value="ForSale">
+                                <label for="forsale">&nbsp; For Sale</label>
+                            </div>
+                            <div class="flex flex-row bg-primary px-2 py-1 rounded-md font-bold text-white mx-3">
+                                <input type="checkbox" id="comingsoon" name="comingsoon" value="Coming Soon">
+                                <label for="comingsoon"> &nbsp;Coming Soon</label>
+                            </div>
+                            <div class="flex flex-row bg-primary px-2 py-1 rounded-md font-bold text-white">
+                                <input type="checkbox" id="pending" name="pending" value="Pending">
+                                <label for="pending"> &nbsp;Pending</label>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row mt-4 items-center justify-center">
+                            <input type="submit" value="Get Results"
+                                class="px-4 py-2 border border-primary font-semibold text-lg hover:cursor-pointer hover:bg-black hover:text-white rounded-md">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!----------------- END OF CONTENT -------------------->
+
+        <!----------------- LISTINGS TABLE ------------------->
+        <div class="flex  flex-col p-4">
+            <div class="bg-slate-50  w-full">
+                <table class="min-w-full  ">
+                    <thead class="bg-primary">
+                        <tr class="text-left px-2 text-sm">
+                            <th class="py-2 px-2 border border-white w-2"> </th>
+                            <th class="py-2 px-2 border border-white">Zpid </th>
+                            <th class="py-2 px-2 border border-white">Address</th>
+                            <th class="py-2 px-2 border border-white">Owner</th>
+                            <th class="py-2 px-2 border border-white">Status</th>
+                            <th class="py-2 px-2 border border-white">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% properties.map((property, index)=> { %>
+                            <tr class="<%= index % 2 === 0 ? 'bg-gray-100' : 'bg-white' %>">
+                                <td class="py-2 px-2 border border-white w-2 text-xs font-bold">
+                                    <%= index + 1 %>
+                                </td>
+                                <td class="py-2 px-2 border border-white">
+                                    <%= property.zpid %>
+                                </td>
+                                <td class="py-2 px-2 border border-white">
+                                    <%= property.address %>, <%= property.city %>, <%= property.state %>, <%=
+                                                    property.zipcode %>
+                                </td>
+                                <td class="py-2 px-2 border border-white">
+                                    <%= property.customer_first_name %>, <%= property.customer_last_name %>
+                                </td>
+                                <span
+                                    class="<%= property.status === 'ForSale' ? 'bg-red-600' : property.status === 'Pending' ? 'status-pending' : property.status === 'ComingSoon' ? 'status-comingsoon' : '' %>">
+                                    <%= property.status==='ForSale' ? 'For Sale' : property.status==='Pending'
+                                        ? 'Pending' : property.status==='ComingSoon' ? 'Coming Soon' : property.status
+                                        %>
+                                </span>
+                                <td class="py-2 px-2 border border-white">
+                                    <%= property.status %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+
+
+                </table>
+            </div>
+        </div>
+        <!----------------- END OF LISTINGS TABLE ------------------->
+
+
+</body>
+
+</html>
