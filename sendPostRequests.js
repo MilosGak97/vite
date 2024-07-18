@@ -77,7 +77,6 @@ async function sendPostRequests(req, res) {
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
                     const photos = dataArray[i].photos;
-                    console.log("PHOTOS DATA IS HERE: ", photos)
 
                     const extractPhotoUrls = (photos) => {
                         if (!photos || !Array.isArray(photos)) {
