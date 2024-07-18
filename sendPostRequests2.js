@@ -117,7 +117,6 @@ async function sendPostRequests2(req, res) {
                         photo: photoUrls,
                         photo2: listing.photos
                     };
-
                     await collection.insertOne(propertyData);
                 }
             } else {
