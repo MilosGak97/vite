@@ -130,12 +130,15 @@ async function sendPostRequests(req, res) {
 
                         if (hdpTypeDimension === "ForSale") {
                             for_sale = "Yes";
+                            for_sale_date = new Date();
                         }
                         if (hdpTypeDimension === "Pending") {
                             for_sale = "Yes";
+                            for_sale_date = new Date();
                         }
                         if (hdpTypeDimension === "ComingSoon") {
                             for_sale = "Yes";
+                            for_sale_date = new Date();
                         }
 
 
