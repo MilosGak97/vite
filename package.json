@@ -6,10 +6,10 @@
   "scripts": {
     "build:css": "npx postcss src/public/styles.css -o src/public/output.css",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js",
+    "start": "node server.js",
     "start:tailwind": "npx tailwindcss build --watch src/public/styles.css -o src/public/output.css",
     "start:server": "nodemon server.js",
-    "start": "concurrently \"npm run start:tailwind\" \"npm run start:server\""
+    "dev": "concurrently \"npm run start:tailwind\" \"npm run start:server\""
   },
   "keywords": [],
   "author": "",
