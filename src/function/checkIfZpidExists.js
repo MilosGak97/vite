@@ -18,4 +18,4 @@ const checkIfZpidExists = async (zpid) => {
     }
 };
 
-module.exports = checkIfZpidExists;
+module.exports = { checkIfZpidExists };
