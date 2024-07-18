@@ -92,6 +92,33 @@ async function sendPostRequests(req, res) {
 
                     const photoUrls = extractPhotoUrls(photos);
 
+                    const hdpTypeDimension = listing.hdpTypeDimension;
+                    let for_sale;
+                    let for_sale_date;
+                    let for_sale_reachout;
+
+                    let coming_soon;
+                    let coming_soon_date;
+                    let coming_soon_reachout;
+
+                    let pending;
+                    let pending_date;
+                    let pending_reachout;
+
+                    let verified;
+
+                    let customer_first_name;
+                    let customer_last_name;
+                    let company_owned;
+
+                    let current_status;
+
+                    let notes;
+
+                    if (hdpTypeDimension === "ForSale") {
+
+                    }
+
                     const propertyData = {
                         url: listing.url,
                         zpid: listing.zpid,
@@ -101,6 +128,7 @@ async function sendPostRequests(req, res) {
                         zipcode: listing.zipcode,
                         bedrooms: listing.bedrooms,
                         bathrooms: listing.bathrooms,
+                        sqft: listing.livingArea,
                         price: listing.price,
                         longitude: listing.longitude,
                         latitude: listing.latitude,
@@ -117,7 +145,23 @@ async function sendPostRequests(req, res) {
                         listing_provided_by_email: listing.listing_provided_by.email,
                         listing_provided_by_company: listing.listing_provided_by.company,
                         photoCount: listing.photoCount,
-                        photo: photoUrls
+                        photo: photoUrls,
+
+                        for_sale: for_sale,
+                        for_sale_date: for_sale_date,
+                        for_sale_reachout: for_sale_reachout,
+                        coming_soon: coming_soon,
+                        coming_soon_date: coming_soon_date,
+                        coming_soon_reachout: coming_soon_reachout,
+                        pending: pending,
+                        pending_date: pending_date,
+                        pending_reachout: pending_reachout,
+                        verified: verified,
+                        customer_first_name: customer_first_name,
+                        customer_last_name: customer_last_name,
+                        company_owned: company_owned,
+                        current_status: current_status,
+                        notes: notes
                     };
 
                     await collection.insertOne(propertyData);
