@@ -124,6 +124,7 @@ async function sendPostRequests(req, res) {
                         let company_owned;//
 
                         let current_status;//
+                        let current_status_date;//
 
                         let notes;//
 
@@ -186,6 +187,7 @@ async function sendPostRequests(req, res) {
                             customer_last_name: customer_last_name,
                             company_owned: company_owned,
                             current_status: current_status,
+                            current_status_date: current_status_date,
                             notes: notes
                         };
 
