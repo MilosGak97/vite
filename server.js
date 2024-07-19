@@ -41,7 +41,7 @@ app.get('/dashboard', (req, res) => {
 app.get('/filtering', (req, res) => {
     res.render('filtering.ejs');
 });
-
+/*
 app.get('/listings', async (req, res) => {
 
     // Middleware to parse JSON and form data
@@ -64,6 +64,57 @@ app.get('/listings', async (req, res) => {
     }
 
 });
+*/
+
+app.get('/listings', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        // Get query parameters
+        const { state, date_start, date_end, forsale, comingsoon, pending } = req.query;
+
+        // Build query object
+        let query = {
+            verified: { $in: ["Full", "NoData"] }
+        };
+
+        // Add state filter if provided
+        if (state) {
+            query.state = state;
+        }
+
+        // Add date range filter if provided
+        if (date_start && date_end) {
+            query.current_status_date = {
+                $gte: new Date(date_start),
+                $lte: new Date(date_end)
+            };
+        } else if (date_start) {
+            query.current_status_date = { $gte: new Date(date_start) };
+        } else if (date_end) {
+            query.current_status_date = { $lte: new Date(date_end) };
+        }
+
+        // Add status filter if provided
+        const statusFilters = [];
+        if (forsale) statusFilters.push("ForSale");
+        if (comingsoon) statusFilters.push("ComingSoon");
+        if (pending) statusFilters.push("Pending");
+
+        if (statusFilters.length > 0) {
+            query.current_status = { $in: statusFilters };
+        }
+
+        // Fetch filtered properties
+        const properties = await propertiesCollection.find(query).toArray();
+        res.render('listings', { properties });
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 app.get('/shipping', (req, res) => {
     res.render('shipping.ejs');
