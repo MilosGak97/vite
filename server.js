@@ -9,6 +9,7 @@ const path = require('path');
 
 
 
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -18,10 +19,12 @@ connectDB();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/public')); // Set views directory
 
-// Use body-parser for JSON
+
+// Middleware to parse URL-encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Middleware to parse JSON bodies (if needed)
 app.use(bodyParser.json());
-
-
 
 app.use(express.static(path.join(__dirname, 'src/public')));
 
@@ -38,33 +41,79 @@ app.get('/dashboard', (req, res) => {
     res.render('index.ejs');
 });
 
-app.get('/filtering', (req, res) => {
-    res.render('filtering.ejs');
-});
-/*
-app.get('/listings', async (req, res) => {
 
-    // Middleware to parse JSON and form data
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
+app.get('/filtering', async (req, res) => {
     try {
-        const database = await connectDB(); // Ensure the database connection is established
-        const propertiesCollection = database.collection('properties');
+        const database = await connectDB();
+        const Property = database.collection('properties');
 
-        // Modify the query to filter for records with verified as "Full" or "NoData"
-        const query = {
-            verified: { $in: ["Full", "NoData"] }
-        };
+        // Fetch one property with 'verified' field as null  
+        const property = await Property.findOne({ verified: null });
 
-        const properties = await propertiesCollection.find(query).toArray();
-        res.render('listings', { properties });
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photo === 'string') {
+                try {
+                    property.photo = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photo = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photo.slice(0, 15);
+            const propertyOtherPhoto = property.photo.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering', { propertyFirst15, propertyOtherPhoto, PropertyZpid });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null });
+        }
     } catch (error) {
         console.error("Error fetching properties:", error);
         res.status(500).send("Internal Server Error");
     }
-
 });
-*/
+
+app.post('/update-verified/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        }
+
+        const database = await connectDB();
+        const Property = database.collection('properties');
+
+        const updateResult = await Property.updateOne(
+            { zpid: Number(zpid) }, // Ensure zpid is a number
+            { $set: { verified } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.error('Error updating property: No documents matched the query');
+            return res.status(404).send('Property not found');
+        }
+
+        res.redirect('/filtering');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 app.get('/listings', async (req, res) => {
     try {
@@ -88,12 +137,14 @@ app.get('/listings', async (req, res) => {
         if (date_start && date_end) {
             query.current_status_date = {
                 $gte: new Date(date_start),
-                $lte: new Date(date_end)
+                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
             };
         } else if (date_start) {
             query.current_status_date = { $gte: new Date(date_start) };
         } else if (date_end) {
-            query.current_status_date = { $lte: new Date(date_end) };
+            query.current_status_date = {
+                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
+            };
         }
 
         // Add status filter if provided
@@ -108,12 +159,27 @@ app.get('/listings', async (req, res) => {
 
         // Fetch filtered properties
         const properties = await propertiesCollection.find(query).toArray();
-        res.render('listings', { properties });
+        const totalResults = properties.length;
+
+        // Render the template with parameters
+        res.render('listings', {
+            properties,
+            state,
+            date_start,
+            date_end,
+            forsale: forsale || undefined,
+            comingsoon: comingsoon || undefined,
+            pending: pending || undefined,
+            totalResults // Pass totalResults to the EJS template
+        });
     } catch (error) {
         console.error("Error fetching properties:", error);
         res.status(500).send("Internal Server Error");
     }
 });
+
+// server.js or app.js
+
 
 
 app.get('/shipping', (req, res) => {
