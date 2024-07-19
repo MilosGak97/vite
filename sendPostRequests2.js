@@ -126,6 +126,7 @@ async function sendPostRequests2(req, res) {
                         let company_owned;//
 
                         let current_status;//
+                        let current_status_date;//
 
                         let notes;//
 
@@ -133,14 +134,17 @@ async function sendPostRequests2(req, res) {
                         if (hdpTypeDimension === "ForSale") {
                             for_sale = "Yes";
                             for_sale_date = new Date();
+                            current_status_date = for_sale_date;
                         }
                         if (hdpTypeDimension === "Pending") {
                             pending = "Yes";
                             pending_date = new Date();
+                            current_status_date = pending_date;
                         }
                         if (hdpTypeDimension === "ComingSoon") {
                             coming_soon = "Yes";
                             coming_soon_date = new Date();
+                            current_status_date = coming_soon_date;
                         }
                         current_status = hdpTypeDimension;
 
@@ -188,6 +192,7 @@ async function sendPostRequests2(req, res) {
                             customer_last_name: customer_last_name,
                             company_owned: company_owned,
                             current_status: current_status,
+                            current_status_date: current_status_date,
                             notes: notes
                         };
 
