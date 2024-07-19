@@ -50,12 +50,19 @@ app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB(); // Ensure the database connection is established
         const propertiesCollection = database.collection('properties');
-        const properties = await propertiesCollection.find({}).toArray();
+
+        // Modify the query to filter for records with verified as "Full" or "NoData"
+        const query = {
+            verified: { $in: ["Full", "NoData"] }
+        };
+
+        const properties = await propertiesCollection.find(query).toArray();
         res.render('listings', { properties });
     } catch (error) {
         console.error("Error fetching properties:", error);
         res.status(500).send("Internal Server Error");
     }
+
 });
 
 app.get('/shipping', (req, res) => {

@@ -72,7 +72,7 @@
                     <thead class="bg-primary">
                         <tr class="text-left px-2 text-sm">
                             <th class="py-2 px-2 border border-white w-2"> </th>
-                            <th class="py-2 px-2 border border-white">Zpid </th>
+                            <th class="py-2 px-2 border border-white w-2">Zpid </th>
                             <th class="py-2 px-2 border border-white">Address</th>
                             <th class="py-2 px-2 border border-white">Owner</th>
                             <th class="py-2 px-2 border border-white">Status</th>
@@ -85,7 +85,7 @@
                                 <td class="py-2 px-2 border border-white w-2 text-xs font-bold">
                                     <%= index + 1 %>
                                 </td>
-                                <td class="py-2 px-2 border border-white">
+                                <td class="py-2 px-2 border border-white w-2">
                                     <%= property.zpid %>
                                 </td>
                                 <td class="py-2 px-2 border border-white">
@@ -95,14 +95,18 @@
                                 <td class="py-2 px-2 border border-white">
                                     <%= property.customer_first_name %>, <%= property.customer_last_name %>
                                 </td>
-                                <span
-                                    class="<%= property.status === 'ForSale' ? 'bg-red-600' : property.status === 'Pending' ? 'status-pending' : property.status === 'ComingSoon' ? 'status-comingsoon' : '' %>">
-                                    <%= property.status==='ForSale' ? 'For Sale' : property.status==='Pending'
-                                        ? 'Pending' : property.status==='ComingSoon' ? 'Coming Soon' : property.status
+
+                                <td class="py-2 px-2 flex flex-row">
+                                    <div class="text-white font-bold w-2 h-2
+                                            <%= property.current_status === 'ForSale' ? 'bg-orange-600' : '' %>
+                                            <%= property.current_status === 'Pending' ? 'bg-primary' : '' %>
+                                            <%= property.current_status === 'ComingSoon' ? 'bg-blue-600' : '' %>">
+                                    </div>
+                                    <%= property.current_status==='ForSale' ? 'For Sale' :
+                                        property.current_status==='Pending' ? 'Pending' :
+                                        property.current_status==='ComingSoon' ? 'Coming Soon' : property.current_status
                                         %>
-                                </span>
-                                <td class="py-2 px-2 border border-white">
-                                    <%= property.status %>
+
                                 </td>
                             </tr>
                             <% }) %>
