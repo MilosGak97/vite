@@ -94,29 +94,31 @@ async function sendPostRequests(req, res) {
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
                                 console.log("exists.for_sale is null:", exists.for_sale);
-                            } else if (exists.for_sale !== null) {
-                                console.log("exists.for_sale is not null: ", exists.for_sale);
+
                                 updateFields.$set.for_sale = "Yes";
                                 updateFields.$set.for_sale_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.for_sale !== null) {
+                                console.log("exists.for_sale is not null: ", exists.for_sale);
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
                                 console.log("Correct loop4: ", exists.pending);
-                            } else if (exists.pending !== null) {
-                                console.log("exists.pending: ", exists.pending);
+
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.pending !== null) {
+                                console.log("exists.pending: ", exists.pending);
                             }
                         } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.coming_soon === null) {
                                 console.log("Correct loop5: ", exists.coming_soon);
-                            } else if (exists.coming_soon !== null) {
-                                console.log("exists.coming_soon: ", exists.coming_soon);
                                 updateFields.$set.coming_soon = "Yes";
                                 updateFields.$set.coming_soon_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.coming_soon !== null) {
+                                console.log("exists.coming_soon: ", exists.coming_soon);
                             }
                         }
 
