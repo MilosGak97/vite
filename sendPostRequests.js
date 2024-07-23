@@ -93,9 +93,9 @@ async function sendPostRequests(req, res) {
 
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
-                                console.log("Correct loop3: ", exists.for_sale);
+                                console.log("exists.for_sale is null:", exists.for_sale);
                             } else if (exists.for_sale !== null) {
-                                console.log("exists.for_sale: ", exists.for_sale);
+                                console.log("exists.for_sale is not null: ", exists.for_sale);
                                 updateFields.$set.for_sale = "Yes";
                                 updateFields.$set.for_sale_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
@@ -122,7 +122,7 @@ async function sendPostRequests(req, res) {
 
                         // Set the current_status field
                         updateFields.$set.current_status = hdpTypeDimension;
-
+                        console.log("Update fields object: ", updateFields);
                         // Perform the update based on zpid
                         await collection.updateOne(
                             { zpid: Number(listing.zpid) },
