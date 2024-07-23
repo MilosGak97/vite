@@ -118,8 +118,7 @@ async function sendPostRequests(req, res) {
                         // Perform the update based on zpid
                         await collection.updateOne(
                             { zpid: listing.zpid },
-                            updateFields,
-                            { upsert: true } // Creates a new document if none exists with the specified zpid
+                            updateFields
                         );
                     } else {
                         // Handle the case where the property does not exist
