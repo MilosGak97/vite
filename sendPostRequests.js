@@ -86,6 +86,8 @@ async function sendPostRequests(req, res) {
                     const exists = await checkIfZpidExists(listing.zpid);
                     if (exists) {
                         let updateFields = {};
+                        const hdpTypeDimension = listing.hdpTypeDimension;
+
 
                         if (hdpTypeDimension === "ForSale") {
                             updateFields = {
