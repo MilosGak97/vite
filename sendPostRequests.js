@@ -15,6 +15,10 @@ async function sendPostRequests(req, res) {
         }).toArray();
         console.log("Records: ", records)
 
+        // Create the body for the POST request
+        // const body = records.map(record => ({ url: record.url }));
+        // console.log("Body: ", body)
+
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
