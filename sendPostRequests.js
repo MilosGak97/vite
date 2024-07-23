@@ -85,7 +85,8 @@ async function sendPostRequests(req, res) {
 
                     const exists = await checkIfZpidExists(listing.zpid);
                     if (exists) {
-                        let updateFields = {};
+                        // Initialize updateFields with an empty $set object
+                        let updateFields = { $set: {} };
                         const hdpTypeDimension = listing.hdpTypeDimension;
                         console.log("Correct loop: ", hdpTypeDimension);
                         console.log("Correct loop2: ", exists);
@@ -93,46 +94,33 @@ async function sendPostRequests(req, res) {
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
                                 console.log("Correct loop3: ", exists.for_sale);
-                                updateFields = {
-                                    $set: {
-                                        for_sale: "Yes",
-                                        for_sale_date: new Date(),
-                                        current_status_date: new Date()
-                                    }
-                                };
                             } else if (exists.for_sale !== null) {
                                 console.log("exists.for_sale: ", exists.for_sale);
+                                updateFields.$set.for_sale = "Yes";
+                                updateFields.$set.for_sale_date = new Date();
+                                updateFields.$set.current_status_date = new Date();
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
-
                                 console.log("Correct loop4: ", exists.pending);
-                                updateFields = {
-                                    $set: {
-                                        pending: "Yes",
-                                        pending_date: new Date(),
-                                        current_status_date: new Date()
-                                    }
-                                };
                             } else if (exists.pending !== null) {
                                 console.log("exists.pending: ", exists.pending);
+                                updateFields.$set.pending = "Yes";
+                                updateFields.$set.pending_date = new Date();
+                                updateFields.$set.current_status_date = new Date();
                             }
                         } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.coming_soon === null) {
                                 console.log("Correct loop5: ", exists.coming_soon);
-
-                                updateFields = {
-                                    $set: {
-                                        coming_soon: "Yes",
-                                        coming_soon_date: new Date(),
-                                        current_status_date: new Date()
-                                    }
-                                };
                             } else if (exists.coming_soon !== null) {
                                 console.log("exists.coming_soon: ", exists.coming_soon);
+                                updateFields.$set.coming_soon = "Yes";
+                                updateFields.$set.coming_soon_date = new Date();
+                                updateFields.$set.current_status_date = new Date();
                             }
                         }
 
+                        // Set the current_status field
                         updateFields.$set.current_status = hdpTypeDimension;
 
                         // Perform the update based on zpid
@@ -140,7 +128,8 @@ async function sendPostRequests(req, res) {
                             { zpid: Number(listing.zpid) },
                             updateFields
                         );
-                    } else {
+                    }
+                    else {
                         // Handle the case where the property does not exist
 
                         const extractPhotoUrls = (photos) => {
