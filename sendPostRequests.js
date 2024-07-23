@@ -9,7 +9,11 @@ async function sendPostRequests(req, res) {
             { "url": "https://www.zillow.com/homedetails/339-Yorkshire-Pl-Morganville-NJ-07751/70169351_zpid/" }
 
         ];
-
+        // Query MongoDB for records with current_type as "forsale" or "comingsoon"
+        const records = await collection.find({
+            current_type: { $in: ["forsale", "comingsoon"] }
+        }).toArray();
+        console.log("Records: ", records)
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
@@ -31,10 +35,10 @@ async function sendPostRequests(req, res) {
         const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
 
         const response = await axios.post(url, body, { headers });
-        console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
+        //console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
 
         const snapshotId = response.data.snapshot_id;
-        console.log(snapshotId);
+        //console.log(snapshotId);
         const collection = client.db().collection('snapshots');
 
         const shapshotData = {
@@ -55,7 +59,7 @@ async function sendPostRequests(req, res) {
                     });
 
                     if (response.data.status === 'running') {
-                        console.log('Snapshot is not ready yet, trying again in 10 seconds...');
+                        //console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
                         //console.log('Response data:', response.data);
@@ -63,7 +67,7 @@ async function sendPostRequests(req, res) {
                         return response.data;
                     }
                 } catch (error) {
-                    console.error('Error fetching data:', error);
+                    //console.error('Error fetching data:', error);
                     throw error; // or handle gracefully
                 }
             }
@@ -88,28 +92,28 @@ async function sendPostRequests(req, res) {
                         // Initialize updateFields with an empty $set object
                         let updateFields = { $set: {} };
                         const hdpTypeDimension = listing.hdpTypeDimension;
-                        console.log("Correct loop: ", hdpTypeDimension);
-                        console.log("Correct loop2: ", exists);
+                        //console.log("Correct loop: ", hdpTypeDimension);
+                        //console.log("Correct loop2: ", exists);
 
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
-                                console.log("exists.for_sale is null:", exists.for_sale);
+                                //console.log("exists.for_sale is null:", exists.for_sale);
 
                                 updateFields.$set.for_sale = "Yes";
                                 updateFields.$set.for_sale_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
                             } else if (exists.for_sale !== null) {
-                                console.log("exists.for_sale is not null: ", exists.for_sale);
+                                //console.log("exists.for_sale is not null: ", exists.for_sale);
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
-                                console.log("Correct loop4: ", exists.pending);
+                                //console.log("Correct loop4: ", exists.pending);
 
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
                             } else if (exists.pending !== null) {
-                                console.log("exists.pending: ", exists.pending);
+                                //console.log("exists.pending: ", exists.pending);
                             }
                         } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.coming_soon === null) {
@@ -118,13 +122,13 @@ async function sendPostRequests(req, res) {
                                 updateFields.$set.coming_soon_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
                             } else if (exists.coming_soon !== null) {
-                                console.log("exists.coming_soon: ", exists.coming_soon);
+                                //console.log("exists.coming_soon: ", exists.coming_soon);
                             }
                         }
 
                         // Set the current_status field
                         updateFields.$set.current_status = hdpTypeDimension;
-                        console.log("Update fields object: ", updateFields);
+                        //console.log("Update fields object: ", updateFields);
                         // Perform the update based on zpid
                         await collection.updateOne(
                             { zpid: Number(listing.zpid) },
