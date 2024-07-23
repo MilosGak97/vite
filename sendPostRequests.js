@@ -90,29 +90,44 @@ async function sendPostRequests(req, res) {
 
 
                         if (hdpTypeDimension === "ForSale") {
-                            updateFields = {
-                                $set: {
-                                    for_sale: "Yes",
-                                    for_sale_date: new Date(),
-                                    current_status_date: new Date()
-                                }
-                            };
+                            if (exists.for_sale === null) {
+
+                                updateFields = {
+                                    $set: {
+                                        for_sale: "Yes",
+                                        for_sale_date: new Date(),
+                                        current_status_date: new Date()
+                                    }
+                                };
+                            } else if (exists.for_sale !== null) {
+                                continue;
+                            }
                         } else if (hdpTypeDimension === "Pending") {
-                            updateFields = {
-                                $set: {
-                                    pending: "Yes",
-                                    pending_date: new Date(),
-                                    current_status_date: new Date()
-                                }
-                            };
+                            if (exists.pending === null) {
+
+                                updateFields = {
+                                    $set: {
+                                        pending: "Yes",
+                                        pending_date: new Date(),
+                                        current_status_date: new Date()
+                                    }
+                                };
+                            } else if (exists.for_sale !== null) {
+                                continue;
+                            }
                         } else if (hdpTypeDimension === "ComingSoon") {
-                            updateFields = {
-                                $set: {
-                                    coming_soon: "Yes",
-                                    coming_soon_date: new Date(),
-                                    current_status_date: new Date()
-                                }
-                            };
+                            if (exists.coming_soon === null) {
+
+                                updateFields = {
+                                    $set: {
+                                        coming_soon: "Yes",
+                                        coming_soon_date: new Date(),
+                                        current_status_date: new Date()
+                                    }
+                                };
+                            } else if (exists.coming_soon !== null) {
+                                continue;
+                            }
                         }
 
                         updateFields.$set.current_status = hdpTypeDimension;
