@@ -87,11 +87,12 @@ async function sendPostRequests(req, res) {
                     if (exists) {
                         let updateFields = {};
                         const hdpTypeDimension = listing.hdpTypeDimension;
-
+                        console.log("Correct loop: ", hdpTypeDimension);
+                        console.log("Correct loop2: ", exists);
 
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
-
+                                console.log("Correct loop3: ", exists.for_sale);
                                 updateFields = {
                                     $set: {
                                         for_sale: "Yes",
@@ -100,11 +101,12 @@ async function sendPostRequests(req, res) {
                                     }
                                 };
                             } else if (exists.for_sale !== null) {
-                                continue;
+                                console.log("exists.for_sale: ", exists.for_sale);
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
 
+                                console.log("Correct loop4: ", exists.pending);
                                 updateFields = {
                                     $set: {
                                         pending: "Yes",
@@ -112,11 +114,12 @@ async function sendPostRequests(req, res) {
                                         current_status_date: new Date()
                                     }
                                 };
-                            } else if (exists.for_sale !== null) {
-                                continue;
+                            } else if (exists.pending !== null) {
+                                console.log("exists.pending: ", exists.pending);
                             }
                         } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.coming_soon === null) {
+                                console.log("Correct loop5: ", exists.coming_soon);
 
                                 updateFields = {
                                     $set: {
@@ -126,7 +129,7 @@ async function sendPostRequests(req, res) {
                                     }
                                 };
                             } else if (exists.coming_soon !== null) {
-                                continue;
+                                console.log("exists.coming_soon: ", exists.coming_soon);
                             }
                         }
 
