@@ -85,8 +85,42 @@ async function sendPostRequests(req, res) {
 
                     const exists = await checkIfZpidExists(listing.zpid);
                     if (exists) {
-                        // Handle the case where the property already exists
-                        continue;
+                        let updateFields = {};
+
+                        if (hdpTypeDimension === "ForSale") {
+                            updateFields = {
+                                $set: {
+                                    for_sale: "Yes",
+                                    for_sale_date: new Date(),
+                                    current_status_date: new Date()
+                                }
+                            };
+                        } else if (hdpTypeDimension === "Pending") {
+                            updateFields = {
+                                $set: {
+                                    pending: "Yes",
+                                    pending_date: new Date(),
+                                    current_status_date: new Date()
+                                }
+                            };
+                        } else if (hdpTypeDimension === "ComingSoon") {
+                            updateFields = {
+                                $set: {
+                                    coming_soon: "Yes",
+                                    coming_soon_date: new Date(),
+                                    current_status_date: new Date()
+                                }
+                            };
+                        }
+
+                        updateFields.$set.current_status = hdpTypeDimension;
+
+                        // Perform the update based on zpid
+                        await collection.updateOne(
+                            { zpid: listing.zpid },
+                            updateFields,
+                            { upsert: true } // Creates a new document if none exists with the specified zpid
+                        );
                     } else {
                         // Handle the case where the property does not exist
 
@@ -132,14 +166,17 @@ async function sendPostRequests(req, res) {
                         if (hdpTypeDimension === "ForSale") {
                             for_sale = "Yes";
                             for_sale_date = new Date();
+                            current_status_date = for_sale_date;
                         }
                         if (hdpTypeDimension === "Pending") {
                             pending = "Yes";
                             pending_date = new Date();
+                            current_status_date = for_pending_date;
                         }
                         if (hdpTypeDimension === "ComingSoon") {
                             coming_soon = "Yes";
                             coming_soon_date = new Date();
+                            current_status_date = for_coming_soon_date;
                         }
                         current_status = hdpTypeDimension;
 
