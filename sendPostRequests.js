@@ -117,7 +117,7 @@ async function sendPostRequests(req, res) {
 
                         // Perform the update based on zpid
                         await collection.updateOne(
-                            { zpid: listing.zpid },
+                            { zpid: Number(listing.zpid) },
                             updateFields
                         );
                     } else {
