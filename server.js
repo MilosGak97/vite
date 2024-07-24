@@ -53,7 +53,7 @@ app.get('/export-csv', async (req, res) => {
 
         // Build query object
         let query = {
-            verified: { $in: ["Full", "NoData"] }
+            verified: { $in: ["Full", "NoPhotos"] }
         };
 
         // Add state filter if provided
@@ -88,8 +88,23 @@ app.get('/export-csv', async (req, res) => {
         // Fetch filtered properties
         const properties = await propertiesCollection.find(query).toArray();
 
-        // Convert properties to CSV format
-        const csv = parse(properties);
+        // Define the fields you want to include in the CSV
+        const fields = ['zpid', 'address', 'city', 'state', 'zipcode', 'current_status'];
+
+        // Map properties to include only the specified fields
+        const filteredProperties = properties.map(property => {
+            return {
+                address: property.address,
+                city: property.city,
+                state: property.state,
+                zipcode: property.zipcode
+            };
+        });
+
+        // Convert filtered properties to CSV format
+        const csv = parse(filteredProperties, { fields });
+
+        console.log(csv); // or save the CSV to a file
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
@@ -253,7 +268,7 @@ app.get('/listings', async (req, res) => {
 
         // Build query object
         let query = {
-            verified: { $in: ["Full", "NoData"] }
+            verified: { $in: ["Full", "NoPhotos"] }
         };
 
         // Add state filter if provided
