@@ -13,7 +13,7 @@
     <%- include('partials/menu') %>
 
         <% if (PropertyZpid) { %>
-            <div class="mt-4">
+            <div class="mt-4 p-1">
                 <h2><input type="text" value="<%= PropertyZpid %>" hidden></h2>
 
                 <% if (propertyFirst15.length> 0) { %>
@@ -108,7 +108,7 @@
 
 
             <% } else { %>
-                <p>No more unverified properties available.</p>
+                <p class="p-8 bg-yellow-50 h-screen">No more unverified properties available.</p>
                 <% } %>
 </body>
 

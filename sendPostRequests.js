@@ -4,20 +4,21 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function sendPostRequests(req, res) {
     try {
-        const body = [
+        /*const body = [
             { "url": "https://www.zillow.com/homedetails/33-Daly-Ct-Old-Bridge-NJ-08857/124182759_zpid/" },
             { "url": "https://www.zillow.com/homedetails/339-Yorkshire-Pl-Morganville-NJ-07751/70169351_zpid/" }
 
-        ];
+        ];*/
+
+        const collection2 = client.db().collection('properties');
         // Query MongoDB for records with current_type as "forsale" or "comingsoon"
-        const records = await collection.find({
-            current_type: { $in: ["forsale", "comingsoon"] }
+        const records = await collection2.find({
+            current_status: { $in: ["ForSale", "ComingSoon"] }
         }).toArray();
-        console.log("Records: ", records)
 
         // Create the body for the POST request
-        // const body = records.map(record => ({ url: record.url }));
-        // console.log("Body: ", body)
+        const body = records.map(record => ({ url: record.url }));
+        console.log("Body: ", body)
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
@@ -179,6 +180,7 @@ async function sendPostRequests(req, res) {
                         let current_status_date;//
 
                         let notes;//
+                        let branch;
 
 
                         if (hdpTypeDimension === "ForSale") {
@@ -243,7 +245,8 @@ async function sendPostRequests(req, res) {
                             company_owned: company_owned,
                             current_status: current_status,
                             current_status_date: current_status_date,
-                            notes: notes
+                            notes: notes,
+                            branch: branch
                         };
 
                         await collection.insertOne(propertyData);

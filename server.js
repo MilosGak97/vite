@@ -97,9 +97,75 @@ app.post('/update-verified/:zpid', async (req, res) => {
         const database = await connectDB();
         const Property = database.collection('properties');
 
+        const getAddress = await Property.findOne(
+            { zpid: Number(zpid) }
+        )
+
+        const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
+        console.log(fullAddress);
+
+        // Encode the full address for the URL
+        const encodedAddress = encodeURIComponent(fullAddress);
+
+
+        // Initialize owners array
+        let formattedOwners = [];
+
+        try {
+            // Send the request to the Precisely API
+            const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                headers: {
+                    'Authorization': 'Bearer cU64MatsEQuCos34bUAYKUhDWkWE', // Replace with your actual Bearer token
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
+            });
+
+            console.log("API RESULT: ", response.data);
+
+            // Extract owner details
+            const owners = response.data.propertyAttributes.owners;
+            formattedOwners = owners.map(owner => ({
+                firstName: owner.firstName || 'Undefined',
+                lastName: owner.lastName || 'Undefined'
+            }));
+
+
+        } catch (apiError) {
+            console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+
+            // Set default values if API request fails
+            formattedOwners = [{
+                firstName: 'Undefined',
+                lastName: 'Undefined'
+            }];
+        }
+
+
+        /*
+        
+                // Send the request to the Precisely API
+                const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                    headers: {
+                        'Authorization': 'Bearer AMaYOoJlVt2hR0hALkGWno8MFWyt', // Replace with your actual Bearer token
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
+                });
+        
+                console.log("API RESULT: ", response.data);
+        
+                // Extract owner details
+                const owners = response.data.propertyAttributes.owners;
+                const formattedOwners = owners.map(owner => ({
+                    ownerId: owner.ownerId,
+                    firstName: owner.firstName,
+                    middleName: owner.middleName,
+                    lastName: owner.lastName
+                }));
+        */
+        console.log("Formatted Owners: ", formattedOwners);
         const updateResult = await Property.updateOne(
             { zpid: Number(zpid) }, // Ensure zpid is a number
-            { $set: { verified } }
+            { $set: { owners: formattedOwners, verified: verified } }
         );
 
         if (updateResult.modifiedCount === 0) {

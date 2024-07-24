@@ -11,7 +11,8 @@ module.exports = {
       colors: {
         // Add your custom colors here
         'primary': '#FFAD03', // Example custom color
-        'secondary': '#1B1B1B'
+        'secondary': '#1B1B1B', // Example custom color
+        'third': '#fffff2'
       }
     },
   },

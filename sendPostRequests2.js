@@ -128,7 +128,7 @@ async function sendPostRequests2(req, res) {
                         let current_status;//
                         let current_status_date;//
 
-                        let notes;//
+                        let notes;// 
 
 
                         if (hdpTypeDimension === "ForSale") {
