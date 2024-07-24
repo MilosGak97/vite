@@ -133,8 +133,16 @@
                                                     property.zipcode %>
                                 </td>
                                 <td class="py-2 px-2 border border-white">
-                                    <%= property.owners[0].firstName %>, <%= property.owners[0].lastName %>
+                                    <% if (property.owners.length> 0 && (property.owners[0].firstName === "Undefined" ||
+                                        property.owners[0].lastName === "Undefined")) { %>
+                                        No Data
+                                        <% } else if (property.owners.length> 0) { %>
+                                            <%= property.owners[0].firstName %>, <%= property.owners[0].lastName %>
+                                                    <% } else { %>
+                                                        No Data
+                                                        <% } %>
                                 </td>
+
 
                                 <td class="py-2 px-2 flex flex-row items-center">
                                     <div class="text-white font-bold w-2  h-4
