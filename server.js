@@ -6,6 +6,7 @@ const sendPostRequests2 = require('./sendPostRequests2');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
+const { parse } = require('json2csv');
 
 
 
@@ -40,6 +41,67 @@ app.post('/trigger2', sendPostRequests2);
 app.get('/dashboard', (req, res) => {
     res.render('index.ejs');
 });
+
+// Endpoint to export properties as CSV
+app.get('/export-csv', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        // Get query parameters
+        const { state, date_start, date_end, forsale, comingsoon, pending } = req.query;
+
+        // Build query object
+        let query = {
+            verified: { $in: ["Full", "NoData"] }
+        };
+
+        // Add state filter if provided
+        if (state) {
+            query.state = state;
+        }
+
+        // Add date range filter if provided
+        if (date_start && date_end) {
+            query.current_status_date = {
+                $gte: new Date(date_start),
+                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
+            };
+        } else if (date_start) {
+            query.current_status_date = { $gte: new Date(date_start) };
+        } else if (date_end) {
+            query.current_status_date = {
+                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
+            };
+        }
+
+        // Add status filter if provided
+        const statusFilters = [];
+        if (forsale) statusFilters.push("ForSale");
+        if (comingsoon) statusFilters.push("ComingSoon");
+        if (pending) statusFilters.push("Pending");
+
+        if (statusFilters.length > 0) {
+            query.current_status = { $in: statusFilters };
+        }
+
+        // Fetch filtered properties
+        const properties = await propertiesCollection.find(query).toArray();
+
+        // Convert properties to CSV format
+        const csv = parse(properties);
+
+        // Send CSV file as response
+        res.header('Content-Type', 'text/csv');
+        res.attachment('properties.csv');
+        res.send(csv);
+    } catch (error) {
+        console.error("Error exporting properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 
 
 app.get('/filtering', async (req, res) => {
