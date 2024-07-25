@@ -135,8 +135,6 @@ async function sendPostRequests2(req, res) {
 
                         let verified;//
 
-                        let customer_first_name;//
-                        let customer_last_name;//
                         let company_owned;//
 
                         let current_status;//
@@ -148,7 +146,7 @@ async function sendPostRequests2(req, res) {
                         if (photoCount < 5) {
                             verified = "NoPhotos";
 
-                            const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
+                            const fullAddress = `${listing.address.streetAddress} ${listing.city}, ${listing.state} ${listing.zipcode}`;
                             console.log(fullAddress);
 
                             // Encode the full address for the URL
