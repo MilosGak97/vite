@@ -450,6 +450,15 @@
                 <div class=" w-full flex flex-col justify-start items-start p-8">
                 </div>
             </div>
+
+            <div class="w-full flex flex-col justify-start items-start p-8">
+                <!-- Form to trigger the POST request -->
+                <form id="triggerForm" action="/trigger2" method="POST" target="_blank">
+                    <label for="url">URL:</label>
+                    <input type="text" id="url" name="url" placeholder="Enter URL" required>
+                    <button type="submit">Trigger Scrapping</button>
+                </form>
+            </div>
         </body>
 
         </html>
