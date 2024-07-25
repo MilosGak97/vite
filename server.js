@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const webhookHandler = require('./webhookHandler');
 const sendPostRequests = require('./sendPostRequests');
 const sendPostRequests2 = require('./sendPostRequests2');
+const sendPostRequests3 = require('./getSnapshotData');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
@@ -38,7 +39,7 @@ app.post('/trigger', sendPostRequests);
 app.post('/trigger2', sendPostRequests2);
 
 // Endpoint to trigger sendPostRequests
-app.post('/trigger3', sendPostRequests2);
+app.post('/trigger3', getSnapshotData);
 
 // Define routes
 app.get('/dashboard', (req, res) => {

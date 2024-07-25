@@ -3,7 +3,7 @@ const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 
-async function sendPostRequests3(req, res) {
+async function getSnapshotData(req, res) {
     try {
         async function fetchData() {
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -224,4 +224,4 @@ async function sendPostRequests3(req, res) {
     }
 }
 
-module.exports = sendPostRequests3;
+module.exports = getSnapshotData;
