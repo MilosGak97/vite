@@ -135,17 +135,26 @@
                                 <td class="py-2 px-2 border border-white">
                                     <% if (property.owners.length> 0) {
                                         const owner = property.owners[0];
+                                        const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ?
+                                        owner.ownerName : "";
                                         const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+                                        const middleName = owner.middleName && owner.middleName !== "Undefined" ?
+                                        owner.middleName : "";
                                         const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
-                                        if (firstName || lastName) { %>
-                                        <%= firstName %>
-                                            <%= lastName %>
-                                                <% } else { %>
-                                                    No Data
-                                                    <% } } else { %>
-                                                        No Data
-                                                        <% } %>
+
+                                        if (ownerName) { %>
+                                        <%= ownerName %> <!-- Display ownerName if available -->
+                                            <% } else if (firstName || middleName || lastName) { %>
+                                                <%= firstName %>
+                                                    <%= middleName %>
+                                                        <%= lastName %>
+                                                            <% } else { %>
+                                                                No Data
+                                                                <% } } else { %>
+                                                                    No Data
+                                                                    <% } %>
                                 </td>
+
 
 
                                 <td class="py-2 px-2 flex flex-row items-center">
