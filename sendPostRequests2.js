@@ -12,7 +12,7 @@ async function sendPostRequests2(req, res) {
             console.log(requrl);
             return res.status(400).send('Invalid URL');
         }
-
+        console.log("BODY CONTENT: ", body)
         const body = [{ url: requrl }];
 
         /*
