@@ -118,6 +118,8 @@ async function sendPostRequests2(req, res) {
 
                         const photoUrls = extractPhotoUrls(photos);
 
+                        const photoCount = listing.photoCount;
+
                         const hdpTypeDimension = listing.hdpTypeDimension;
                         let for_sale; //
                         let for_sale_date; //
@@ -140,7 +142,50 @@ async function sendPostRequests2(req, res) {
                         let current_status;//
                         let current_status_date;//
 
+                        // Initialize owners array
+                        let formattedOwners = [];
                         let notes;// 
+                        if (photoCount < 5) {
+                            verified = "NoPhotos";
+
+                            const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
+                            console.log(fullAddress);
+
+                            // Encode the full address for the URL
+                            const encodedAddress = encodeURIComponent(fullAddress);
+
+
+                            try {
+                                // Send the request to the Precisely API
+                                const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                                    headers: {
+                                        'Authorization': 'Bearer bwVARnCMssLP1FDGViJ0s2S96VeG', // Replace with your actual Bearer token
+                                        'Content-Type': 'application/json; charset=utf-8'
+                                    }
+                                });
+
+                                console.log("API RESULT: ", response.data);
+
+                                // Extract owner details
+                                const owners = response.data.propertyAttributes.owners;
+                                formattedOwners = owners.map(owner => ({
+                                    firstName: owner.firstName || 'Undefined',
+                                    middleName: owner.middleName || 'Undefined',
+                                    lastName: owner.lastName || 'Undefined',
+                                    ownerName: owner.ownerName || "Undefined"
+                                }));
+
+
+                            } catch (apiError) {
+                                console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+
+                                // Set default values if API request fails
+                                formattedOwners = [{
+                                    firstName: 'Undefined',
+                                    lastName: 'Undefined'
+                                }];
+                            }
+                        }
 
 
                         if (hdpTypeDimension === "ForSale") {
@@ -187,7 +232,7 @@ async function sendPostRequests2(req, res) {
                             listing_provided_by_name: listing.listing_provided_by.name,
                             listing_provided_by_email: listing.listing_provided_by.email,
                             listing_provided_by_company: listing.listing_provided_by.company,
-                            photoCount: listing.photoCount,
+                            photoCount: photoCount,
                             photo: photoUrls,
 
                             for_sale: for_sale,
@@ -200,8 +245,7 @@ async function sendPostRequests2(req, res) {
                             pending_date: pending_date,
                             pending_reachout: pending_reachout,
                             verified: verified,
-                            customer_first_name: customer_first_name,
-                            customer_last_name: customer_last_name,
+                            owners: formattedOwners,
                             company_owned: company_owned,
                             current_status: current_status,
                             current_status_date: current_status_date,
