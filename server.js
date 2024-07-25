@@ -84,6 +84,8 @@ app.get('/export-csv', async (req, res) => {
         if (statusFilters.length > 0) {
             query.current_status = { $in: statusFilters };
         }
+
+
         const properties = await propertiesCollection.find(query).toArray();
 
         // Define the fields you want to include in the CSV
@@ -91,26 +93,51 @@ app.get('/export-csv', async (req, res) => {
 
         // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
-            if (owners.length === 0) {
+            if (!owners || owners.length === 0) {
                 return '';
             }
 
+            // Helper function to check if owner is valid
+            const isValidOwner = (owner) => {
+                return owner && owner.firstName !== 'undefined' && owner.lastName !== 'undefined';
+            };
+
+            // Handle cases with one owner
             if (owners.length === 1) {
                 const owner = owners[0];
-                return `${owner.firstName} ${owner.lastName}`;
+                return isValidOwner(owner) ? `${owner.firstName || ''} ${owner.lastName || ''}`.trim() : '';
             }
 
-            if (owners.length === 2) {
-                const [firstOwner, secondOwner] = owners;
-                if (firstOwner.lastName === secondOwner.lastName) {
-                    return `${firstOwner.firstName} & ${secondOwner.firstName} ${firstOwner.lastName}`;
-                } else {
-                    return `${firstOwner.firstName} ${firstOwner.lastName} & ${secondOwner.firstName} ${secondOwner.lastName}`;
+            // Handle cases with two owners
+            if (owners.length >= 2) {
+                const firstOwner = owners[0];
+                const secondOwner = owners[1];
+
+                // Check if both owners are valid
+                const isFirstOwnerValid = isValidOwner(firstOwner);
+                const isSecondOwnerValid = isValidOwner(secondOwner);
+
+                if (isFirstOwnerValid && isSecondOwnerValid) {
+                    // Check if both owners have the same last name
+                    if (firstOwner.lastName === secondOwner.lastName) {
+                        return `${firstOwner.firstName || ''} & ${secondOwner.firstName || ''} ${firstOwner.lastName}`.trim();
+                    } else {
+                        return `${firstOwner.firstName || ''} ${firstOwner.lastName || ''} & ${secondOwner.firstName || ''} ${secondOwner.lastName || ''}`.trim();
+                    }
                 }
+
+                if (isFirstOwnerValid) {
+                    return `${firstOwner.firstName || ''} ${firstOwner.lastName || ''}`.trim();
+                }
+
+                if (isSecondOwnerValid) {
+                    return `${secondOwner.firstName || ''} ${secondOwner.lastName || ''}`.trim();
+                }
+
+                return ''; // No valid owners
             }
 
             // Handle cases with more than 2 owners if necessary
-            // For now, returning a default message
             return 'More than two owners';
         };
 
@@ -127,6 +154,8 @@ app.get('/export-csv', async (req, res) => {
 
         // Convert filtered properties to CSV format
         const csv = parse(filteredProperties, { fields });
+
+
 
         console.log(csv); // or save the CSV to a file
 
