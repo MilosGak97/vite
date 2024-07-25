@@ -223,10 +223,12 @@ app.post('/update-verified/:zpid', async (req, res) => {
             return res.status(400).send('Invalid form submission');
         }
         console.log("Verified: ", verified);
+
+
+        const database = await connectDB();
+        const Property = database.collection('properties');
         if (verified === "Full" || verified === "NoPhotos") {
 
-            const database = await connectDB();
-            const Property = database.collection('properties');
 
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
@@ -288,6 +290,11 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 { zpid: Number(zpid) }, // Ensure zpid is a number
                 { $set: { verified: verified } }
             );
+            if (updateResult.modifiedCount === 0) {
+                console.error('Error updating property: No documents matched the query');
+                return res.status(404).send('Property not found');
+            }
+
 
         }
         res.redirect('/filtering');
