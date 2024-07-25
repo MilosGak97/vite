@@ -1,4 +1,4 @@
-const axios = require('axios');
+/*const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
@@ -33,8 +33,6 @@ async function getSnapshotData(req, res) {
                 }
             }
         }
-*/
-
 
         async function listAllListings(data) {
             if (Array.isArray(data)) {
@@ -228,3 +226,4 @@ async function getSnapshotData(req, res) {
 }
 
 module.exports = getSnapshotData;
+*/
