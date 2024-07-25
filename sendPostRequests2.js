@@ -8,6 +8,8 @@ async function sendPostRequests2(req, res) {
 
         // Validate URL (basic example)
         if (!requrl || typeof requrl !== 'string') {
+            console.log("Type Of:", typeof requrl);
+            console.log(requrl);
             return res.status(400).send('Invalid URL');
         }
 
