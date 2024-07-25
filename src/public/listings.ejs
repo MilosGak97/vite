@@ -133,15 +133,20 @@
                                                     property.zipcode %>
                                 </td>
                                 <td class="py-2 px-2 border border-white">
-                                    <% if (property.owners.length> 0 && (property.owners[0].firstName === "Undefined" ||
-                                        property.owners[0].lastName === "Undefined")) { %>
-                                        No Data
-                                        <% } else if (property.owners.length> 0) { %>
-                                            <%= property.owners[0].firstName %>, <%= property.owners[0].lastName %>
-                                                    <% } else { %>
+                                    <% if (property.owners.length> 0) {
+                                        const owner = property.owners[0];
+                                        const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+                                        const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
+                                        if (firstName || lastName) { %>
+                                        <%= firstName %>
+                                            <%= lastName %>
+                                                <% } else { %>
+                                                    No Data
+                                                    <% } } else { %>
                                                         No Data
                                                         <% } %>
                                 </td>
+
 
 
                                 <td class="py-2 px-2 flex flex-row items-center">

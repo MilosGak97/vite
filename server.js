@@ -259,7 +259,9 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 const owners = response.data.propertyAttributes.owners;
                 formattedOwners = owners.map(owner => ({
                     firstName: owner.firstName || 'Undefined',
-                    lastName: owner.lastName || 'Undefined'
+                    middleName: owner.middleName || 'Undefined',
+                    lastName: owner.lastName || 'Undefined',
+                    ownerName: owner.ownerName || "Undefined"
                 }));
 
 
