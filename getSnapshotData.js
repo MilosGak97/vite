@@ -5,6 +5,8 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function getSnapshotData(req, res) {
     try {
+
+        /*
         async function fetchData() {
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
             const url2 = `https://api.brightdata.com/datasets/v3/snapshot/s_lz1ovu5f6l3w8d2v5?format=json`;
@@ -31,6 +33,7 @@ async function getSnapshotData(req, res) {
                 }
             }
         }
+*/
 
 
         async function listAllListings(data) {
