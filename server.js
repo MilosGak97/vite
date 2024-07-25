@@ -84,20 +84,44 @@ app.get('/export-csv', async (req, res) => {
         if (statusFilters.length > 0) {
             query.current_status = { $in: statusFilters };
         }
-
-        // Fetch filtered properties
         const properties = await propertiesCollection.find(query).toArray();
 
         // Define the fields you want to include in the CSV
-        const fields = ['zpid', 'address', 'city', 'state', 'zipcode', 'current_status'];
+        const fields = ['address', 'city', 'state', 'zipcode', 'owner_fullname'];
 
-        // Map properties to include only the specified fields
+        // Function to generate owner_fullname based on owners array
+        const generateOwnerFullname = (owners) => {
+            if (owners.length === 0) {
+                return '';
+            }
+
+            if (owners.length === 1) {
+                const owner = owners[0];
+                return `${owner.firstName} ${owner.lastName}`;
+            }
+
+            if (owners.length === 2) {
+                const [firstOwner, secondOwner] = owners;
+                if (firstOwner.lastName === secondOwner.lastName) {
+                    return `${firstOwner.firstName} & ${secondOwner.firstName} ${firstOwner.lastName}`;
+                } else {
+                    return `${firstOwner.firstName} ${firstOwner.lastName} & ${secondOwner.firstName} ${secondOwner.lastName}`;
+                }
+            }
+
+            // Handle cases with more than 2 owners if necessary
+            // For now, returning a default message
+            return 'More than two owners';
+        };
+
+        // Map properties to include only the specified fields and generate owner_fullname
         const filteredProperties = properties.map(property => {
             return {
                 address: property.address,
                 city: property.city,
                 state: property.state,
-                zipcode: property.zipcode
+                zipcode: property.zipcode,
+                owner_fullname: generateOwnerFullname(property.owners)
             };
         });
 
