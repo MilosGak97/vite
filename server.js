@@ -283,6 +283,12 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 return res.status(404).send('Property not found');
             }
 
+        } else {
+            const updateResult = await Property.updateOne(
+                { zpid: Number(zpid) }, // Ensure zpid is a number
+                { $set: { verified: verified } }
+            );
+
         }
         res.redirect('/filtering');
     } catch (error) {
