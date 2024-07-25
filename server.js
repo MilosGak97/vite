@@ -85,7 +85,6 @@ app.get('/export-csv', async (req, res) => {
             query.current_status = { $in: statusFilters };
         }
 
-
         const properties = await propertiesCollection.find(query).toArray();
 
         // Define the fields you want to include in the CSV
@@ -99,7 +98,7 @@ app.get('/export-csv', async (req, res) => {
 
             // Helper function to check if owner is valid
             const isValidOwner = (owner) => {
-                return owner && owner.firstName !== 'undefined' && owner.lastName !== 'undefined';
+                return owner && owner.firstName !== 'Undefined' && owner.lastName !== 'Undefined';
             };
 
             // Handle cases with one owner
