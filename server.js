@@ -37,6 +37,9 @@ app.post('/trigger', sendPostRequests);
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
 
+// Endpoint to trigger sendPostRequests
+app.post('/trigger3', sendPostRequests2);
+
 // Define routes
 app.get('/dashboard', (req, res) => {
     res.render('index.ejs');
