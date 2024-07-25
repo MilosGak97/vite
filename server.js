@@ -222,86 +222,68 @@ app.post('/update-verified/:zpid', async (req, res) => {
             console.error('Error: Verified field is undefined');
             return res.status(400).send('Invalid form submission');
         }
+        console.log("Verified: ", verified);
+        if (verified === "Full" || verified === "NoPhotos") {
 
-        const database = await connectDB();
-        const Property = database.collection('properties');
+            const database = await connectDB();
+            const Property = database.collection('properties');
 
-        const getAddress = await Property.findOne(
-            { zpid: Number(zpid) }
-        )
+            const getAddress = await Property.findOne(
+                { zpid: Number(zpid) }
+            )
 
-        const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
-        console.log(fullAddress);
+            const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
+            console.log(fullAddress);
 
-        // Encode the full address for the URL
-        const encodedAddress = encodeURIComponent(fullAddress);
-
-
-        // Initialize owners array
-        let formattedOwners = [];
-
-        try {
-            // Send the request to the Precisely API
-            const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
-                headers: {
-                    'Authorization': 'Bearer cU64MatsEQuCos34bUAYKUhDWkWE', // Replace with your actual Bearer token
-                    'Content-Type': 'application/json; charset=utf-8'
-                }
-            });
-
-            console.log("API RESULT: ", response.data);
-
-            // Extract owner details
-            const owners = response.data.propertyAttributes.owners;
-            formattedOwners = owners.map(owner => ({
-                firstName: owner.firstName || 'Undefined',
-                lastName: owner.lastName || 'Undefined'
-            }));
+            // Encode the full address for the URL
+            const encodedAddress = encodeURIComponent(fullAddress);
 
 
-        } catch (apiError) {
-            console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+            // Initialize owners array
+            let formattedOwners = [];
 
-            // Set default values if API request fails
-            formattedOwners = [{
-                firstName: 'Undefined',
-                lastName: 'Undefined'
-            }];
-        }
-
-
-        /*
-        
+            try {
                 // Send the request to the Precisely API
                 const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                     headers: {
-                        'Authorization': 'Bearer AMaYOoJlVt2hR0hALkGWno8MFWyt', // Replace with your actual Bearer token
+                        'Authorization': 'Bearer cU64MatsEQuCos34bUAYKUhDWkWE', // Replace with your actual Bearer token
                         'Content-Type': 'application/json; charset=utf-8'
                     }
                 });
-        
+
                 console.log("API RESULT: ", response.data);
-        
+
                 // Extract owner details
                 const owners = response.data.propertyAttributes.owners;
-                const formattedOwners = owners.map(owner => ({
-                    ownerId: owner.ownerId,
-                    firstName: owner.firstName,
-                    middleName: owner.middleName,
-                    lastName: owner.lastName
+                formattedOwners = owners.map(owner => ({
+                    firstName: owner.firstName || 'Undefined',
+                    lastName: owner.lastName || 'Undefined'
                 }));
-        */
-        console.log("Formatted Owners: ", formattedOwners);
-        const updateResult = await Property.updateOne(
-            { zpid: Number(zpid) }, // Ensure zpid is a number
-            { $set: { owners: formattedOwners, verified: verified } }
-        );
 
-        if (updateResult.modifiedCount === 0) {
-            console.error('Error updating property: No documents matched the query');
-            return res.status(404).send('Property not found');
+
+            } catch (apiError) {
+                console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+
+                // Set default values if API request fails
+                formattedOwners = [{
+                    firstName: 'Undefined',
+                    lastName: 'Undefined'
+                }];
+            }
+
+
+            console.log("Formatted Owners: ", formattedOwners);
+            const updateResult = await Property.updateOne(
+                { zpid: Number(zpid) }, // Ensure zpid is a number
+                { $set: { owners: formattedOwners, verified: verified } }
+            );
+
+            if (updateResult.modifiedCount === 0) {
+                console.error('Error updating property: No documents matched the query');
+                return res.status(404).send('Property not found');
+            }
+
         }
-
         res.redirect('/filtering');
     } catch (error) {
         console.error('Error updating property:', error);
