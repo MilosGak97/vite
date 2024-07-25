@@ -12,9 +12,9 @@ async function sendPostRequests2(req, res) {
             console.log(requrl);
             return res.status(400).send('Invalid URL');
         }
-        console.log("BODY CONTENT: ", body)
         const body = [{ url: requrl }];
 
+        console.log("BODY CONTENT: ", body)
         /*
         const body = [{
             "url": "https://www.zillow.com/mercer-county-nj/?searchQueryState=%7B%22mapBounds%22%3A%7B%22north%22%3A40.84567812635663%2C%22south%22%3A39.99045155841231%2C%22east%22%3A-73.61060925585937%2C%22west%22%3A-75.21735974414062%7D%2C%22isMapVisible%22%3Atrue%2C%22filterState%22%3A%7B%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1201%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2802%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2441%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2552%2C%22regionType%22%3A4%7D%5D%2C%22pagination%22%3A%7B%7D%7D"
