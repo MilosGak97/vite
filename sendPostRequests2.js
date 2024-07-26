@@ -143,6 +143,7 @@ async function sendPostRequests2(req, res) {
                         // Initialize owners array
                         let formattedOwners = [];
                         let notes;// 
+                        /*
                         if (photoCount < 5) {
                             verified = "NoPhotos";
 
@@ -202,7 +203,7 @@ async function sendPostRequests2(req, res) {
                                 }];
                             }
                         }
-
+*/
 
                         if (hdpTypeDimension === "ForSale") {
                             for_sale = "Yes";

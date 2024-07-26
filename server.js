@@ -453,7 +453,6 @@ app.get('/shippings', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
 app.get('/shipping/:id', async (req, res) => {
     try {
         const shippingId = new ObjectId(req.params.id); // Convert shippingId to ObjectId
@@ -469,15 +468,32 @@ app.get('/shipping/:id', async (req, res) => {
             ]
         }).toArray();
 
-        console.log('Properties:', properties); // Log properties for debugging
+        // Add the shipped_at_status field based on the matching condition
+        const propertiesWithStatus = properties.map(property => {
+            let shipped_at_status = '';
+            if (property.for_sale_reachout && property.for_sale_reachout.equals(shippingId)) {
+                shipped_at_status = 'For Sale';
+            } else if (property.pending_reachout && property.pending_reachout.equals(shippingId)) {
+                shipped_at_status = 'Pending';
+            } else if (property.coming_soon_reachout && property.coming_soon_reachout.equals(shippingId)) {
+                shipped_at_status = 'Coming Soon';
+            }
+            return {
+                ...property,
+                shipped_at_status
+            };
+        });
+
+        console.log('Properties:', propertiesWithStatus); // Log properties for debugging
 
         // Render the properties in a new template
-        res.render('shipping_properties', { properties });
+        res.render('shipping_properties', { properties: propertiesWithStatus });
     } catch (error) {
         console.error("Error fetching properties:", error);
         res.status(500).send("Internal Server Error");
     }
 });
+
 
 
 
