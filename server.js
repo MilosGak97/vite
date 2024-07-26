@@ -3,12 +3,12 @@ const bodyParser = require('body-parser');
 const webhookHandler = require('./webhookHandler');
 const sendPostRequests = require('./sendPostRequests');
 const sendPostRequests2 = require('./sendPostRequests2');
-const sendPostRequests3 = require('./getSnapshotData');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
 const { parse } = require('json2csv');
 
+const { ObjectId } = require('mongodb');
 
 
 
@@ -50,54 +50,37 @@ app.get('/export-csv', async (req, res) => {
     try {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
+        const shippingsCollection = database.collection('shippings');
 
-        // Get query parameters
-        const { state, date_start, date_end, forsale, comingsoon, pending } = req.query;
 
-        // Build query object
+
+
+
+        // Build query object with fixed criteria
         let query = {
-            verified: { $in: ["Full", "NoPhotos"] }
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [false] },
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ]
         };
 
-        // Add state filter if provided
-        if (state) {
-            query.state = state;
-        }
 
-        // Add date range filter if provided
-        if (date_start && date_end) {
-            query.current_status_date = {
-                $gte: new Date(date_start),
-                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
-            };
-        } else if (date_start) {
-            query.current_status_date = { $gte: new Date(date_start) };
-        } else if (date_end) {
-            query.current_status_date = {
-                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
-            };
-        }
-
-        // Add status filter if provided
-        const statusFilters = [];
-        if (forsale) statusFilters.push("ForSale");
-        if (comingsoon) statusFilters.push("ComingSoon");
-        if (pending) statusFilters.push("Pending");
-
-        if (statusFilters.length > 0) {
-            query.current_status = { $in: statusFilters };
-        }
 
         const properties = await propertiesCollection.find(query).toArray();
 
         // Define the fields you want to include in the CSV
-        const fields = ['address', 'city', 'state', 'zipcode', 'owner_fullname'];
+        const fields = ['owner_fullname', 'current_resident', 'address', 'city', 'state', 'zipcode'];
 
-        // Function to generate owner_fullname based on owners array
         // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
             if (!owners || owners.length === 0) {
-                return 'No Data';
+                return '';
             }
 
             const owner = owners[0];
@@ -111,25 +94,62 @@ app.get('/export-csv', async (req, res) => {
             } else if (firstName || middleName || lastName) {
                 return `${firstName} ${middleName} ${lastName}`.trim();
             } else {
-                return 'No Data';
+                return '';
             }
         };
 
         // Map properties to include only the specified fields and generate owner_fullname
         const filteredProperties = properties.map(property => {
+            let owner_fullname = generateOwnerFullname(property.owners);
+            let current_resident = "Or Current Resident";
+
+            if (owner_fullname === '') {
+                owner_fullname = "Current";
+                current_resident = "Resident";
+            }
+
             return {
+                owner_fullname: owner_fullname,
+                current_resident: current_resident,
                 address: property.address,
                 city: property.city,
                 state: property.state,
-                zipcode: property.zipcode,
-                owner_fullname: generateOwnerFullname(property.owners)
+                zipcode: property.zipcode
             };
         });
 
+        // Create a new shipping document
+        const shippingDate = new Date().toISOString().split('T')[0];
+        const shippingDocument = {
+            created_at: new Date(),
+            shipping_date: shippingDate,
+            total_count: properties.length
+        };
+
+        const shippingResult = await shippingsCollection.insertOne(shippingDocument);
+        const shippingId = shippingResult.insertedId;
+
+        // Update properties with the new shippingId in the appropriate field
+        for (const property of properties) {
+            let updateField;
+            if (property.current_status === 'ForSale') {
+                updateField = 'for_sale_reachout';
+            } else if (property.current_status === 'ComingSoon') {
+                updateField = 'coming_soon_reachout';
+            } else if (property.current_status === 'Pending') {
+                updateField = 'pending_reachout';
+            }
+
+            if (updateField) {
+                await propertiesCollection.updateOne(
+                    { _id: property._id },
+                    { $set: { [updateField]: shippingId } }
+                );
+            }
+        }
+
         // Convert filtered properties to CSV format
         const csv = parse(filteredProperties, { fields });
-
-
 
         console.log(csv); // or save the CSV to a file
 
@@ -142,8 +162,6 @@ app.get('/export-csv', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
-
 
 
 app.get('/filtering', async (req, res) => {
@@ -303,6 +321,47 @@ app.post('/update-verified/:zpid', async (req, res) => {
     }
 });
 
+app.get('/fix-address', async (req, res) => {
+    try {
+        // Connect to the database
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        // Fetch all properties
+        const properties = await propertiesCollection.find({}).toArray();
+        console.log(`Fetched ${properties.length} properties`);
+
+        // Regex to check if a string starts with a number
+        const startsWithNumberRegex = /^\d+/;
+
+        // Iterate through each property and update verified field if address doesn't start with a number
+        for (const property of properties) {
+            try {
+                const address = property.address || "";
+                if (!startsWithNumberRegex.test(address)) {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+                        { $set: { verified: "Empty" } }
+                    );
+                    console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
+                } else {
+                    console.log(`Property ID ${property._id} has a valid address: "${address}"`);
+                }
+            } catch (updateError) {
+                console.error(`Error updating property ID ${property._id}:`, updateError);
+            }
+        }
+
+        console.log('Address check and update completed successfully.');
+        res.send('Address check and update completed successfully.');
+    } catch (error) {
+        console.error('Error checking and updating addresses:', error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        // Ensure the client is closed when done
+        await client.close();
+    }
+});
 
 app.get('/listings', async (req, res) => {
     try {
@@ -314,7 +373,8 @@ app.get('/listings', async (req, res) => {
 
         // Build query object
         let query = {
-            verified: { $in: ["Full", "NoPhotos"] }
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [false] }
         };
 
         // Add state filter if provided
@@ -346,6 +406,16 @@ app.get('/listings', async (req, res) => {
             query.current_status = { $in: statusFilters };
         }
 
+        // Add logic to check if the property has not been shipped yet
+        query.$or = [
+            { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+            { current_status: "ForSale", for_sale_reachout: null },
+            { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+            { current_status: "ComingSoon", coming_soon_reachout: null },
+            { current_status: "Pending", pending_reachout: { $exists: false } },
+            { current_status: "Pending", pending_reachout: null }
+        ];
+
         // Fetch filtered properties
         const properties = await propertiesCollection.find(query).toArray();
         const totalResults = properties.length;
@@ -368,12 +438,48 @@ app.get('/listings', async (req, res) => {
 });
 
 // server.js or app.js
+app.get('/shippings', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const shippingsCollection = database.collection('shippings');
 
+        // Fetch all shippings, sorted by created_at in descending order
+        const shippings = await shippingsCollection.find().sort({ created_at: -1 }).toArray();
 
-
-app.get('/shipping', (req, res) => {
-    res.render('shipping.ejs');
+        // Render the EJS template with shippings data
+        res.render('shippings', { shippings });
+    } catch (error) {
+        console.error("Error fetching shippings:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
+
+app.get('/shipping/:id', async (req, res) => {
+    try {
+        const shippingId = new ObjectId(req.params.id); // Convert shippingId to ObjectId
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        // Fetch all properties with the given shipping ID
+        const properties = await propertiesCollection.find({
+            $or: [
+                { for_sale_reachout: shippingId },
+                { pending_reachout: shippingId },
+                { coming_soon_reachout: shippingId }
+            ]
+        }).toArray();
+
+        console.log('Properties:', properties); // Log properties for debugging
+
+        // Render the properties in a new template
+        res.render('shipping_properties', { properties });
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 
 app.get('/skiptracing', (req, res) => {
     res.render('skiptracing.ejs');

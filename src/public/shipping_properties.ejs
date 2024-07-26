@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Project</title>
+    <link href="../output.css" rel="stylesheet">
+    <link href="../styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <%- include('partials/menu') %>
+
+        <div class="text-center container mx-auto p-4">
+            <h1 class="text-2xl font-bold mb-4">Properties for Shipping</h1>
+
+            <table class="min-w-full bg-white border">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">#</th>
+                        <th class="py-2 px-4 border-b">Address</th>
+                        <th class="py-2 px-4 border-b">City</th>
+                        <th class="py-2 px-4 border-b">State</th>
+                        <th class="py-2 px-4 border-b">Zipcode</th>
+                        <th class="py-2 px-4 border-b">Status</th>
+                        <th class="py-2 px-4 border-b">Owner Full Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% properties.forEach((property, index)=> { %>
+                        <tr>
+                            <td class="py-2 px-4 border-b">
+                                <%= index + 1 %>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <%= property.address %>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <%= property.city %>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <%= property.state %>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <%= property.zipcode %>
+                            </td>
+                            <td class="py-2 px-4 border-b">
+                                <%= property.current_status %>
+                            </td>
+                            <td class="py-2 px-2 border border-white">
+                                <% if (property.owners && property.owners.length> 0) {
+                                    const owner = property.owners[0];
+                                    const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ?
+                                    owner.ownerName : "";
+                                    const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+                                    const middleName = owner.middleName && owner.middleName !== "Undefined" ?
+                                    owner.middleName : "";
+                                    const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
+
+                                    if (ownerName) { %>
+                                    <%= ownerName %> <!-- Display ownerName if available -->
+                                        <% } else if (firstName || middleName || lastName) { %>
+                                            <%= firstName %>
+                                                <%= middleName %>
+                                                    <%= lastName %>
+                                                        <% } else { %>
+                                                            No Data
+                                                            <% } } else { %>
+                                                                No Data
+                                                                <% } %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+</body>
+
+</html>

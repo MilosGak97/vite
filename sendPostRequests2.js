@@ -139,7 +139,7 @@ async function sendPostRequests2(req, res) {
 
                         let current_status;//
                         let current_status_date;//
-
+                        let initial_scrape = true;
                         // Initialize owners array
                         let formattedOwners = [];
                         let notes;// 
@@ -267,7 +267,8 @@ async function sendPostRequests2(req, res) {
                             current_status: current_status,
                             current_status_date: current_status_date,
                             notes: notes,
-                            companyOwned: companyOwned
+                            companyOwned: companyOwned,
+                            initial_scrape: initial_scrape
                         };
 
                         await collection.insertOne(propertyData);
