@@ -164,14 +164,33 @@ async function sendPostRequests2(req, res) {
 
                                 console.log("API RESULT: ", response.data);
 
-                                // Extract owner details
-                                const owners = response.data.propertyAttributes.owners;
-                                formattedOwners = owners.map(owner => ({
-                                    firstName: owner.firstName || 'Undefined',
-                                    middleName: owner.middleName || 'Undefined',
-                                    lastName: owner.lastName || 'Undefined',
-                                    ownerName: owner.ownerName || "Undefined"
-                                }));
+                                let companyOwned = false; // Initialize the flag
+
+                                // Function to check if a string contains any of the keywords
+                                const containsKeywords = (str) => {
+                                    const keywords = ["LLC", "BANK", "TRUST"];
+                                    return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                                };
+
+                                // Format owner details and check for keywords
+                                formattedOwners = owners.map(owner => {
+                                    const firstName = owner.firstName || 'Undefined';
+                                    const middleName = owner.middleName || 'Undefined';
+                                    const lastName = owner.lastName || 'Undefined';
+                                    const ownerName = owner.ownerName || 'Undefined';
+
+                                    // Check if any of the fields contain the keywords
+                                    if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                                        companyOwned = true;
+                                    }
+
+                                    return {
+                                        firstName,
+                                        middleName,
+                                        lastName,
+                                        ownerName
+                                    };
+                                });
 
 
                             } catch (apiError) {
