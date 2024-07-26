@@ -268,7 +268,6 @@ async function sendPostRequests2(req, res) {
                             current_status_date: current_status_date,
                             notes: notes,
                             companyOwned: companyOwned,
-                            initial_scrape: initial_scrape,
                             branches: branches
                         };
 
