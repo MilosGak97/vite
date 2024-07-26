@@ -135,7 +135,7 @@ async function sendPostRequests2(req, res) {
 
                         let verified;//
 
-                        let company_owned;//
+                        let companyOwned;//
 
                         let current_status;//
                         let current_status_date;//
@@ -263,7 +263,6 @@ async function sendPostRequests2(req, res) {
                             pending_reachout: pending_reachout,
                             verified: verified,
                             owners: formattedOwners,
-                            company_owned: company_owned,
                             current_status: current_status,
                             current_status_date: current_status_date,
                             notes: notes,
