@@ -218,6 +218,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
 
             // Initialize owners array
             let formattedOwners = [];
+            let companyOwned = false; // Initialize the flag
 
             try {
                 // Send the request to the Precisely API
@@ -230,7 +231,9 @@ app.post('/update-verified/:zpid', async (req, res) => {
 
                 console.log("API RESULT: ", response.data);
 
-                let companyOwned = false; // Initialize the flag
+                // Extract owner details
+                const owners = response.data.propertyAttributes.owners;
+
 
                 // Function to check if a string contains any of the keywords
                 const containsKeywords = (str) => {
@@ -258,6 +261,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
                     };
                 });
 
+
             } catch (apiError) {
                 console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
 
@@ -272,7 +276,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
             console.log("Formatted Owners: ", formattedOwners);
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
-                { $set: { owners: formattedOwners, verified: verified } }
+                { $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
             );
 
             if (updateResult.modifiedCount === 0) {

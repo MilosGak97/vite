@@ -152,6 +152,7 @@ async function sendPostRequests2(req, res) {
                             // Encode the full address for the URL
                             const encodedAddress = encodeURIComponent(fullAddress);
 
+                            let companyOwned = false; // Initialize the flag
 
                             try {
                                 // Send the request to the Precisely API
@@ -164,7 +165,6 @@ async function sendPostRequests2(req, res) {
 
                                 console.log("API RESULT: ", response.data);
 
-                                let companyOwned = false; // Initialize the flag
 
                                 // Function to check if a string contains any of the keywords
                                 const containsKeywords = (str) => {
@@ -267,7 +267,7 @@ async function sendPostRequests2(req, res) {
                             current_status: current_status,
                             current_status_date: current_status_date,
                             notes: notes,
-                            company_owned: company_owned
+                            companyOwned: companyOwned
                         };
 
                         await collection.insertOne(propertyData);
