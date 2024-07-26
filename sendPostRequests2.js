@@ -266,7 +266,8 @@ async function sendPostRequests2(req, res) {
                             company_owned: company_owned,
                             current_status: current_status,
                             current_status_date: current_status_date,
-                            notes: notes
+                            notes: notes,
+                            company_owned: company_owned
                         };
 
                         await collection.insertOne(propertyData);
