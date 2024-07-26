@@ -251,7 +251,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 // Send the request to the Precisely API
                 const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                     headers: {
-                        'Authorization': 'Bearer bwVARnCMssLP1FDGViJ0s2S96VeG', // Replace with your actual Bearer token
+                        'Authorization': 'Bearer SHxoIFrmTCE9HTlue9HMDvqkua6g', // Replace with your actual Bearer token
                         'Content-Type': 'application/json; charset=utf-8'
                     }
                 });
