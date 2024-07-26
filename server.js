@@ -94,53 +94,25 @@ app.get('/export-csv', async (req, res) => {
         const fields = ['address', 'city', 'state', 'zipcode', 'owner_fullname'];
 
         // Function to generate owner_fullname based on owners array
+        // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
             if (!owners || owners.length === 0) {
-                return '';
+                return 'No Data';
             }
 
-            // Helper function to check if owner is valid
-            const isValidOwner = (owner) => {
-                return owner && owner.firstName !== 'Undefined' && owner.lastName !== 'Undefined';
-            };
+            const owner = owners[0];
+            const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ? owner.ownerName : "";
+            const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+            const middleName = owner.middleName && owner.middleName !== "Undefined" ? owner.middleName : "";
+            const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
 
-            // Handle cases with one owner
-            if (owners.length === 1) {
-                const owner = owners[0];
-                return isValidOwner(owner) ? `${owner.firstName || ''} ${owner.lastName || ''}`.trim() : '';
+            if (ownerName) {
+                return ownerName; // Display ownerName if available
+            } else if (firstName || middleName || lastName) {
+                return `${firstName} ${middleName} ${lastName}`.trim();
+            } else {
+                return 'No Data';
             }
-
-            // Handle cases with two owners
-            if (owners.length >= 2) {
-                const firstOwner = owners[0];
-                const secondOwner = owners[1];
-
-                // Check if both owners are valid
-                const isFirstOwnerValid = isValidOwner(firstOwner);
-                const isSecondOwnerValid = isValidOwner(secondOwner);
-
-                if (isFirstOwnerValid && isSecondOwnerValid) {
-                    // Check if both owners have the same last name
-                    if (firstOwner.lastName === secondOwner.lastName) {
-                        return `${firstOwner.firstName || ''} & ${secondOwner.firstName || ''} ${firstOwner.lastName}`.trim();
-                    } else {
-                        return `${firstOwner.firstName || ''} ${firstOwner.lastName || ''} & ${secondOwner.firstName || ''} ${secondOwner.lastName || ''}`.trim();
-                    }
-                }
-
-                if (isFirstOwnerValid) {
-                    return `${firstOwner.firstName || ''} ${firstOwner.lastName || ''}`.trim();
-                }
-
-                if (isSecondOwnerValid) {
-                    return `${secondOwner.firstName || ''} ${secondOwner.lastName || ''}`.trim();
-                }
-
-                return ''; // No valid owners
-            }
-
-            // Handle cases with more than 2 owners if necessary
-            return 'More than two owners';
         };
 
         // Map properties to include only the specified fields and generate owner_fullname
