@@ -152,7 +152,6 @@ async function sendPostRequests2(req, res) {
                             // Encode the full address for the URL
                             const encodedAddress = encodeURIComponent(fullAddress);
 
-                            let companyOwned = false; // Initialize the flag
 
                             try {
                                 // Send the request to the Precisely API
