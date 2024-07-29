@@ -322,6 +322,32 @@ app.post('/update-verified/:zpid', async (req, res) => {
     }
 });
 
+app.get('/fix/:zpid', async (req, res) => {
+    const { zpid } = req.params;
+
+    try {
+        // Connect to the database
+        const database = await connectDB();
+        const Property = database.collection('properties');
+
+        // Update the verified field to null
+        const updateResult = await Property.updateOne(
+            { zpid: Number(zpid) }, // Ensure zpid is a number
+            { $set: { verified: null } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.error('Error updating property: No documents matched the query');
+            return res.status(404).send('Property not found');
+        }
+
+        res.status(200).send('Property verified field updated to null successfully');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('An error occurred while updating the property');
+    }
+});
+
 app.get('/fix-address', async (req, res) => {
     try {
         // Connect to the database
