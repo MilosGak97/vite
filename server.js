@@ -347,6 +347,7 @@ app.get('/fix/:zpid', async (req, res) => {
     }
 });
 
+/*
 app.get('/fix-address', async (req, res) => {
     try {
         // Connect to the database
@@ -388,6 +389,41 @@ app.get('/fix-address', async (req, res) => {
         await client.close();
     }
 });
+*/
+
+
+app.get('/fixing', async (req, res) => {
+    let client;
+    try {
+        // Connect to the database
+        client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+        const database = client.db(dbName);
+        const propertiesCollection = database.collection('properties');
+
+        // Fetch all properties with initial_scrape === true
+        const propertiesToDelete = await propertiesCollection.find({ initial_scrape: true }).toArray();
+        console.log(`Fetched ${propertiesToDelete.length} properties to delete`);
+
+        // Delete all properties with initial_scrape === true
+        const deleteResult = await propertiesCollection.deleteMany({ initial_scrape: true });
+        console.log(`Deleted ${deleteResult.deletedCount} properties with initial_scrape === true`);
+
+        res.send('Properties with initial_scrape === true have been deleted successfully.');
+    } catch (error) {
+        console.error('Error deleting properties:', error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        // Ensure the client is closed when done
+        if (client) {
+            await client.close();
+        }
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+
 
 app.get('/listings', async (req, res) => {
     try {
