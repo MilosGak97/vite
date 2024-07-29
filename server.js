@@ -396,8 +396,7 @@ app.get('/fixing', async (req, res) => {
     let client;
     try {
         // Connect to the database
-        client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-        const database = client.db(dbName);
+        const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
         // Fetch all properties with initial_scrape === true
@@ -418,10 +417,6 @@ app.get('/fixing', async (req, res) => {
             await client.close();
         }
     }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
 });
 
 
