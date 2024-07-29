@@ -168,9 +168,10 @@ app.get('/filtering', async (req, res) => {
     try {
         const database = await connectDB();
         const Property = database.collection('properties');
-
-        // Fetch one property with 'verified' field as null  
-        const property = await Property.findOne({ verified: null });
+        const property = await Property.findOne({
+            verified: null,
+            initial_scrape: { $exists: false }
+        });
 
         if (property) {
             // Convert photo strings to arrays if needed

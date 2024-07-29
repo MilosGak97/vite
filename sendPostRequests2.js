@@ -140,7 +140,7 @@ async function sendPostRequests2(req, res) {
                         let current_status;//
                         let current_status_date;//
                         let initial_scrape = true;
-                        let branches = "Texas";
+                        let branches = "NJ";
                         // Initialize owners array
                         let formattedOwners = [];
                         let notes;// 
