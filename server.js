@@ -169,8 +169,7 @@ app.get('/filtering', async (req, res) => {
         const database = await connectDB();
         const Property = database.collection('properties');
         const property = await Property.findOne({
-            verified: null,
-            initial_scrape: { $exists: false }
+            verified: null
         });
 
         if (property) {
