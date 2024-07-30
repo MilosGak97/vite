@@ -4,6 +4,8 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function sendPostRequests2(req, res) {
     try {
+
+        /*
         const { requrl } = req.body;
 
         // Validate URL (basic example)
@@ -13,14 +15,42 @@ async function sendPostRequests2(req, res) {
             return res.status(400).send('Invalid URL');
         }
         const body = [{ url: requrl }];
-
-        console.log("BODY CONTENT: ", body)
+*/
         /*
         const body = [{
             "url": "https://www.zillow.com/mercer-county-nj/?searchQueryState=%7B%22mapBounds%22%3A%7B%22north%22%3A40.84567812635663%2C%22south%22%3A39.99045155841231%2C%22east%22%3A-73.61060925585937%2C%22west%22%3A-75.21735974414062%7D%2C%22isMapVisible%22%3Atrue%2C%22filterState%22%3A%7B%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1201%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2802%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2441%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A2552%2C%22regionType%22%3A4%7D%5D%2C%22pagination%22%3A%7B%7D%7D"
         }
         ];
         */
+
+        const { requrl, branch } = req.body;
+
+        // Validate URL (basic example)
+        if (!requrl || typeof requrl !== 'string') {
+            console.log("Type Of (URL):", typeof requrl);
+            console.log("URL: ", requrl);
+            return res.status(400).send('Invalid URL');
+        }
+
+        const body = [{ url: requrl }];
+        // Validate URL (basic example)
+        if (!branch || typeof branch !== 'string') {
+            console.log("Type Of (BRANCH):", typeof branch);
+            console.log("Branch: ", branch);
+            return res.status(400).send('Invalid URL');
+        }
+
+        // Log received parameters
+        console.log("Received URL: ", requrl);
+        console.log("Received Branch: ", branch);
+
+        // Sample response to mimic some processing
+        res.status(200).send({
+            message: 'Parameters received successfully',
+            receivedData: { requrl, branch }
+        });
+
+
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
@@ -52,7 +82,8 @@ async function sendPostRequests2(req, res) {
 
         const shapshotData = {
             snapshot_id: snapshotId,
-            requested_time: new Date()
+            requested_time: new Date(),
+            branch: branch
         }
         await collection.insertOne(shapshotData);
 
@@ -69,11 +100,11 @@ async function sendPostRequests2(req, res) {
                     });
 
                     if (response.data.status === 'running') {
-                        console.log('Snapshot is not ready yet, trying again in 10 seconds...');
+                        console.log(snapshotId, ':Not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
                         console.log('Response data:', response.data);
-                        listAllListings(response.data);
+                        listAllListings(response.data, branch);
                         return response.data;
                     }
                 } catch (error) {
@@ -84,10 +115,8 @@ async function sendPostRequests2(req, res) {
         }
 
 
-        async function listAllListings(data) {
+        async function listAllListings(data, branch) {
             if (Array.isArray(data)) {
-
-
                 const dataArray = data;
                 const collection = client.db().collection('properties');
 
@@ -140,10 +169,10 @@ async function sendPostRequests2(req, res) {
                         let current_status;//
                         let current_status_date;//
                         let initial_scrape = true;
-                        let branches = "NJ";
                         // Initialize owners array
                         let formattedOwners = [];
-                        let notes;// 
+                        let notes;//
+                        let readytodelete = true;
                         /*
                         if (photoCount < 5) {
                             verified = "NoPhotos";
@@ -268,8 +297,8 @@ async function sendPostRequests2(req, res) {
                             current_status_date: current_status_date,
                             notes: notes,
                             companyOwned: companyOwned,
-                            branches: branches,
-                            initial_scrape: initial_scrape
+                            branch: branch,
+                            readytodelete
                         };
 
                         await collection.insertOne(propertyData);

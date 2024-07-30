@@ -10,9 +10,98 @@
     <link href="styles.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="bg-third">
     <%- include('partials/menu') %>
+        <!DOCTYPE html>
+        <html lang="en">
 
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Scrapper Trigger</title>
+            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        </head>
+
+        <body class="bg-gray-100">
+
+            <div class="min-h-screen flex items-center justify-center">
+                <div class="w-full max-w-2xl p-8 bg-white shadow-lg rounded-lg">
+                    <!-- Form to trigger the POST request -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-4">Trigger Scrapping</h2>
+                        <form id="triggerForm" action="/trigger2" method="POST">
+                            <div class="mb-4">
+                                <label for="requrl" class="block text-gray-700">URL:</label>
+                                <input type="text" id="requrl" name="requrl" placeholder="Enter URL" required
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div class="mb-4">
+                                <label for="branch" class="block text-gray-700">Branch:</label>
+                                <select id="branch" name="branch"
+                                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <option value="TX">TX Branch</option>
+                                    <option value="NJ">NJ Branch</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white rounded-md">Trigger
+                                Scrapping</button>
+                        </form>
+                    </div>
+
+                    <!-- Buttons to run specific scrappers -->
+                    <div class="mb-8">
+                        <h2 class="text-2xl font-semibold mb-4">Run Scrapper</h2>
+                        <button id="runTXScrapper" class="w-full px-4 py-2 bg-red-500 text-white rounded-md mb-4">Run TX
+                            Scrapper</button>
+                        <button id="runNJScrapper" class="w-full px-4 py-2 bg-green-500 text-white rounded-md">Run NJ
+                            Scrapper</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById('runTXScrapper').addEventListener('click', function () {
+                    runScrappers('TX');
+                });
+
+                document.getElementById('runNJScrapper').addEventListener('click', function () {
+                    runScrappers('NJ');
+                });
+
+                async function runScrappers(branch) {
+                    const urls = [
+                        'https://example.com/trigger1',
+                        'https://example.com/trigger2',
+                        'https://example.com/trigger3'
+                    ];
+
+                    const requrl = document.getElementById('requrl').value;
+
+                    for (const url of urls) {
+                        try {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ branch, requrl })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            console.log(`Response from ${url}:`, data);
+                        } catch (error) {
+                            console.error(`Error with request to ${url}:`, error);
+                        }
+                    }
+                }
+            </script>
+        </body>
+
+        </html>
 
 </body>
 
