@@ -44,12 +44,6 @@ async function sendPostRequests2(req, res) {
         console.log("Received URL: ", requrl);
         console.log("Received Branch: ", branch);
 
-        // Sample response to mimic some processing
-        res.status(200).send({
-            message: 'Parameters received successfully',
-            receivedData: { requrl, branch }
-        });
-
 
 
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
@@ -100,7 +94,7 @@ async function sendPostRequests2(req, res) {
                     });
 
                     if (response.data.status === 'running') {
-                        console.log(snapshotId, ':Not ready yet, trying again in 10 seconds...');
+                        console.log(snapshotId, ': Not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
                         console.log('Response data:', response.data);
