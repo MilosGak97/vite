@@ -44,7 +44,7 @@
                             <% } else { %>
                                 <p>No photos available for this property.</p>
                                 <% } %>
-                                    <form action="/update-verified/<%= PropertyZpid %>" method="post"
+                                    <form action="/update-verified-tx/<%= PropertyZpid %>" method="post"
                                         class="fixed bottom-20 left-[40%] w-[400px] flex flex-row justify-between">
                                         <button type="submit" name="verified" id="emptyButton" value="Empty"
                                             class="w-[160px] text-center py-4 bg-white border-4 border-primary font-black text-primary text-xl tracking-widest rounded-2xl">Empty
@@ -85,13 +85,13 @@
                 // Optional: Ensure the form is submitted with the appropriate action
                 document.getElementById('emptyButton').addEventListener('click', function () {
                     var form = document.getElementById('updateForm');
-                    form.action = '/update-verified/<%= PropertyZpid %>?verified=Empty';
+                    form.action = '/update-verified-tx/<%= PropertyZpid %>?verified=Empty';
                     form.submit();
                 });
 
                 document.getElementById('fullButton').addEventListener('click', function () {
                     var form = document.getElementById('updateForm');
-                    form.action = '/update-verified/<%= PropertyZpid %>?verified=Full';
+                    form.action = '/update-verified-tx/<%= PropertyZpid %>?verified=Full';
                     form.submit();
                 });
 

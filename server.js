@@ -53,9 +53,6 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
 
 
-
-
-
         // Build query object with fixed criteria
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
@@ -168,9 +165,15 @@ app.get('/filtering', async (req, res) => {
     try {
         const database = await connectDB();
         const Property = database.collection('properties');
-        const property = await Property.findOne({
-            verified: null
-        });
+
+        const query = {
+            verified: null,
+            initial_scrape: { $exists: false },
+            readytodelete: true
+        }
+        const totalCount = await Property.countDocuments(query)
+
+        const property = await Property.findOne(query);
 
         if (property) {
             // Convert photo strings to arrays if needed
@@ -191,16 +194,65 @@ app.get('/filtering', async (req, res) => {
             const PropertyZpid = property.zpid;
 
             // Render the EJS template with property data
-            res.render('filtering', { propertyFirst15, propertyOtherPhoto, PropertyZpid });
+            res.render('filtering', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
         } else {
             // Handle the case where no property was found
-            res.render('filtering', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null });
+            res.render('filtering', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
         }
     } catch (error) {
         console.error("Error fetching properties:", error);
         res.status(500).send("Internal Server Error");
     }
 });
+
+
+app.get('/filtering-tx', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const Property = database.collection('properties');
+
+        const query = {
+            verified: null,
+            branches: "TX",
+            initial_scrape: true
+        }
+
+        // Count the total number of properties matching the parameters
+        const totalCount = await Property.countDocuments(query);
+
+
+        const property = await Property.findOne(query);
+
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photo === 'string') {
+                try {
+                    property.photo = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photo = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photo.slice(0, 15);
+            const propertyOtherPhoto = property.photo.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering-tx', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering-tx', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
+        }
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 app.post('/update-verified/:zpid', async (req, res) => {
 
@@ -321,6 +373,50 @@ app.post('/update-verified/:zpid', async (req, res) => {
     }
 });
 
+
+
+app.post('/update-verified-tx/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        }
+        console.log("Verified: ", verified);
+
+
+        const database = await connectDB();
+        const Property = database.collection('properties');
+        const formattedOwners = [{
+            firstName: 'Initial_Scrape',
+            lastName: 'Initial_Scrape'
+        }];
+
+        let companyOwned = false; // Initialize the flag
+
+        const updateResult = await Property.updateOne(
+            { zpid: Number(zpid) }, // Ensure zpid is a number
+            { $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.error('Error updating property: No documents matched the query');
+            return res.status(404).send('Property not found');
+        }
+        console.log("Redirecting to /filtering-tx")
+        res.redirect('/filtering-tx');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.get('/fix/:zpid', async (req, res) => {
     const { zpid } = req.params;
 
@@ -399,13 +495,14 @@ app.get('/fixing', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        // Fetch all properties with initial_scrape === true
-        const propertiesToDelete = await propertiesCollection.find({ initial_scrape: true }).toArray();
-        console.log(`Fetched ${propertiesToDelete.length} properties to delete`);
+
 
         // Delete all properties with initial_scrape === true
-        const deleteResult = await propertiesCollection.deleteMany({ initial_scrape: true });
-        console.log(`Deleted ${deleteResult.deletedCount} properties with initial_scrape === true`);
+        const updateManyTX = await propertiesCollection.updateMany({ branches: "TX" },
+            { $unset: { branches: "TX" } }
+        );
+        console.log(updateManyTX)
+
 
         res.send('Properties with initial_scrape === true have been deleted successfully.');
     } catch (error) {
@@ -425,53 +522,22 @@ app.get('/listings', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        // Get query parameters
-        const { state, date_start, date_end, forsale, comingsoon, pending } = req.query;
 
         // Build query object
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [false] }
+            companyOwned: { $in: [false] },
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ]
         };
 
-        // Add state filter if provided
-        if (state) {
-            query.state = state;
-        }
 
-        // Add date range filter if provided
-        if (date_start && date_end) {
-            query.current_status_date = {
-                $gte: new Date(date_start),
-                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
-            };
-        } else if (date_start) {
-            query.current_status_date = { $gte: new Date(date_start) };
-        } else if (date_end) {
-            query.current_status_date = {
-                $lt: new Date(new Date(date_end).getTime() + 24 * 60 * 60 * 1000) // Add one day to end date to make it inclusive
-            };
-        }
-
-        // Add status filter if provided
-        const statusFilters = [];
-        if (forsale) statusFilters.push("ForSale");
-        if (comingsoon) statusFilters.push("ComingSoon");
-        if (pending) statusFilters.push("Pending");
-
-        if (statusFilters.length > 0) {
-            query.current_status = { $in: statusFilters };
-        }
-
-        // Add logic to check if the property has not been shipped yet
-        query.$or = [
-            { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-            { current_status: "ForSale", for_sale_reachout: null },
-            { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-            { current_status: "ComingSoon", coming_soon_reachout: null },
-            { current_status: "Pending", pending_reachout: { $exists: false } },
-            { current_status: "Pending", pending_reachout: null }
-        ];
 
         // Fetch filtered properties
         const properties = await propertiesCollection.find(query).toArray();
@@ -480,12 +546,6 @@ app.get('/listings', async (req, res) => {
         // Render the template with parameters
         res.render('listings', {
             properties,
-            state,
-            date_start,
-            date_end,
-            forsale: forsale || undefined,
-            comingsoon: comingsoon || undefined,
-            pending: pending || undefined,
             totalResults // Pass totalResults to the EJS template
         });
     } catch (error) {

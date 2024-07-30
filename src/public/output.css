@@ -604,6 +604,10 @@ video {
   left: 0px;
 }
 
+.left-20 {
+  left: 5rem;
+}
+
 .left-\[40\%\] {
   left: 40%;
 }

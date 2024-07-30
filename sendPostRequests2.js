@@ -99,7 +99,7 @@ async function fetchData(snapshotId, branch) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
             } else {
                 console.log('Response data:', response.data);
-                await listAllListings(response.data, branch);
+                await listAllListings(response.data, branch, snapshotId);
                 return response.data;
             }
         } catch (error) {
@@ -109,7 +109,7 @@ async function fetchData(snapshotId, branch) {
     }
 }
 
-async function listAllListings(data, branch) {
+async function listAllListings(data, branch, snapshot_id) {
     if (Array.isArray(data)) {
         const dataArray = data;
         const collection = client.db().collection('properties');
@@ -196,8 +196,10 @@ async function listAllListings(data, branch) {
                     propertyTypeDimension: listing.propertyTypeDimension,
                     hdpTypeDimension: listing.hdpTypeDimension,
                     listingTypeDimension: listing.listingTypeDimension,
+                    status: listing.contingent_listing_type,
                     is_listed_by_management_company: listing.is_listed_by_management_company,
                     listing_provided_by_name: listing.listing_provided_by.name,
+                    listing_provided_by_phone_number: listing.listing_provided_by.phone_number,
                     listing_provided_by_email: listing.listing_provided_by.email,
                     listing_provided_by_company: listing.listing_provided_by.company,
                     photoCount: photoCount,
@@ -218,7 +220,8 @@ async function listAllListings(data, branch) {
                     notes: notes,
                     companyOwned: companyOwned,
                     branch: branch,
-                    readytodelete
+                    readytodelete,
+                    snapshot_id: snapshot_id
                 };
 
                 await collection.insertOne(propertyData);
