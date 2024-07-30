@@ -213,7 +213,7 @@ app.get('/filtering-tx', async (req, res) => {
 
         const query = {
             verified: null,
-            branches: "TX",
+            branch: "TX",
             initial_scrape: true
         }
 
@@ -487,7 +487,7 @@ app.get('/fix-address', async (req, res) => {
 });
 */
 
-
+/*
 app.get('/fixing', async (req, res) => {
     let client;
     try {
@@ -499,7 +499,7 @@ app.get('/fixing', async (req, res) => {
 
         // Delete all properties with initial_scrape === true
         const updateManyTX = await propertiesCollection.updateMany({ branches: "TX" },
-            { $unset: { branches: "TX" } }
+            { $unset: { branch: "TX" } }
         );
         console.log(updateManyTX)
 
@@ -514,7 +514,7 @@ app.get('/fixing', async (req, res) => {
             await client.close();
         }
     }
-});
+});*/
 
 
 app.get('/listings', async (req, res) => {
@@ -534,7 +534,9 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
-            ]
+            ],
+            initial_scrape: { $exists: false },
+
         };
 
 
