@@ -294,7 +294,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 // Send the request to the Precisely API
                 const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                     headers: {
-                        'Authorization': 'Bearer ausGUCZGCiJ1yQyG6CDZGnSebT59', // Replace with your actual Bearer token
+                        'Authorization': 'Bearer mF5bBESnuE2iRgK3gNEw2TWSNDXL', // Replace with your actual Bearer token
                         'Content-Type': 'application/json; charset=utf-8'
                     }
                 });
@@ -487,7 +487,7 @@ app.get('/fix-address', async (req, res) => {
 });
 */
 
-/*
+
 app.get('/fixing', async (req, res) => {
     let client;
     try {
@@ -498,13 +498,11 @@ app.get('/fixing', async (req, res) => {
 
 
         // Delete all properties with initial_scrape === true
-        const updateManyTX = await propertiesCollection.updateMany({ branches: "TX" },
-            { $unset: { branch: "TX" } }
-        );
+        const updateManyTX = await propertiesCollection.deleteMany({ readytodelete: true });
         console.log(updateManyTX)
 
 
-        res.send('Properties with initial_scrape === true have been deleted successfully.');
+        res.send(updateManyTX);
     } catch (error) {
         console.error('Error deleting properties:', error);
         res.status(500).send('Internal Server Error');
@@ -514,7 +512,7 @@ app.get('/fixing', async (req, res) => {
             await client.close();
         }
     }
-});*/
+});
 
 
 app.get('/listings', async (req, res) => {

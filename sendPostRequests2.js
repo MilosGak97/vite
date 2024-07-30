@@ -118,9 +118,10 @@ async function listAllListings(data, branch, snapshot_id) {
         for (let i = 0; i < dataArray.length; i++) {
             const listing = dataArray[i];
             const photos = dataArray[i].photos;
-
+            let duplicateCount = 0;  // Counter for duplicates
             const exists = await checkIfZpidExists(listing.zpid);
             if (exists) {
+                duplicateCount++;
                 // Handle the case where the property already exists
                 continue;
             } else {
@@ -175,6 +176,67 @@ async function listAllListings(data, branch, snapshot_id) {
                 }
                 current_status = hdpTypeDimension;
 
+
+                if (photoCount < 5) {
+                    verified = "NoPhotos";
+
+                    const fullAddress = `${listing.address.streetAddress} ${listing.city}, ${listing.state} ${listing.zipcode}`;
+                    console.log(fullAddress);
+
+                    // Encode the full address for the URL
+                    const encodedAddress = encodeURIComponent(fullAddress);
+
+
+                    try {
+                        // Send the request to the Precisely API
+                        const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                            headers: {
+                                'Authorization': 'Bearer mF5bBESnuE2iRgK3gNEw2TWSNDXL', // Replace with your actual Bearer token
+                                'Content-Type': 'application/json; charset=utf-8'
+                            }
+                        });
+
+                        console.log("API RESULT: ", response.data);
+
+
+                        // Function to check if a string contains any of the keywords
+                        const containsKeywords = (str) => {
+                            const keywords = ["LLC", "BANK", "TRUST"];
+                            return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                        };
+
+                        // Format owner details and check for keywords
+                        formattedOwners = owners.map(owner => {
+                            const firstName = owner.firstName || 'Undefined';
+                            const middleName = owner.middleName || 'Undefined';
+                            const lastName = owner.lastName || 'Undefined';
+                            const ownerName = owner.ownerName || 'Undefined';
+
+                            // Check if any of the fields contain the keywords
+                            if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                                companyOwned = true;
+                            }
+
+                            return {
+                                firstName,
+                                middleName,
+                                lastName,
+                                ownerName
+                            };
+                        });
+
+
+                    } catch (apiError) {
+                        console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+
+                        // Set default values if API request fails
+                        formattedOwners = [{
+                            firstName: 'Undefined',
+                            lastName: 'Undefined'
+                        }];
+                    }
+                }
+
                 const propertyData = {
                     url: listing.url,
                     zpid: listing.zpid,
@@ -226,6 +288,7 @@ async function listAllListings(data, branch, snapshot_id) {
 
                 await collection.insertOne(propertyData);
             }
+            console.log("Total duplicates: ", duplicateCount)
         }
     } else {
         console.log('Data is not in expected array format');
