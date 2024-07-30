@@ -489,17 +489,47 @@ app.get('/fix-address', async (req, res) => {
 
 
 app.get('/fixing', async (req, res) => {
+
+    /*
+
+    _id
+66a8b9bd22559afd6bd8c882
+snapshot_id
+"s_lz88z1ncgx1ske4eb"
+requested_time
+2024-07-30T10:00:29.890+00:00
+branch
+"TX"
+THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
+*/
     let client;
     try {
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
+        const properties = await propertiesCollection.find({ initial_scrape: true, branch: "TX" }).toArray();
+        console.log(`Fetched ${properties.length} properties`);
 
+        // Regex to check if a string starts with a number
+        const startsWithNumberRegex = /^\d+/;
 
-        // Delete all properties with initial_scrape === true
-        const updateManyTX = await propertiesCollection.deleteMany({ readytodelete: true });
-        console.log(updateManyTX)
+        for (const property of properties) {
+            try {
+                const address = property.address || "";
+                if (!startsWithNumberRegex.test(address)) {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+                        { $set: { verified: "Empty" } }
+                    );
+                    console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
+                } else {
+                    console.log(`Property ID ${property._id} has a valid address: "${address}"`);
+                }
+            } catch (updateError) {
+                console.error(`Error updating property ID ${property._id}:`, updateError);
+            }
+        }
 
 
         res.send(updateManyTX);
