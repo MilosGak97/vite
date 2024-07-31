@@ -253,7 +253,94 @@ app.get('/filtering-tx', async (req, res) => {
     }
 });
 
+app.get('/filtering-nj', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const Property = database.collection('properties');
 
+        const query = {
+            verified: null,
+            branches: "NJ",
+            initial_scrape: true
+        }
+
+        // Count the total number of properties matching the parameters
+        const totalCount = await Property.countDocuments(query);
+
+
+        const property = await Property.findOne(query);
+
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photo === 'string') {
+                try {
+                    property.photo = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photo = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photo.slice(0, 15);
+            const propertyOtherPhoto = property.photo.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering-nj', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering-nj', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
+        }
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+app.post('/update-verified-nj/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        }
+        console.log("Verified: ", verified);
+
+
+        const database = await connectDB();
+        const Property = database.collection('properties');
+        const formattedOwners = [{
+            firstName: 'Initial_Scrape',
+            lastName: 'Initial_Scrape'
+        }];
+
+        let companyOwned = false; // Initialize the flag
+
+        const updateResult = await Property.updateOne(
+            { zpid: Number(zpid) }, // Ensure zpid is a number
+            { $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.error('Error updating property: No documents matched the query');
+            return res.status(404).send('Property not found');
+        }
+        console.log("Redirecting to /filtering-nj")
+        res.redirect('/filtering-nj');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 app.post('/update-verified/:zpid', async (req, res) => {
 
     try {
@@ -487,7 +574,7 @@ app.get('/fix-address', async (req, res) => {
 });
 */
 
-
+/*
 app.get('/fixing', async (req, res) => {
 
     /*
@@ -501,15 +588,14 @@ requested_time
 branch
 "TX"
 THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
-*/
+
     let client;
     try {
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        const properties = await propertiesCollection.find({ initial_scrape: true, branch: "TX" }).toArray();
-        console.log(`Fetched ${properties.length} properties`);
+        const properties = await propertiesCollection.find({ initial_scrape: true, branch: "TX", address_valid: { $exists: false } }).toArray();
 
         // Regex to check if a string starts with a number
         const startsWithNumberRegex = /^\d+/;
@@ -520,10 +606,16 @@ THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
                 if (!startsWithNumberRegex.test(address)) {
                     await propertiesCollection.updateOne(
                         { _id: property._id },
-                        { $set: { verified: "Empty" } }
+                        { $set: { verified: "Empty" } },
+                        { $set: { address_valid: false } }
                     );
                     console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
                 } else {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+
+                        { $set: { address_valid: true } }
+                    );
                     console.log(`Property ID ${property._id} has a valid address: "${address}"`);
                 }
             } catch (updateError) {
@@ -532,9 +624,9 @@ THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
         }
 
 
-        res.send(updateManyTX);
+        res.send("Good Job!");
     } catch (error) {
-        console.error('Error deleting properties:', error);
+        console.error('Error:', error);
         res.status(500).send('Internal Server Error');
     } finally {
         // Ensure the client is closed when done
@@ -545,6 +637,82 @@ THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
 });
 
 
+app.get('/fixing2', async (req, res) => {
+    let client;
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        const properties = await propertiesCollection.find({ branch: "TX", verified: null, address_valid: { $exists: false } }).toArray();
+        let counter;
+        for (property of properties) {
+            try {
+                if (property.photoCount < 4) {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+                        { $set: { verified: "NoPhotos", enoughphotos: false } }
+                    );
+                    console.log("Updated one...")
+                } else {
+                    await propertiesCollection.updateOne({
+                        _id: property._id
+                    },
+                        {
+                            $set: { enoughphotos: true }
+                        });
+                }
+            } catch (error) {
+                console.log("Error in foreach: ", error)
+            }
+        }
+    } catch (error) {
+        console.log("Error: ", error);
+        res.status(500).send(error);
+
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+})
+
+app.get('/fixing3', async (req, res) => {
+    const database = await connectDB();
+    const propertiesCollection = database.collection('properties');
+
+    const properties = await propertiesCollection.find({ branches: "NJ", verified: null }).toArray();
+    console.log(`Found ${properties.length} properties to process.`); // Log how many properties are found
+
+    let counter = 0;
+    for (const property of properties) {
+        console.log(`Processing property with ID: ${property._id}`); // Detailed log for each property
+        try {
+            if (property.photoCount < 4) {
+                console.log(`Property with ID ${property._id} has less than 4 photos.`);
+                console.log('PhotoCount: ', property.photoCount);
+                await propertiesCollection.updateOne(
+                    { _id: property._id },
+                    { $set: { verified: "NoPhotos", enoughphotos: false } }
+                );
+                console.log("Updated one (no photos or insufficient photos)...");
+            } else {
+                console.log('ELSE PhotoCount: ', property.photoCount);
+                console.log(`Property with ID ${property._id} meets photo criteria.`);
+                await propertiesCollection.updateOne(
+                    { _id: property._id },
+                    { $set: { enoughphotos: true } }
+                );
+                console.log("Updated one (sufficient photos)...");
+            }
+            counter++;
+        } catch (error) {
+            console.log("Error in foreach: ", error);
+        }
+    }
+    console.log(`${counter} properties were processed.`);
+
+})
+*/
 app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
@@ -552,6 +720,7 @@ app.get('/listings', async (req, res) => {
 
 
         // Build query object
+
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false] },
@@ -564,7 +733,6 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null }
             ],
             initial_scrape: { $exists: false },
-
         };
 
 
@@ -640,9 +808,6 @@ app.get('/shipping/:id', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
-
-
 
 app.get('/skiptracing', (req, res) => {
     res.render('skiptracing.ejs');
