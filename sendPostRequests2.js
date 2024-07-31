@@ -157,7 +157,6 @@ async function listAllListings(data, branch, snapshot_id) {
                 let initial_scrape = true;
                 let formattedOwners = [];
                 let notes;
-                let readytodelete = true;
 
                 if (hdpTypeDimension === "ForSale") {
                     for_sale = "Yes";
@@ -197,7 +196,8 @@ async function listAllListings(data, branch, snapshot_id) {
                         });
 
                         console.log("API RESULT: ", response.data);
-
+                        // Extract owner details
+                        const owners = response.data.propertyAttributes.owners;
 
                         // Function to check if a string contains any of the keywords
                         const containsKeywords = (str) => {
@@ -282,7 +282,6 @@ async function listAllListings(data, branch, snapshot_id) {
                     notes: notes,
                     companyOwned: companyOwned,
                     branch: branch,
-                    readytodelete,
                     snapshot_id: snapshot_id
                 };
 

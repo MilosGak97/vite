@@ -54,19 +54,27 @@ app.get('/export-csv', async (req, res) => {
 
 
         // Build query object with fixed criteria
+        /* let query = {
+             verified: { $in: ["Full", "NoPhotos"] },
+             companyOwned: { $in: [false] },
+             $or: [
+                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                 { current_status: "ForSale", for_sale_reachout: null },
+                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                 { current_status: "ComingSoon", coming_soon_reachout: null },
+                 { current_status: "Pending", pending_reachout: { $exists: false } },
+                 { current_status: "Pending", pending_reachout: null }
+             ]
+         };
+ */
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [false] },
-            $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ]
+            companyOwned: {
+                $in: [null, false]
+            },
+            initial_scrape: { $exists: false },
+            snapshot_id: { $in: ['s_lz9j0sz38leb9761m', 's_lz9j0cde2gvjdt3yex', 's_lz9j060h1hkjnc3r06', 's_lz9iztoe1nbsx2xgt9'] }
         };
-
 
 
         const properties = await propertiesCollection.find(query).toArray();
@@ -168,8 +176,7 @@ app.get('/filtering', async (req, res) => {
 
         const query = {
             verified: null,
-            initial_scrape: { $exists: false },
-            readytodelete: true
+            initial_scrape: { $exists: false }
         }
         const totalCount = await Property.countDocuments(query)
 
@@ -574,20 +581,12 @@ app.get('/fix-address', async (req, res) => {
 });
 */
 
-/*
+
 app.get('/fixing', async (req, res) => {
 
-    /*
 
-    _id
-66a8b9bd22559afd6bd8c882
-snapshot_id
-"s_lz88z1ncgx1ske4eb"
-requested_time
-2024-07-30T10:00:29.890+00:00
-branch
-"TX"
-THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
+
+
 
     let client;
     try {
@@ -595,34 +594,112 @@ THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        const properties = await propertiesCollection.find({ initial_scrape: true, branch: "TX", address_valid: { $exists: false } }).toArray();
+        const properties = await propertiesCollection.find({
+            companyOwned: null, verified: "NoPhotos", $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ],
+            initial_scrape: { $exists: false }
+        }).toArray();
 
-        // Regex to check if a string starts with a number
-        const startsWithNumberRegex = /^\d+/;
 
         for (const property of properties) {
             try {
-                const address = property.address || "";
-                if (!startsWithNumberRegex.test(address)) {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
-                        { $set: { verified: "Empty" } },
-                        { $set: { address_valid: false } }
-                    );
-                    console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
-                } else {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
+                if (property.photoCount < 4) {
+                    const fullAddress = `${property.address} ${property.city}, ${property.state} ${property.zipcode}`;
+                    console.log(fullAddress);
 
-                        { $set: { address_valid: true } }
-                    );
-                    console.log(`Property ID ${property._id} has a valid address: "${address}"`);
+                    // Encode the full address for the URL
+                    const encodedAddress = encodeURIComponent(fullAddress);
+
+
+                    try {
+                        // Send the request to the Precisely API
+                        const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                            headers: {
+                                'Authorization': 'Bearer 99W2OboFyVEacX8UqZFcIflvzmks', // Replace with your actual Bearer token
+                                'Content-Type': 'application/json; charset=utf-8'
+                            }
+                        });
+                        let companyOwned = false;
+                        console.log("API RESULT: ", response.data);
+                        // Extract owner details
+                        const owners = response.data.propertyAttributes.owners;
+
+                        // Function to check if a string contains any of the keywords
+                        const containsKeywords = (str) => {
+                            const keywords = ["LLC", "BANK", "TRUST"];
+                            return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                        };
+
+                        // Format owner details and check for keywords
+                        formattedOwners = owners.map(owner => {
+                            const firstName = owner.firstName || 'Undefined';
+                            const middleName = owner.middleName || 'Undefined';
+                            const lastName = owner.lastName || 'Undefined';
+                            const ownerName = owner.ownerName || 'Undefined';
+
+                            // Check if any of the fields contain the keywords
+                            if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                                companyOwned = true;
+                            }
+
+                            return {
+                                firstName,
+                                middleName,
+                                lastName,
+                                ownerName
+                            };
+                        });
+
+                        await propertiesCollection.updateOne({
+                            zpid: property.zpid
+
+                        },
+                            { $set: { owners: formattedOwners, companyOwned: companyOwned } })
+
+                        console.log("Owners: ", owners);
+                        console.log("Company Owned: ", companyOwned);
+                    } catch (error) {
+                        console.log("Catch error2: ", error)
+                    }
                 }
-            } catch (updateError) {
-                console.error(`Error updating property ID ${property._id}:`, updateError);
+            }
+            catch (error) {
+                console.log("Error in Catch of listing property: ", error)
             }
         }
 
+        // Regex to check if a string starts with a number
+        /*  const startsWithNumberRegex = /^\d+/;
+         
+          for (const property of properties) {
+              try {
+                  const address = property.address || "";
+                  if (!startsWithNumberRegex.test(address)) {
+                      await propertiesCollection.updateOne(
+                          { _id: property._id },
+                          { $set: { verified: "Empty" } },
+                          { $set: { address_valid: false } }
+                      );
+                      console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
+                  } else {
+                      await propertiesCollection.updateOne(
+                          { _id: property._id },
+         
+                          { $set: { address_valid: true } }
+                      );
+                      console.log(`Property ID ${property._id} has a valid address: "${address}"`);
+                  }
+              } catch (updateError) {
+                  console.error(`Error updating property ID ${property._id}:`, updateError);
+              }
+          }
+        */
 
         res.send("Good Job!");
     } catch (error) {
@@ -635,8 +712,16 @@ THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
         }
     }
 });
-
-
+/*
+    _id
+66a8b9bd22559afd6bd8c882
+snapshot_id
+"s_lz88z1ncgx1ske4eb"
+requested_time
+2024-07-30T10:00:29.890+00:00
+branch
+"TX"
+THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
 app.get('/fixing2', async (req, res) => {
     let client;
     try {
@@ -723,18 +808,23 @@ app.get('/listings', async (req, res) => {
 
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [false] },
-            $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ],
+            companyOwned: {
+                $in: [null, false]
+            },
             initial_scrape: { $exists: false },
+            snapshot_id: { $in: ['s_lz9j0sz38leb9761m', 's_lz9j0cde2gvjdt3yex', 's_lz9j060h1hkjnc3r06', 's_lz9iztoe1nbsx2xgt9'] }
         };
 
+        /*
+        
+                    $or: [
+                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                        { current_status: "ForSale", for_sale_reachout: null },
+                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                        { current_status: "ComingSoon", coming_soon_reachout: null },
+                        { current_status: "Pending", pending_reachout: { $exists: false } },
+                        { current_status: "Pending", pending_reachout: null }
+                    ],*/
 
 
         // Fetch filtered properties
