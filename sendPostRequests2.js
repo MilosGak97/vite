@@ -191,7 +191,7 @@ async function listAllListings(data, branch, snapshot_id) {
                         // Send the request to the Precisely API
                         const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                             headers: {
-                                'Authorization': 'Bearer mF5bBESnuE2iRgK3gNEw2TWSNDXL', // Replace with your actual Bearer token
+                                'Authorization': 'Bearer 99W2OboFyVEacX8UqZFcIflvzmks', // Replace with your actual Bearer token
                                 'Content-Type': 'application/json; charset=utf-8'
                             }
                         });
