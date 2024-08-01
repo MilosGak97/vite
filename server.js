@@ -52,6 +52,9 @@ app.get('/export-csv', async (req, res) => {
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('shippings');
 
+        // Convert snapshot_id to ObjectId
+        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
+
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
