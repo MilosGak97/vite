@@ -63,7 +63,8 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
-            ]
+            ],
+            owners: null
         };
 
 
@@ -571,93 +572,90 @@ app.get('/fix-address', async (req, res) => {
 });
 */
 
-
-app.get('/fixing', async (req, res) => {
-
-
-
-
-
+/* Running precisely again for selected query */
+app.get('/fixing-precisely', async (req, res) => {
     let client;
     try {
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        const properties = await propertiesCollection.find({
-            companyOwned: null, verified: "NoPhotos", $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ],
-            initial_scrape: { $exists: false }
-        }).toArray();
+        // Convert snapshot_id to ObjectId
+        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
+        let query = {
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
+            initial_scrape: { $exists: false },
+            "owners.0.firstName": { $in: ["Undefined"] },
+            $or: [
+                { coming_soon_reachout: objectIdSnapshotId },
+                { for_sale_reachout: objectIdSnapshotId },
+                { pending_reachout: objectIdSnapshotId },
+            ]
+        };
 
+        const properties = await propertiesCollection.find({ query }).toArray();
 
         for (const property of properties) {
             try {
-                if (property.photoCount < 4) {
-                    const fullAddress = `${property.address} ${property.city}, ${property.state} ${property.zipcode}`;
-                    console.log(fullAddress);
+                const fullAddress = `${property.address} ${property.city}, ${property.state} ${property.zipcode}`;
+                console.log(fullAddress);
 
-                    // Encode the full address for the URL
-                    const encodedAddress = encodeURIComponent(fullAddress);
+                // Encode the full address for the URL
+                const encodedAddress = encodeURIComponent(fullAddress);
 
 
-                    try {
-                        // Send the request to the Precisely API
-                        const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
-                            headers: {
-                                'Authorization': 'Bearer 99W2OboFyVEacX8UqZFcIflvzmks', // Replace with your actual Bearer token
-                                'Content-Type': 'application/json; charset=utf-8'
-                            }
-                        });
-                        let companyOwned = false;
-                        console.log("API RESULT: ", response.data);
-                        // Extract owner details
-                        const owners = response.data.propertyAttributes.owners;
+                try {
+                    // Send the request to the Precisely API
+                    const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                        headers: {
+                            'Authorization': 'Bearer ebQrs5jbDskTtzQprf65jFlmLKGl', // Replace with your actual Bearer token
+                            'Content-Type': 'application/json; charset=utf-8'
+                        }
+                    });
+                    let companyOwned = false;
+                    console.log("API RESULT: ", response.data);
+                    // Extract owner details
+                    const owners = response.data.propertyAttributes.owners;
 
-                        // Function to check if a string contains any of the keywords
-                        const containsKeywords = (str) => {
-                            const keywords = ["LLC", "BANK", "TRUST"];
-                            return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                    // Function to check if a string contains any of the keywords
+                    const containsKeywords = (str) => {
+                        const keywords = ["LLC", "BANK", "TRUST"];
+                        return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                    };
+
+                    // Format owner details and check for keywords
+                    formattedOwners = owners.map(owner => {
+                        const firstName = owner.firstName || 'Undefined';
+                        const middleName = owner.middleName || 'Undefined';
+                        const lastName = owner.lastName || 'Undefined';
+                        const ownerName = owner.ownerName || 'Undefined';
+
+                        // Check if any of the fields contain the keywords
+                        if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                            companyOwned = true;
+                        }
+
+                        return {
+                            firstName,
+                            middleName,
+                            lastName,
+                            ownerName
                         };
+                    });
 
-                        // Format owner details and check for keywords
-                        formattedOwners = owners.map(owner => {
-                            const firstName = owner.firstName || 'Undefined';
-                            const middleName = owner.middleName || 'Undefined';
-                            const lastName = owner.lastName || 'Undefined';
-                            const ownerName = owner.ownerName || 'Undefined';
+                    await propertiesCollection.updateOne({
+                        zpid: property.zpid
 
-                            // Check if any of the fields contain the keywords
-                            if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
-                                companyOwned = true;
-                            }
+                    },
+                        { $set: { owners: formattedOwners, companyOwned: companyOwned } })
 
-                            return {
-                                firstName,
-                                middleName,
-                                lastName,
-                                ownerName
-                            };
-                        });
-
-                        await propertiesCollection.updateOne({
-                            zpid: property.zpid
-
-                        },
-                            { $set: { owners: formattedOwners, companyOwned: companyOwned } })
-
-                        console.log("Owners: ", owners);
-                        console.log("Company Owned: ", companyOwned);
-                    } catch (error) {
-                        console.log("Catch error2: ", error)
-                    }
+                    console.log("Owners: ", owners);
+                    console.log("Company Owned: ", companyOwned);
+                } catch (error) {
+                    console.log("Catch error2: ", error)
                 }
+
             }
             catch (error) {
                 console.log("Error in Catch of listing property: ", error)
@@ -793,25 +791,34 @@ app.get('/listings', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-
+        // Convert snapshot_id to ObjectId
+        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
         // Build query object
 
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
+            "owners.0.firstName": { $in: ["Undefined"] },
             $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
+                { coming_soon_reachout: objectIdSnapshotId },
+                { for_sale_reachout: objectIdSnapshotId },
+                { pending_reachout: objectIdSnapshotId },
             ]
         };
 
 
-
+        /*
+        ,
+                    $or: [
+                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                        { current_status: "ForSale", for_sale_reachout: null },
+                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                        { current_status: "ComingSoon", coming_soon_reachout: null },
+                        { current_status: "Pending", pending_reachout: { $exists: false } },
+                        { current_status: "Pending", pending_reachout: null }
+                    ]
+                        */
 
 
 
