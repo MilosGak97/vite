@@ -220,8 +220,10 @@ app.get('/filtering-tx', async (req, res) => {
         // Count the total number of properties matching the parameters
         const totalCount = await Property.countDocuments(query);
 
+        // Find one property matching the query, sorted by 'current_status_date' in ascending order
+        const property = await Property.findOne(query, { sort: { current_status_date: 1 } });
 
-        const property = await Property.findOne(query);
+
 
         if (property) {
             // Convert photo strings to arrays if needed
@@ -246,6 +248,56 @@ app.get('/filtering-tx', async (req, res) => {
         } else {
             // Handle the case where no property was found
             res.render('filtering-tx', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
+        }
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+app.get('/filtering-tx2', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const Property = database.collection('properties');
+
+        const query = {
+            verified: null,
+            branch: "TX",
+            initial_scrape: true
+        }
+
+        // Count the total number of properties matching the parameters
+        const totalCount = await Property.countDocuments(query);
+
+        // Find one property matching the query, sorted by 'current_status_date' in ascending order
+        const property = await Property.findOne(query, { sort: { current_status_date: -1 } });
+
+
+
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photo === 'string') {
+                try {
+                    property.photo = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photo = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photo.slice(0, 15);
+            const propertyOtherPhoto = property.photo.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering-tx2', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering-tx2', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
         }
     } catch (error) {
         console.error("Error fetching properties:", error);
@@ -504,6 +556,48 @@ app.post('/update-verified-tx/:zpid', async (req, res) => {
     }
 });
 
+app.post('/update-verified-tx2/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        }
+        console.log("Verified: ", verified);
+
+
+        const database = await connectDB();
+        const Property = database.collection('properties');
+        const formattedOwners = [{
+            firstName: 'Initial_Scrape',
+            lastName: 'Initial_Scrape'
+        }];
+
+        let companyOwned = false; // Initialize the flag
+
+        const updateResult = await Property.updateOne(
+            { zpid: Number(zpid) }, // Ensure zpid is a number
+            { $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.error('Error updating property: No documents matched the query');
+            return res.status(404).send('Property not found');
+        }
+        console.log("Redirecting to /filtering-tx")
+        res.redirect('/filtering-tx2');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 app.get('/fix/:zpid', async (req, res) => {
     const { zpid } = req.params;
 
@@ -529,6 +623,80 @@ app.get('/fix/:zpid', async (req, res) => {
         res.status(500).send('An error occurred while updating the property');
     }
 });
+
+app.get('/fixing', async (req, res) => {
+    res.render("fixing.ejs");
+})
+
+app.post('/fixing-updateOne', async (req, res) => {
+    let client;
+    try {
+
+
+
+
+        // Convert snapshot_id to ObjectId
+        const objectId = new ObjectId('66aa33c9c9eaa7e8b58ba9f9');
+
+        const objectId2 = new ObjectId('66aba170ec4f71d232a4e237');
+
+
+        const filteringQuery = {
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
+            $or: [
+                { coming_soon_reachout: objectId },
+                { for_sale_reachout: objectId },
+                { pending_reachout: objectId },
+            ]
+        };
+
+
+        // Connect to the database
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+
+
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
+
+        for (const property of properties) {
+            try {
+                const updateFields = {};
+                if (property.pending_reachout && property.pending_reachout.equals(objectId)) {
+                    updateFields.pending_reachout = objectId2;
+                }
+                if (property.for_sale_reachout && property.for_sale_reachout.equals(objectId)) {
+                    updateFields.for_sale_reachout = objectId2;
+                }
+                if (property.coming_soon_reachout && property.coming_soon_reachout.equals(objectId)) {
+                    updateFields.coming_soon_reachout = objectId2;
+                }
+
+                if (Object.keys(updateFields).length > 0) {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+                        { $set: updateFields }
+                    );
+                }
+            }
+            catch (error) {
+                console.log("Error in Catch of listing property: ", error)
+            }
+        }
+
+
+        res.send("Good Job!");
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        // Ensure the client is closed when done
+        if (client) {
+            await client.close();
+        }
+    }
+})
 
 /*
 app.get('/fix-address', async (req, res) => {
@@ -793,32 +961,31 @@ app.get('/listings', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
+
         // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId1 = new ObjectId('66ab9acecb2a4f8f20698a0d');
-        // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId2 = new ObjectId('66aa33b385c35c582a8ea4cf');
+        // const objectId = new ObjectId('66aa215a4cedc36cccb68e44');
         // Build query object
-
-        let query = {
-            verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
-            initial_scrape: { $exists: false },
-            $or: [
-                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
-                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
-                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } }
-            ]
-
+        const filteringQuery = {
+            snapshot_id: "s_lzax3y341lswe1oz32"
             /*
+            verified: { $in: ["NoPhotos", "Full"] },
+            companyOwned: { $in: [null, false] },
             $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
+                { coming_soon_reachout: objectId },
+                { for_sale_reachout: objectId },
+                { pending_reachout: objectId },
             ]*/
         };
+        /*
+        $or: [
+            { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+            { current_status: "ForSale", for_sale_reachout: null },
+            { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+            { current_status: "ComingSoon", coming_soon_reachout: null },
+            { current_status: "Pending", pending_reachout: { $exists: false } },
+            { current_status: "Pending", pending_reachout: null },
+        ]*/
+
 
 
         /*
@@ -837,7 +1004,7 @@ app.get('/listings', async (req, res) => {
 
 
         // Fetch filtered properties
-        const properties = await propertiesCollection.find(query).toArray();
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
         const totalResults = properties.length;
 
         // Render the template with parameters
