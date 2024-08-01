@@ -799,12 +799,20 @@ app.get('/listings', async (req, res) => {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
-            "owners.0.firstName": { $in: ["Undefined"] },
             $or: [
-                { coming_soon_reachout: objectIdSnapshotId },
                 { for_sale_reachout: objectIdSnapshotId },
                 { pending_reachout: objectIdSnapshotId },
+                { coming_soon_reachout: objectIdSnapshotId }
             ]
+            /*
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ]*/
         };
 
 
