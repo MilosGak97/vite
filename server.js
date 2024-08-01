@@ -53,16 +53,18 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
 
         // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
+        const objectIdSnapshotId1 = new ObjectId('66ab9acecb2a4f8f20698a0d');
+
+        const objectIdSnapshotId2 = new ObjectId('66aa33b385c35c582a8ea4cf');
 
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
             $or: [
-                { for_sale_reachout: objectIdSnapshotId },
-                { pending_reachout: objectIdSnapshotId },
-                { coming_soon_reachout: objectIdSnapshotId }
+                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
+                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
+                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } }
             ]
         };
 
@@ -790,7 +792,9 @@ app.get('/listings', async (req, res) => {
         const propertiesCollection = database.collection('properties');
 
         // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
+        const objectIdSnapshotId1 = new ObjectId('66ab9acecb2a4f8f20698a0d');
+        // Convert snapshot_id to ObjectId
+        const objectIdSnapshotId2 = new ObjectId('66aa33b385c35c582a8ea4cf');
         // Build query object
 
         let query = {
@@ -798,10 +802,11 @@ app.get('/listings', async (req, res) => {
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
             $or: [
-                { for_sale_reachout: objectIdSnapshotId },
-                { pending_reachout: objectIdSnapshotId },
-                { coming_soon_reachout: objectIdSnapshotId }
+                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
+                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
+                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } }
             ]
+
             /*
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
