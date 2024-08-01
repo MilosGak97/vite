@@ -44,7 +44,8 @@
                                 </select>
                             </div>
                             <button type="submit"
-                                class="w-full px-4 py-2 bg-blue-500 text-white rounded-md font-bold hover:bg-opacity-80">Trigger
+                                class="w-full px-4 py-2 bg-blue-500 text-white rounded-md font-bold hover:bg-opacity-80">Run
+                                Custom
                                 Scrapping</button>
                         </form>
                     </div>
@@ -61,15 +62,32 @@
                                 <input type="text" value="TX" name="branch" hidden>
                             </div>
                             <button type="submit"
-                                class="w-full px-4 py-2 bg-green-500 text-white rounded-md font-bold hover:bg-opacity-80">Trigger
-                                Texas
+                                class="w-full px-4 py-2 bg-green-700 text-white rounded-md font-bold hover:bg-opacity-80">Run
+                                TX
                                 Scrapping</button>
                         </form>
                     </div>
 
-
-
                     <!-- Form to trigger the POST request -->
+                    <div class="mb-8 mt-16">
+                        <h2 class="text-2xl font-semibold mb-4 text-center">Texas Scrapping</h2>
+                        <form id="triggerForm" action="/trigger2" method="POST">
+                            <div class="mb-4">
+                                <input type="text" id="requrl" name="requrl" placeholder="Enter URL"
+                                    value="https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22north%22%3A41.42045716070121%2C%22south%22%3A39.7857152724798%2C%22east%22%3A-73.18999648046096%2C%22west%22%3A-76.40349745702346%7D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22category%22%3A%22cat1%22%2C%22customRegionId%22%3A%226ec9066abdX1-CRtbxpenn1oqw6_v3iwi%22%2C%22mapZoom%22%3A9%2C%22pagination%22%3A%7B%7D%2C%22usersSearchTerm%22%3A%22%22%7D"
+                                    hidden>
+                            </div>
+                            <div class="mb-4">
+                                <input type="text" value="TX" name="branch" hidden>
+                            </div>
+                            <button type="submit"
+                                class="w-full px-4 py-2 bg-orange-700 text-white rounded-md font-bold hover:bg-opacity-80">Run
+                                NJ
+                                Scrapping</button>
+                        </form>
+                    </div>
+
+                    <!-- Form to trigger the POST request  
                     <div class="mb-8 mt-16">
                         <h2 class="text-2xl font-semibold mb-4 text-center">New Jersey Scrapping - GROUP 1</h2>
                         <form id="triggerForm" action="/trigger2" method="POST">
@@ -87,7 +105,7 @@
                                 Scrapping - GROUP 1</button>
                         </form>
                     </div>
-                    <!-- Form to trigger the POST request -->
+                  
                     <div class="mb-8 mt-16">
                         <h2 class="text-2xl font-semibold mb-4 text-center">New Jersey Scrapping - GROUP 2</h2>
                         <form id="triggerForm" action="/trigger2" method="POST">
@@ -106,7 +124,7 @@
                         </form>
                     </div>
 
-                    <!-- Form to trigger the POST request -->
+                    
                     <div class="mb-8 mt-16">
                         <h2 class="text-2xl font-semibold mb-4 text-center">New Jersey Scrapping - GROUP 3</h2>
                         <form id="triggerForm" action="/trigger2" method="POST">
@@ -124,7 +142,7 @@
                                 Scrapping - GROUP 3</button>
                         </form>
                     </div>
-
+                -->
 
 
                 </div>

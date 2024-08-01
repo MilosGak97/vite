@@ -7,6 +7,7 @@ const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
 const { parse } = require('json2csv');
+const moment = require('moment'); // To handle date operations
 
 const { ObjectId } = require('mongodb');
 
@@ -512,8 +513,6 @@ app.post('/update-verified/:zpid', async (req, res) => {
     }
 });
 
-
-
 app.post('/update-verified-tx/:zpid', async (req, res) => {
 
     try {
@@ -697,50 +696,6 @@ app.post('/fixing-updateOne', async (req, res) => {
         }
     }
 })
-
-/*
-app.get('/fix-address', async (req, res) => {
-    try {
-        // Connect to the database
-        const database = await connectDB();
-        const propertiesCollection = database.collection('properties');
-
-        // Fetch all properties
-        const properties = await propertiesCollection.find({}).toArray();
-        console.log(`Fetched ${properties.length} properties`);
-
-        // Regex to check if a string starts with a number
-        const startsWithNumberRegex = /^\d+/;
-
-        // Iterate through each property and update verified field if address doesn't start with a number
-        for (const property of properties) {
-            try {
-                const address = property.address || "";
-                if (!startsWithNumberRegex.test(address)) {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
-                        { $set: { verified: "Empty" } }
-                    );
-                    console.log(`Updated property ID ${property._id}: verified set to Empty due to address "${address}"`);
-                } else {
-                    console.log(`Property ID ${property._id} has a valid address: "${address}"`);
-                }
-            } catch (updateError) {
-                console.error(`Error updating property ID ${property._id}:`, updateError);
-            }
-        }
-
-        console.log('Address check and update completed successfully.');
-        res.send('Address check and update completed successfully.');
-    } catch (error) {
-        console.error('Error checking and updating addresses:', error);
-        res.status(500).send('Internal Server Error');
-    } finally {
-        // Ensure the client is closed when done
-        await client.close();
-    }
-});
-*/
 
 /* Running precisely again for selected query */
 app.get('/fixing-precisely', async (req, res) => {
@@ -964,44 +919,20 @@ app.get('/listings', async (req, res) => {
 
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66aa215a4cedc36cccb68e44');
+
         // Build query object
         const filteringQuery = {
-            snapshot_id: "s_lzax3y341lswe1oz32"
-            /*
             verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
             $or: [
-                { coming_soon_reachout: objectId },
-                { for_sale_reachout: objectId },
-                { pending_reachout: objectId },
-            ]*/
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ]
         };
-        /*
-        $or: [
-            { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-            { current_status: "ForSale", for_sale_reachout: null },
-            { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-            { current_status: "ComingSoon", coming_soon_reachout: null },
-            { current_status: "Pending", pending_reachout: { $exists: false } },
-            { current_status: "Pending", pending_reachout: null },
-        ]*/
-
-
-
-        /*
-        ,
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null }
-                    ]
-                        */
-
-
-
 
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -1113,7 +1044,116 @@ app.get('/pull', async (req, res) => {
     }
 });
 
+app.post('/refresh-count', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const snapshotsCollection = database.collection('snapshots');
+        const propertiesCollection = database.collection('properties');
 
+        const snapshot_id = req.body.snapshot_id;
+        console.log("SNAPSHOT: ", snapshot_id)
+        // Count properties with the given snapshot_id
+        const count = await propertiesCollection.countDocuments({ snapshot_id: snapshot_id });
+        console.log("COUNT: ", count)
+        // Update the snapshot with the count
+        await snapshotsCollection.updateOne(
+            { snapshot_id: snapshot_id },
+            { $set: { count: count } }
+        );
+
+        res.redirect('/snapshots');
+    } catch (error) {
+        console.error("Error updating count:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+app.get('/snapshots', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const snapshotsCollection = database.collection('snapshots');
+
+        // Define start and end of today
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
+
+        // Define start and end of yesterday
+        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
+        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
+
+        // Define start and end of this month
+        const startOfMonth = moment().startOf('month').toDate();
+        const endOfMonth = moment().endOf('month').toDate();
+
+        // Define start and end of last month
+        const startOfLastMonth = moment().subtract(1, 'months').startOf('month').toDate();
+        const endOfLastMonth = moment().subtract(1, 'months').endOf('month').toDate();
+
+        // Find snapshots requested today
+        const snapshotsToday = await snapshotsCollection.find({
+            requested_time: {
+                $gte: startOfDay,
+                $lt: endOfDay
+            }
+        }).sort({ requested_time: -1 }).toArray();
+
+        // Find snapshots requested yesterday
+        const snapshotsYesterday = await snapshotsCollection.find({
+            requested_time: {
+                $gte: startOfYesterday,
+                $lt: endOfYesterday
+            }
+        }).sort({ requested_time: -1 }).toArray();
+
+        // Find snapshots requested this month
+        const snapshotsThisMonth = await snapshotsCollection.find({
+            requested_time: {
+                $gte: startOfMonth,
+                $lt: endOfMonth
+            }
+        }).sort({ requested_time: -1 }).toArray();
+
+        // Find snapshots requested last month
+        const snapshotsLastMonth = await snapshotsCollection.find({
+            requested_time: {
+                $gte: startOfLastMonth,
+                $lt: endOfLastMonth
+            }
+        }).sort({ requested_time: -1 }).sort({ requested_time: -1 }).toArray();
+
+        // Render the EJS template with the snapshots data
+        res.render('snapshots', {
+            snapshotsToday,
+            snapshotsYesterday,
+            snapshotsThisMonth,
+            snapshotsLastMonth
+        });
+    } catch (error) {
+        console.error("Error fetching snapshots:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+app.get('/snapshotsall', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const snapshotsCollection = database.collection('snapshots');
+
+
+        // Find snapshots requested today
+        const snapshots = await snapshotsCollection.find().sort({ requested_time: -1 }).toArray();
+
+
+        // Render the EJS template with the snapshots data
+        res.render('snapshotsall', {
+            snapshots
+        });
+    } catch (error) {
+        console.error("Error fetching snapshots:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

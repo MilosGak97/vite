@@ -62,8 +62,9 @@ async function processBackgroundTasks(requrl, branch) {
         const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}&type=${type}&discover_by=${discover_by}`;
 
         const body = [{ url: requrl }];
+        const bodyurl = body[0].url;
         const response = await axios.post(url, body, { headers });
-        console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
+        console.log(`Response for ${bodyurl}:`, response.data.snapshot_id);
 
         const snapshotId = response.data.snapshot_id;
         console.log(snapshotId);
@@ -72,7 +73,8 @@ async function processBackgroundTasks(requrl, branch) {
         const snapshotData = {
             snapshot_id: snapshotId,
             requested_time: new Date(),
-            branch: branch
+            branch: branch,
+            url: bodyurl
         };
         await collection.insertOne(snapshotData);
 
