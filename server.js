@@ -57,16 +57,11 @@ app.get('/export-csv', async (req, res) => {
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
             $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ],
-            owners: null
+                { for_sale_reachout: objectIdSnapshotId },
+                { pending_reachout: objectIdSnapshotId },
+                { coming_soon_reachout: objectIdSnapshotId }
+            ]
         };
-
 
         const properties = await propertiesCollection.find(query).toArray();
 
