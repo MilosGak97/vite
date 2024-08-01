@@ -57,14 +57,16 @@ app.get('/export-csv', async (req, res) => {
 
         const objectIdSnapshotId2 = new ObjectId('66aa33b385c35c582a8ea4cf');
 
+        const objectIdSnapshotId3 = new ObjectId('66aba047a3d70dbcf001e0f2');
+
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
             $or: [
-                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
-                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } },
-                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2] } }
+                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } },
+                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } },
+                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } }
             ]
         };
 
