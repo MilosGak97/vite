@@ -594,7 +594,7 @@ app.get('/fixing-precisely', async (req, res) => {
             ]
         };
 
-        const properties = await propertiesCollection.find({ query }).toArray();
+        const properties = await propertiesCollection.find(query).toArray();
 
         for (const property of properties) {
             try {
