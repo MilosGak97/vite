@@ -812,7 +812,11 @@ app.get('/listings', async (req, res) => {
                 $in: [null, false]
             },
             initial_scrape: { $exists: false },
-            snapshot_id: { $in: ['s_lz9j0sz38leb9761m', 's_lz9j0cde2gvjdt3yex', 's_lz9j060h1hkjnc3r06', 's_lz9iztoe1nbsx2xgt9'] }
+            $or: [
+                { for_sale_reachout: { $in: '66aa215a4cedc36cccb68e44' } },
+                { pending_reachout: { $in: '66aa215a4cedc36cccb68e44' } },
+                { coming_soon_reachout: { $in: '66aa215a4cedc36cccb68e44' } }
+            ]
         };
 
         /*
