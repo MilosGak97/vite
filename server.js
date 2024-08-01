@@ -931,7 +931,7 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null },
-            ]
+            ], initial_scrape: { $exists: false }
         };
 
         // Fetch filtered properties
