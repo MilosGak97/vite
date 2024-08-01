@@ -52,28 +52,18 @@ app.get('/export-csv', async (req, res) => {
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('shippings');
 
-
-        // Build query object with fixed criteria
-        /* let query = {
-             verified: { $in: ["Full", "NoPhotos"] },
-             companyOwned: { $in: [false] },
-             $or: [
-                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                 { current_status: "ForSale", for_sale_reachout: null },
-                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                 { current_status: "ComingSoon", coming_soon_reachout: null },
-                 { current_status: "Pending", pending_reachout: { $exists: false } },
-                 { current_status: "Pending", pending_reachout: null }
-             ]
-         };
- */
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: {
-                $in: [null, false]
-            },
+            companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
-            snapshot_id: { $in: ['s_lz9j0sz38leb9761m', 's_lz9j0cde2gvjdt3yex', 's_lz9j060h1hkjnc3r06', 's_lz9iztoe1nbsx2xgt9'] }
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ]
         };
 
 
@@ -808,27 +798,22 @@ app.get('/listings', async (req, res) => {
 
         let query = {
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: {
-                $in: [null, false]
-            },
+            companyOwned: { $in: [null, false] },
             initial_scrape: { $exists: false },
             $or: [
-                { for_sale_reachout: { $in: '66aa215a4cedc36cccb68e44' } },
-                { pending_reachout: { $in: '66aa215a4cedc36cccb68e44' } },
-                { coming_soon_reachout: { $in: '66aa215a4cedc36cccb68e44' } }
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
             ]
         };
 
-        /*
-        
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null }
-                    ],*/
+
+
+
+
 
 
         // Fetch filtered properties
