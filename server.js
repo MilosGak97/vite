@@ -53,25 +53,21 @@ app.get('/export-csv', async (req, res) => {
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('shippings');
 
-        // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId1 = new ObjectId('66ab9acecb2a4f8f20698a0d');
-
-        const objectIdSnapshotId2 = new ObjectId('66aa33b385c35c582a8ea4cf');
-
-        const objectIdSnapshotId3 = new ObjectId('66aba047a3d70dbcf001e0f2');
-
-        let query = {
-            verified: { $in: ["Full", "NoPhotos"] },
+        const filteringQuery = {
+            verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
-            initial_scrape: { $exists: false },
             $or: [
-                { for_sale_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } },
-                { pending_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } },
-                { coming_soon_reachout: { $in: [objectIdSnapshotId1, objectIdSnapshotId2, objectIdSnapshotId3] } }
-            ]
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ],
+            initial_scrape: { $exists: false }
         };
 
-        const properties = await propertiesCollection.find(query).toArray();
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
 
         // Define the fields you want to include in the CSV
         const fields = ['owner_fullname', 'current_resident', 'address', 'city', 'state', 'zipcode'];
@@ -931,7 +927,8 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null },
-            ], initial_scrape: { $exists: false }
+            ],
+            initial_scrape: { $exists: false }
         };
 
         // Fetch filtered properties
