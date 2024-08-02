@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const webhookHandler = require('./webhookHandler');
-const sendPostRequests = require('./sendPostRequests');
+const processUrl = require('./sendPostRequests');
 const sendPostRequests2 = require('./sendPostRequests2');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 // Use the webhook handler
 app.use('/', webhookHandler);
 // Endpoint to trigger sendPostRequests
-app.post('/trigger', sendPostRequests);
+app.post('/trigger', processUrl);
 
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
