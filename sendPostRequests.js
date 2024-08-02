@@ -121,7 +121,7 @@ async function sendPostRequests(req, res) {
                             } else if (exists.pending !== null) {
                                 //console.log("exists.pending: ", exists.pending);
                             }
-                        } else if (hdpTypeDimension === "ComingSoon") {
+                        } else if (hdpTypeDimension === "UnderContract") {
                             if (exists.pending === null) {
                                 //console.log("Correct loop4: ", exists.pending);
 
