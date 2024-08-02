@@ -1008,8 +1008,7 @@ app.post('/trigger3', async (req, res) => {
                 current_status: { $in: ["ForSale", "ComingSoon"] },
                 verified: { $in: ["Full", "NoPhotos"] },
                 last_status_check: { $exists: false },
-                companyOwned: { $in: [false, null] },
-                branch: "NJ"
+                companyOwned: { $in: [false, null] }
             };
 
             // Fetch the first 75 properties
