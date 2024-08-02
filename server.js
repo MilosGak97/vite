@@ -8,6 +8,8 @@ const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
 const { parse } = require('json2csv');
 const moment = require('moment'); // To handle date operations
+const tokenManager = require('./tokenManager');
+const cron = require('node-cron');
 
 const { ObjectId } = require('mongodb');
 
@@ -17,6 +19,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 connectDB();
+
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
@@ -275,7 +278,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 // Send the request to the Precisely API
                 const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                     headers: {
-                        'Authorization': 'Bearer WYXO9pFely4FLMuG9oAZAMMzN6ha', // Replace with your actual Bearer token
+                        'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
                         'Content-Type': 'application/json; charset=utf-8'
                     }
                 });
@@ -480,7 +483,7 @@ app.get('/fixing-precisely', async (req, res) => {
                     // Send the request to the Precisely API
                     const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                         headers: {
-                            'Authorization': 'Bearer WYXO9pFely4FLMuG9oAZAMMzN6ha', // Replace with your actual Bearer token
+                            'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
                             'Content-Type': 'application/json; charset=utf-8'
                         }
                     });
@@ -663,30 +666,10 @@ app.get('/listings', async (req, res) => {
         const propertiesCollection = database.collection('properties');
 
 
-        // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
-
         // Build query object
 
         const filteringQuery = {
 
-            current_status: { $in: ["Pending"] },
-            verified: { $in: ["Full", "NoPhotos"] },
-            last_status_check: { $exists: true },
-            $or: [
-                { for_sale_reachout: objectId },
-                { pending_reachout: objectId },
-                { coming_soon_reachout: objectId }
-
-            ],
-            companyOwned: false
-            /*
-                                 current_status: { $in: ["ForSale", "ComingSoon"] },
-                                 verified: { $in: ["Full", "NoPhotos"] },
-                                 last_status_check: { $exists: false },
-                                 companyOwned: { $in: [false, null] }
-                                 */
-            /*
             verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
             $or: [
@@ -698,7 +681,6 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null },
             ],
             branch: { $in: ["TX", "NJ"] }
-            */
         };
 
         // Fetch filtered properties
@@ -922,129 +904,79 @@ app.get('/snapshotsall', async (req, res) => {
     }
 });
 
-app.post('/handle-url', async (req, res) => {
-    try {
-        const { url } = req.body;
-        console.log(url);
-        if (!url) {
-            return res.status(400).json({ error: 'URL is required' });
-        }
 
-        await processUrl(url);
-        res.status(200).json({ message: 'URL processed successfully' });
-    } catch (error) {
-        console.error('Error processing URL:', error);
-        res.status(500).json({ error: 'Failed to process URL' });
-    }
-});
-
-
-
-const sendUrls = async (urls) => {
-    urls.forEach(url => {
-        axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url })
-            .then(response => console.log(`URL ${url} processed successfully:`))
-            .catch(error => console.error(`Error processing URL ${url}:`, error));
-    });
-};
-/*
-app.post('/trigger3', async (req, res) => {
-
-    // Helper function to create a delay
-    /*
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    const sendUrls = async (urls) => {
-        for (const url of urls) {
-            try {
-                const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url });
-                console.log(`URL ${url} processed successfully:`, response.data);
-            } catch (error) {
-                console.error(`Error processing URL ${url}:`, error);
-            }
-            // Wait for 1 second before processing the next URL
-            await delay(1000);
-        }
-    }; 
-
-    const database = await connectDB();
-    const propertiesCollection = database.collection('properties');
-
-    const filteringQuery = {
-        current_status: { $in: ["ForSale", "ComingSoon"] },
-        verified: { $in: ["Full", "NoPhotos"] },
-        last_status_check: { $exists: false },
-        companyOwned: { $in: [false, null] },
-        branch: "NJ"
-    };
-
-    // Fetch the first 200 properties
-    const properties = await propertiesCollection.find(filteringQuery).limit(75).toArray();
-    console.log("PROPERTIES: ", properties);
-
-    // Extract the URL field
-    const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
-    console.log("URLS:", urls);
-
-    try {
-        if (!Array.isArray(urls)) {
-            return res.status(400).json({ error: 'URLs should be an array' });
-        }
-
-        sendUrls(urls);
-        res.status(200).json({ message: 'All URLs are being processed.' });
-    } catch (error) {
-        console.error('Error processing URLs:', error);
-        res.status(500).json({ error: 'Failed to process URLs' });
-    }
-});
-*/
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 
 app.post('/trigger3', async (req, res) => {
     try {
-        for (let i = 0; i < 150; i++) {
-            const database = await connectDB();
-            const propertiesCollection = database.collection('properties');
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
 
-            const filteringQuery = {
-                current_status: { $in: ["ForSale", "ComingSoon"] },
-                verified: { $in: ["Full", "NoPhotos"] },
-                last_status_check: { $exists: false },
-                companyOwned: { $in: [false, null] }
-            };
+        let skip = 0;
+        const limit = 250;
+        let hasMore = true;
 
-            // Fetch the first 75 properties
-            const properties = await propertiesCollection.find(filteringQuery).limit(75).toArray();
-            // console.log("PROPERTIES: ", properties);
+        const filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            last_status_check: { $exists: false },
+            companyOwned: { $in: [false, null] }
+        };
 
+        while (hasMore) {
+            const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
+            if (properties.length === 0) {
+                hasMore = false;
+                break;
+            }
             // Extract the URL field
             const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
-            // console.log("URLS:", urls);
 
-            if (!Array.isArray(urls)) {
-                return res.status(400).json({ error: 'URLs should be an array' });
-            }
-
-            await sendUrls(urls);
-
-            console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
-            // Wait for 30 seconds before the next iteration
-            await delay(30000);
+            console.log("URLS:", urls);
+        }
+        if (!Array.isArray(urls)) {
+            return res.status(400).json({ error: 'URLs should be an array' });
         }
 
-        res.status(200).json({ message: 'All iterations completed.' });
+        await processUrl(urls);
+
+        console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
+        // Wait for 30 seconds before the next iteration
+        await delay(1000);
+
+        // Update the skip for the next batch
+        skip += limit;
+
+        res.status(200).json({ message: 'All URLs are being processed.' });
     } catch (error) {
         console.error('Error processing URLs:', error);
-        res.status(500).json({ error: 'Failed to process URLs' });
+        res.status(500).json('Failed to process URLs');
     }
 });
 
+// Function to trigger the script
+const triggerScript = async () => {
+    try {
+        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/trigger2', {
+            requrl: 'https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-76.89129393357007%2C%22east%22%3A-76.69045012253491%2C%22south%22%3A39.35388545272256%2C%22north%22%3A39.45787308434294%7D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%226m%22%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A13%2C%22usersSearchTerm%22%3A%22%22%2C%22customRegionId%22%3A%22875d466ad3X1-CR8p64l73zpt69_1c15kj%22%2C%22pagination%22%3A%7B%7D%7D',
+            branch: 'MD'
+        });
+        console.log('Script triggered successfully:', response.data);
+    } catch (error) {
+        console.error('Error triggering script:', error.response ? error.response.data : error.message);
+    }
+};
+
+// Schedule the cron job to run at the same time every day (e.g., at 10:00 AM)
+cron.schedule('17 16 * * *', () => {
+    console.log('Running the cron job to trigger the script');
+    triggerScript();
+}, {
+    scheduled: true,
+    timezone: "America/New_York" // Set the timezone as needed 
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-
-// s_lyqxhv8i2dhnakw152

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
+const tokenManager = require('./tokenManager');
 
 async function sendPostRequests2(req, res) {
     try {
@@ -193,7 +194,7 @@ async function listAllListings(data, branch, snapshot_id) {
                             // Send the request to the Precisely API
                             const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                                 headers: {
-                                    'Authorization': 'Bearer WYXO9pFely4FLMuG9oAZAMMzN6ha', // Replace with your actual Bearer token
+                                    'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
                                     'Content-Type': 'application/json; charset=utf-8'
                                 }
                             });

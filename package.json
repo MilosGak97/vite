@@ -25,7 +25,8 @@
     "json2csv": "^6.0.0-alpha.2",
     "moment": "^2.30.1",
     "mongodb": "^6.8.0",
-    "mongoose": "^8.5.1"
+    "mongoose": "^8.5.1",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
