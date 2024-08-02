@@ -939,7 +939,7 @@ app.post('/handle-url', async (req, res) => {
 const sendUrls = async (urls) => {
     urls.forEach(url => {
         axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url })
-            .then(response => console.log(`URL ${url} processed successfully:`, response.data))
+            .then(response => console.log(`URL ${url} processed successfully:`))
             .catch(error => console.error(`Error processing URL ${url}:`, error));
     });
 };
@@ -1000,7 +1000,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 app.post('/trigger3', async (req, res) => {
     try {
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 150; i++) {
             const database = await connectDB();
             const propertiesCollection = database.collection('properties');
 
@@ -1014,11 +1014,11 @@ app.post('/trigger3', async (req, res) => {
 
             // Fetch the first 75 properties
             const properties = await propertiesCollection.find(filteringQuery).limit(75).toArray();
-            console.log("PROPERTIES: ", properties);
+            // console.log("PROPERTIES: ", properties);
 
             // Extract the URL field
             const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
-            console.log("URLS:", urls);
+            // console.log("URLS:", urls);
 
             if (!Array.isArray(urls)) {
                 return res.status(400).json({ error: 'URLs should be an array' });
