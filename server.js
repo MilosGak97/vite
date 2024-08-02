@@ -34,7 +34,36 @@ app.use(express.static(path.join(__dirname, 'src/public')));
 // Use the webhook handler
 app.use('/', webhookHandler);
 // Endpoint to trigger sendPostRequests
-app.post('/trigger', processUrl);
+app.post('/trigger', async (req, res) => {
+    try {
+
+        const body = [
+            "https://www.zillow.com/homedetails/13-Delaware-Ct-APT-D-Matawan-NJ-07747/61841735_zpid/",
+            "https://www.zillow.com/homedetails/1801-Wrangler-Ave-Marlboro-NJ-07746/2055042801_zpid/",
+            "https://www.zillow.com/homedetails/30-Coventry-Rd-Hamburg-NJ-07419/338464562_zpid/",
+            "https://www.zillow.com/homedetails/308-Saw-Mill-Rd-North-Haledon-NJ-07508/39746423_zpid/",
+            "https://www.zillow.com/homedetails/90-Prospect-Ave-APT-5C-Hackensack-NJ-07601/67880563_zpid/",
+            "https://www.zillow.com/homedetails/42-Overlook-Ave-Haledon-NJ-07508/402396101_zpid/",
+            "https://www.zillow.com/homedetails/278-N-4th-St-Paterson-NJ-07522/39752869_zpid/",
+            "https://www.zillow.com/homedetails/201-Luis-M-Marin-Blvd-UNIT-1307-Jersey-City-NJ-07302/2069581675_zpid/",
+            "https://www.zillow.com/homedetails/19-Lauren-Ln-Sussex-NJ-07461/39965763_zpid/",
+            "https://www.zillow.com/homedetails/48-Haven-Ave-Bergenfield-NJ-07621/37852507_zpid/"
+        ];
+
+        if (!Array.isArray(body)) {
+            return res.status(400).json({ error: 'URLs should be an array' });
+        }
+
+        for (const url of body) {
+            await processUrl(url); // Process each URL
+        }
+
+        res.status(200).json({ message: 'All URLs processed successfully.' });
+    } catch (error) {
+        console.error('Error processing URLs:', error);
+        res.status(500).json({ error: 'Failed to process URLs' });
+    }
+});
 
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
@@ -883,6 +912,58 @@ app.get('/snapshotsall', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+app.post('/handle-url', async (req, res) => {
+    try {
+        const { url } = req.body;
+        console.log(url);
+        if (!url) {
+            return res.status(400).json({ error: 'URL is required' });
+        }
+
+        await processUrl(url);
+        res.status(200).json({ message: 'URL processed successfully' });
+    } catch (error) {
+        console.error('Error processing URL:', error);
+        res.status(500).json({ error: 'Failed to process URL' });
+    }
+});
+
+app.post('/trigger3', async (req, res) => {
+    const sendUrls = async (urls) => {
+        urls.forEach(url => {
+            axios.post('http://localhost:3000/handle-url', { url })
+                .then(response => console.log(`URL ${url} processed successfully:`, response.data))
+                .catch(error => console.error(`Error processing URL ${url}:`, error));
+        });
+    };
+    try {
+        const urls = [
+            "https://www.zillow.com/homedetails/13-Delaware-Ct-APT-D-Matawan-NJ-07747/61841735_zpid/",
+            "https://www.zillow.com/homedetails/1801-Wrangler-Ave-Marlboro-NJ-07746/2055042801_zpid/",
+            "https://www.zillow.com/homedetails/30-Coventry-Rd-Hamburg-NJ-07419/338464562_zpid/",
+            "https://www.zillow.com/homedetails/308-Saw-Mill-Rd-North-Haledon-NJ-07508/39746423_zpid/",
+            "https://www.zillow.com/homedetails/90-Prospect-Ave-APT-5C-Hackensack-NJ-07601/67880563_zpid/",
+            "https://www.zillow.com/homedetails/42-Overlook-Ave-Haledon-NJ-07508/402396101_zpid/",
+            "https://www.zillow.com/homedetails/278-N-4th-St-Paterson-NJ-07522/39752869_zpid/",
+            "https://www.zillow.com/homedetails/201-Luis-M-Marin-Blvd-UNIT-1307-Jersey-City-NJ-07302/2069581675_zpid/",
+            "https://www.zillow.com/homedetails/19-Lauren-Ln-Sussex-NJ-07461/39965763_zpid/",
+            "https://www.zillow.com/homedetails/48-Haven-Ave-Bergenfield-NJ-07621/37852507_zpid/"
+        ];
+
+        if (!Array.isArray(urls)) {
+            return res.status(400).json({ error: 'URLs should be an array' });
+        }
+
+        sendUrls(urls);
+        res.status(200).json({ message: 'All URLs are being processed.' });
+    } catch (error) {
+        console.error('Error processing URLs:', error);
+        res.status(500).json({ error: 'Failed to process URLs' });
+    }
+});
+
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
