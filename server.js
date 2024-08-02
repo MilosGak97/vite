@@ -361,21 +361,17 @@ app.post('/fixing-updateOne', async (req, res) => {
 
 
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66aa33c9c9eaa7e8b58ba9f9');
+        //  const objectId = new ObjectId('66aa33c9c9eaa7e8b58ba9f9');
 
-        const objectId2 = new ObjectId('66aba170ec4f71d232a4e237');
+        // const objectId2 = new ObjectId('66aba170ec4f71d232a4e237');
 
 
         const filteringQuery = {
-            verified: { $in: ["Full", "NoPhotos"] },
+            verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
-            $or: [
-                { coming_soon_reachout: objectId },
-                { for_sale_reachout: objectId },
-                { pending_reachout: objectId },
-            ]
+            branch: "NJ",
+            initial_scrape: true
         };
-
 
         // Connect to the database
         const database = await connectDB();
@@ -387,23 +383,21 @@ app.post('/fixing-updateOne', async (req, res) => {
 
         for (const property of properties) {
             try {
-                const updateFields = {};
-                if (property.pending_reachout && property.pending_reachout.equals(objectId)) {
-                    updateFields.pending_reachout = objectId2;
-                }
-                if (property.for_sale_reachout && property.for_sale_reachout.equals(objectId)) {
-                    updateFields.for_sale_reachout = objectId2;
-                }
-                if (property.coming_soon_reachout && property.coming_soon_reachout.equals(objectId)) {
-                    updateFields.coming_soon_reachout = objectId2;
+                let updateField = {};
+                if (property.current_status === "ForSale") {
+                    updateField.for_sale_reachout = "Initial_Scrape";
+                } else if (property.current_status === "ComingSoon") {
+                    updateField.coming_soon_reachout = "Initial_Scrape";
+                } else if (property.current_status === "Pending") {
+                    updateField.pending_reachout = "Initial_Scrape";
                 }
 
-                if (Object.keys(updateFields).length > 0) {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
-                        { $set: updateFields }
-                    );
-                }
+                // Update the respective reachout field
+                await propertiesCollection.updateOne(
+                    { _id: property._id },
+                    { $set: updateField }
+                );
+                console.log("SCRIPT IS DONE");
             }
             catch (error) {
                 console.log("Error in Catch of listing property: ", error)
@@ -422,6 +416,7 @@ app.post('/fixing-updateOne', async (req, res) => {
         }
     }
 })
+
 
 /* Running precisely again for selected query */
 app.get('/fixing-precisely', async (req, res) => {
@@ -648,9 +643,17 @@ app.get('/listings', async (req, res) => {
 
         // Build query object
         const filteringQuery = {
-            verified: { $in: ["Empty"] },
+            verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
-            branches: { $in: ["NJ"] }
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ],
+            branch: { $in: ["TX", "NJ"] }
         };
 
         // Fetch filtered properties

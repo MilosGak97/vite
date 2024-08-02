@@ -6,7 +6,8 @@ async function sendPostRequests(req, res) {
     try {
         body = [
             { "url": "https://www.zillow.com/homedetails/13810-Longview-St-Houston-TX-77015/84027384_zpid/" }, //84027384
-            { "url": "https://www.zillow.com/homedetails/1003-E-Wallisville-Rd-Highlands-TX-77562/27837391_zpid/" } //27837391
+            { "url": "https://www.zillow.com/homedetails/1003-E-Wallisville-Rd-Highlands-TX-77562/27837391_zpid/" }, //27837391 
+            { "url": "https://www.zillow.com/homedetails/45-Berkshire-Pl-D-Irvington-NJ-07111/2065210358_zpid/" } //2065210358
         ]
 
         const collection2 = client.db().collection('properties');
@@ -68,7 +69,7 @@ async function sendPostRequests(req, res) {
                         //console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
-                        //console.log('Response data:', response.data);
+                        console.log('Response data:', response.data);
                         listAllListings(response.data);
                         return response.data;
                     }
@@ -81,9 +82,6 @@ async function sendPostRequests(req, res) {
 
         async function listAllListings(data) {
             if (Array.isArray(data)) {
-
-
-
                 const dataArray = data;
                 const collection = client.db().collection('properties');
 
@@ -124,7 +122,6 @@ async function sendPostRequests(req, res) {
                         } else if (hdpTypeDimension === "UnderContract") {
                             if (exists.pending === null) {
                                 //console.log("Correct loop4: ", exists.pending);
-
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
@@ -142,8 +139,9 @@ async function sendPostRequests(req, res) {
                             }
                         }
 
-                        // Set the current_status field
+                        // Set the current_status field contingent_listing_type
                         updateFields.$set.current_status = hdpTypeDimension;
+                        updateFields.$set.contingent_listing_type = listing.contingent_listing_type;
                         //console.log("Update fields object: ", updateFields);
                         // Perform the update based on zpid
                         await collection.updateOne(
@@ -192,6 +190,7 @@ async function sendPostRequests(req, res) {
 
                         let notes;//
                         let branch;
+                        let first_pending = true;
 
 
                         if (hdpTypeDimension === "ForSale") {
@@ -257,9 +256,10 @@ async function sendPostRequests(req, res) {
                             current_status: current_status,
                             current_status_date: current_status_date,
                             notes: notes,
-                            branch: branch
+                            branch: branch,
+                            first_pending: first_pending
                         };
-
+                        console.log("Created: ", listing.zpid)
                         await collection.insertOne(propertyData);
                     }
 
