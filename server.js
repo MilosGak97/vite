@@ -272,7 +272,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
                 // Send the request to the Precisely API
                 const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                     headers: {
-                        'Authorization': 'Bearer 99W2OboFyVEacX8UqZFcIflvzmks', // Replace with your actual Bearer token
+                        'Authorization': 'Bearer WYXO9pFely4FLMuG9oAZAMMzN6ha', // Replace with your actual Bearer token
                         'Content-Type': 'application/json; charset=utf-8'
                     }
                 });
@@ -447,14 +447,18 @@ app.get('/fixing-precisely', async (req, res) => {
         // Convert snapshot_id to ObjectId
         const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
         let query = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
-            initial_scrape: { $exists: false },
-            "owners.0.firstName": { $in: ["Undefined"] },
+            last_status_check: { $exists: true },
+            initial_scrape: true,
             $or: [
-                { coming_soon_reachout: objectIdSnapshotId },
-                { for_sale_reachout: objectIdSnapshotId },
-                { pending_reachout: objectIdSnapshotId },
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+
             ]
         };
 
@@ -473,7 +477,7 @@ app.get('/fixing-precisely', async (req, res) => {
                     // Send the request to the Precisely API
                     const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
                         headers: {
-                            'Authorization': 'Bearer ebQrs5jbDskTtzQprf65jFlmLKGl', // Replace with your actual Bearer token
+                            'Authorization': 'Bearer WYXO9pFely4FLMuG9oAZAMMzN6ha', // Replace with your actual Bearer token
                             'Content-Type': 'application/json; charset=utf-8'
                         }
                     });
@@ -663,25 +667,25 @@ app.get('/listings', async (req, res) => {
 
         const filteringQuery = {
 
-            /*
-            THE ONE THAT CHANGED STATUS
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             last_status_check: { $exists: true },
+            initial_scrape: true,
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
+                { current_status: "Pending", pending_reachout: null }
+
             ]
-                */
-
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-            verified: { $in: ["Full", "NoPhotos"] },
-            last_status_check: { $exists: true }
-
+            /*
+                                 current_status: { $in: ["ForSale", "ComingSoon"] },
+                                 verified: { $in: ["Full", "NoPhotos"] },
+                                 last_status_check: { $exists: false },
+                                 companyOwned: { $in: [false, null] }
+                                 */
             /*
             verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
