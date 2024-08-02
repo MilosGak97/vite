@@ -4,22 +4,23 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function sendPostRequests(req, res) {
     try {
-        /*const body = [
+        body = [
             { "url": "https://www.zillow.com/homedetails/33-Daly-Ct-Old-Bridge-NJ-08857/124182759_zpid/" },
             { "url": "https://www.zillow.com/homedetails/339-Yorkshire-Pl-Morganville-NJ-07751/70169351_zpid/" }
 
-        ];*/
+        ]
 
         const collection2 = client.db().collection('properties');
         // Query MongoDB for records with current_type as "forsale" or "comingsoon"
-        const records = await collection2.find({
-            current_status: { $in: ["ForSale", "ComingSoon"] }
-        }).toArray();
-
-        // Create the body for the POST request
-        const body = records.map(record => ({ url: record.url }));
-        console.log("Body: ", body)
-
+        /*
+          const records = await collection2.find({
+              current_status: { $in: ["ForSale", "ComingSoon"] }
+          }).toArray();
+  
+          // Create the body for the POST request
+          const body = records.map(record => ({ url: record.url }));
+          console.log("Body: ", body)
+  */
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
@@ -40,10 +41,10 @@ async function sendPostRequests(req, res) {
         const url = `https://api.brightdata.com/datasets/v3/trigger?dataset_id=${datasetId}&endpoint=${encodeURIComponent(endpoint)}&format=${format}&uncompressed_webhook=${uncompressedWebhook}`;
 
         const response = await axios.post(url, body, { headers });
-        //console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
+        console.log(`Response for ${body[0].url}:`, response.data.snapshot_id);
 
         const snapshotId = response.data.snapshot_id;
-        //console.log(snapshotId);
+        console.log("SnapshotID:", snapshotId);
         const collection = client.db().collection('snapshots');
 
         const shapshotData = {
@@ -111,6 +112,16 @@ async function sendPostRequests(req, res) {
                                 //console.log("exists.for_sale is not null: ", exists.for_sale);
                             }
                         } else if (hdpTypeDimension === "Pending") {
+                            if (exists.pending === null) {
+                                //console.log("Correct loop4: ", exists.pending);
+
+                                updateFields.$set.pending = "Yes";
+                                updateFields.$set.pending_date = new Date();
+                                updateFields.$set.current_status_date = new Date();
+                            } else if (exists.pending !== null) {
+                                //console.log("exists.pending: ", exists.pending);
+                            }
+                        } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.pending === null) {
                                 //console.log("Correct loop4: ", exists.pending);
 
