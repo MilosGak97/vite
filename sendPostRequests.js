@@ -5,16 +5,16 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 async function sendPostRequests(req, res) {
     try {
         body = [
-            { "url": "https://www.zillow.com/homedetails/33-Daly-Ct-Old-Bridge-NJ-08857/124182759_zpid/" },
-            { "url": "https://www.zillow.com/homedetails/339-Yorkshire-Pl-Morganville-NJ-07751/70169351_zpid/" }
-
+            { "url": "https://www.zillow.com/homedetails/13810-Longview-St-Houston-TX-77015/84027384_zpid/" }, //84027384
+            { "url": "https://www.zillow.com/homedetails/1003-E-Wallisville-Rd-Highlands-TX-77562/27837391_zpid/" } //27837391
         ]
 
         const collection2 = client.db().collection('properties');
         // Query MongoDB for records with current_type as "forsale" or "comingsoon"
         /*
           const records = await collection2.find({
-              current_status: { $in: ["ForSale", "ComingSoon"] }
+              current_status: { $in: ["ForSale", "ComingSoon"] },
+              verified: {$in: ["Full", "NoPhotos"]}
           }).toArray();
   
           // Create the body for the POST request
