@@ -968,22 +968,15 @@ app.post('/trigger3', async (req, res) => {
         branch: "NJ"
     };
 
-    const properties = await propertiesCollection.find(filteringQuery).toArray();
+    // Fetch the first 200 properties
+    const properties = await propertiesCollection.find(filteringQuery).limit(200).toArray();
+    console.log("PROPERTIES: ", properties);
+
+    // Extract the URL field
+    const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
+    console.log("URLS:", urls);
 
     try {
-        const urls = [
-            "https://www.zillow.com/homedetails/13-Delaware-Ct-APT-D-Matawan-NJ-07747/61841735_zpid/",
-            "https://www.zillow.com/homedetails/1801-Wrangler-Ave-Marlboro-NJ-07746/2055042801_zpid/",
-            "https://www.zillow.com/homedetails/30-Coventry-Rd-Hamburg-NJ-07419/338464562_zpid/",
-            "https://www.zillow.com/homedetails/308-Saw-Mill-Rd-North-Haledon-NJ-07508/39746423_zpid/",
-            "https://www.zillow.com/homedetails/90-Prospect-Ave-APT-5C-Hackensack-NJ-07601/67880563_zpid/",
-            "https://www.zillow.com/homedetails/42-Overlook-Ave-Haledon-NJ-07508/402396101_zpid/",
-            "https://www.zillow.com/homedetails/278-N-4th-St-Paterson-NJ-07522/39752869_zpid/",
-            "https://www.zillow.com/homedetails/201-Luis-M-Marin-Blvd-UNIT-1307-Jersey-City-NJ-07302/2069581675_zpid/",
-            "https://www.zillow.com/homedetails/19-Lauren-Ln-Sussex-NJ-07461/39965763_zpid/",
-            "https://www.zillow.com/homedetails/48-Haven-Ave-Bergenfield-NJ-07621/37852507_zpid/"
-        ];
-
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
