@@ -101,7 +101,7 @@ async function sendPostRequests(req, res) {
 
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
-                                //console.log("exists.for_sale is null:", exists.for_sale);
+                                console.log("exists.for_sale is null:", exists.for_sale);
 
                                 updateFields.$set.for_sale = "Yes";
                                 updateFields.$set.for_sale_date = new Date();
@@ -111,7 +111,7 @@ async function sendPostRequests(req, res) {
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
-                                //console.log("Correct loop4: ", exists.pending);
+                                console.log("Correct loop4: ", exists.pending);
 
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
@@ -121,7 +121,7 @@ async function sendPostRequests(req, res) {
                             }
                         } else if (hdpTypeDimension === "UnderContract") {
                             if (exists.pending === null) {
-                                //console.log("Correct loop4: ", exists.pending);
+                                console.log("Correct loop4.a: ", exists.pending);
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
