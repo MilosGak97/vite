@@ -2,10 +2,28 @@ const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
-const processUrl = async (requrl) => {
-    try {
-        const body = [{ url: requrl }];
-        console.log("BODY:", body);
+async function sendPostRequests(req, res) {
+    try {/*
+        body = [
+            { "url": "https://www.zillow.com/homedetails/13810-Longview-St-Houston-TX-77015/84027384_zpid/" }, //84027384
+            { "url": "https://www.zillow.com/homedetails/1003-E-Wallisville-Rd-Highlands-TX-77562/27837391_zpid/" }, //27837391 
+            { "url": "https://www.zillow.com/homedetails/45-Berkshire-Pl-D-Irvington-NJ-07111/2065210358_zpid/" } //2065210358
+        ]
+*/
+        const collection2 = client.db().collection('properties');
+        // Query MongoDB for records with current_type as "forsale" or "comingsoon"
+
+        const records = await collection2.find({
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            branch: "TX"
+
+        }).toArray();
+
+        // Create the body for the POST request
+        const body = records.map(record => ({ url: record.url }));
+        console.log("Body: ", body)
+
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
@@ -30,14 +48,13 @@ const processUrl = async (requrl) => {
 
         const snapshotId = response.data.snapshot_id;
         console.log("SnapshotID:", snapshotId);
-        const collection = client.db().collection('snapshotsPending');
+        const collection = client.db().collection('snapshots');
 
         const shapshotData = {
             snapshot_id: snapshotId,
             requested_time: new Date()
         }
         await collection.insertOne(shapshotData);
-
         async function fetchData(snapshotId) {
             const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
             const url2 = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
@@ -55,10 +72,11 @@ const processUrl = async (requrl) => {
                         await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                     } else {
                         console.log('Response data:', response.data);
-                        await listAllListings(response.data);
+                        listAllListings(response.data);
                         return response.data;
                     }
                 } catch (error) {
+                    //console.error('Error fetching data:', error);
                     throw error; // or handle gracefully
                 }
             }
@@ -69,44 +87,65 @@ const processUrl = async (requrl) => {
                 const dataArray = data;
                 const collection = client.db().collection('properties');
 
+                // Logging individual items and inserting into MongoDB
                 for (let i = 0; i < dataArray.length; i++) {
                     const listing = dataArray[i];
                     const photos = dataArray[i].photos;
 
+
                     const exists = await checkIfZpidExists(listing.zpid);
                     if (exists) {
+                        // Initialize updateFields with an empty $set object
                         let updateFields = { $set: {} };
                         const hdpTypeDimension = listing.hdpTypeDimension;
+                        //console.log("Correct loop: ", hdpTypeDimension);
+                        //console.log("Correct loop2: ", exists);
 
                         if (hdpTypeDimension === "ForSale") {
                             if (exists.for_sale === null) {
+                                console.log("exists.for_sale is null:", exists.for_sale);
+
                                 updateFields.$set.for_sale = "Yes";
                                 updateFields.$set.for_sale_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.for_sale !== null) {
+                                //console.log("exists.for_sale is not null: ", exists.for_sale);
                             }
                         } else if (hdpTypeDimension === "Pending") {
                             if (exists.pending === null) {
+                                console.log("Correct loop4: ", exists.pending);
+
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.pending !== null) {
+                                //console.log("exists.pending: ", exists.pending);
                             }
                         } else if (hdpTypeDimension === "UnderContract") {
                             if (exists.pending === null) {
+                                console.log("Correct loop4.a: ", exists.pending);
                                 updateFields.$set.pending = "Yes";
                                 updateFields.$set.pending_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.pending !== null) {
+                                //console.log("exists.pending: ", exists.pending);
                             }
                         } else if (hdpTypeDimension === "ComingSoon") {
                             if (exists.coming_soon === null) {
+                                console.log("Correct loop5: ", exists.coming_soon);
                                 updateFields.$set.coming_soon = "Yes";
                                 updateFields.$set.coming_soon_date = new Date();
                                 updateFields.$set.current_status_date = new Date();
+                            } else if (exists.coming_soon !== null) {
+                                //console.log("exists.coming_soon: ", exists.coming_soon);
                             }
                         }
 
+                        // Set the current_status field contingent_listing_type
                         updateFields.$set.current_status = hdpTypeDimension;
                         updateFields.$set.contingent_listing_type = listing.contingent_listing_type;
-
+                        //console.log("Update fields object: ", updateFields);
+                        // Perform the update based on zpid
                         if (hdpTypeDimension === exists.current_status) {
                             await collection.updateOne(
                                 { zpid: Number(listing.zpid) },
@@ -121,7 +160,10 @@ const processUrl = async (requrl) => {
                             );
                             console.log("Updated status for: ", listing.zpid)
                         }
-                    } else {
+                    }
+                    else {
+                        // Handle the case where the property does not exist
+
                         const extractPhotoUrls = (photos) => {
                             if (!photos || !Array.isArray(photos)) {
                                 return [];
@@ -137,30 +179,31 @@ const processUrl = async (requrl) => {
                         const photoUrls = extractPhotoUrls(photos);
 
                         const hdpTypeDimension = listing.hdpTypeDimension;
-                        let for_sale;
-                        let for_sale_date;
-                        let for_sale_reachout;
+                        let for_sale; //
+                        let for_sale_date; //
+                        let for_sale_reachout;//
 
-                        let coming_soon;
-                        let coming_soon_date;
-                        let coming_soon_reachout;
+                        let coming_soon;//
+                        let coming_soon_date;//
+                        let coming_soon_reachout;//
 
-                        let pending;
-                        let pending_date;
-                        let pending_reachout;
+                        let pending;//
+                        let pending_date;//
+                        let pending_reachout;//
 
-                        let verified;
+                        let verified;//
 
-                        let customer_first_name;
-                        let customer_last_name;
-                        let company_owned;
+                        let customer_first_name;//
+                        let customer_last_name;//
+                        let company_owned;//
 
-                        let current_status;
-                        let current_status_date;
+                        let current_status;//
+                        let current_status_date;//
 
-                        let notes;
+                        let notes;//
                         let branch;
                         let first_pending = true;
+
 
                         if (hdpTypeDimension === "ForSale") {
                             for_sale = "Yes";
@@ -170,14 +213,16 @@ const processUrl = async (requrl) => {
                         if (hdpTypeDimension === "Pending") {
                             pending = "Yes";
                             pending_date = new Date();
-                            current_status_date = pending_date;
+                            current_status_date = for_pending_date;
                         }
                         if (hdpTypeDimension === "ComingSoon") {
                             coming_soon = "Yes";
                             coming_soon_date = new Date();
-                            current_status_date = coming_soon_date;
+                            current_status_date = for_coming_soon_date;
                         }
                         current_status = hdpTypeDimension;
+
+
 
                         const propertyData = {
                             url: listing.url,
@@ -229,29 +274,26 @@ const processUrl = async (requrl) => {
                         console.log("Created: ", listing.zpid)
                         await collection.insertOne(propertyData);
                     }
+
                 }
             } else {
                 console.log('Data is not in expected array format');
             }
         }
 
-        await client.connect();
-        await fetchData(snapshotId);
+        try {
+            await client.connect();
+            const data = await fetchData(snapshotId);
+            res.status(200).json(data);
+        } catch (error) {
+            res.status(500).json({ error: 'Error fetching data' });
+        } finally {
+            console.log("Bravo, gotovo je!")
+        }
     } catch (error) {
-        console.error('Error processing URL:', error);
+        console.error('Error sending POST request:', error);
+        res.status(500).json({ error: 'Failed to send POST request' });
     }
-};
+}
 
-// Sample body array
-const body = [
-    { "url": "https://www.zillow.com/homedetails/13-Delaware-Ct-APT-D-Matawan-NJ-07747/61841735_zpid/" },
-    { "url": "https://www.zillow.com/homedetails/1801-Wrangler-Ave-Marlboro-NJ-07746/2055042801_zpid/" }
-];
-
-// Iterate over each URL and process it
-body.forEach(item => {
-    processUrl(item.url);
-});
-
-
-module.exports = processUrl;
+module.exports = sendPostRequests;

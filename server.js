@@ -642,7 +642,13 @@ app.get('/listings', async (req, res) => {
         // const objectId = new ObjectId('66aa215a4cedc36cccb68e44');
 
         // Build query object
+
         const filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            branch: "TX"
+
+            /*
             verified: { $in: ["NoPhotos", "Full"] },
             companyOwned: { $in: [null, false] },
             $or: [
@@ -654,6 +660,7 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null },
             ],
             branch: { $in: ["TX", "NJ"] }
+            */
         };
 
         // Fetch filtered properties
