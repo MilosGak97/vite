@@ -956,26 +956,59 @@ app.post('/trigger3', async (req, res) => {
 });
 
 // Function to trigger the script
-const triggerScript = async () => {
+const triggerScript = async (url, branch) => {
     try {
         const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/trigger2', {
-            requrl: 'https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-76.89129393357007%2C%22east%22%3A-76.69045012253491%2C%22south%22%3A39.35388545272256%2C%22north%22%3A39.45787308434294%7D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%226m%22%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A13%2C%22usersSearchTerm%22%3A%22%22%2C%22customRegionId%22%3A%22875d466ad3X1-CR8p64l73zpt69_1c15kj%22%2C%22pagination%22%3A%7B%7D%7D',
-            branch: 'MD'
+            requrl: url,
+            branch: branch
         });
-        console.log('Script triggered successfully:', response.data);
+        console.log(`Script triggered successfully for branch ${branch}:`, response.data);
     } catch (error) {
-        console.error('Error triggering script:', error.response ? error.response.data : error.message);
+        console.error(`Error triggering script for branch ${branch}:`, error.response ? error.response.data : error.message);
     }
 };
 
-// Schedule the cron job to run at the same time every day (e.g., at 10:00 AM)
-cron.schedule('17 16 * * *', () => {
+
+// Schedule the cron job to run at 12:45 AM every day (Fairfield, NJ time) / 6:45AM Serbia time
+cron.schedule('36 16 * * *', () => {
+    console.log('Running the cron job to trigger the script at 4:00 AM');
+    triggerScript('https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-76.89129393357007%2C%22east%22%3A-76.69045012253491%2C%22south%22%3A39.35388545272256%2C%22north%22%3A39.45787308434294%7D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%226m%22%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A13%2C%22usersSearchTerm%22%3A%22%22%2C%22customRegionId%22%3A%22875d466ad3X1-CR8p64l73zpt69_1c15kj%22%2C%22pagination%22%3A%7B%7D%7D', 'MD');
+}, {
+    scheduled: true,
+    timezone: "America/New_York" // Set the timezone to Eastern Time
+});
+
+
+// Schedule the cron job to run at 1:15 AM every day (Fairfield, NJ time) / 7:15AM Serbia time
+cron.schedule('15 1 * * *', () => {
+    console.log('Running the cron job to trigger the script at 4:00 AM');
+    triggerScript('https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-96.23800374414061%2C%22east%22%3A-94.63125325585936%2C%22south%22%3A29.366468858307613%2C%22north%22%3A30.300427680002166%7D%2C%22usersSearchTerm%22%3A%22%22%2C%22filterState%22%3A%7B%22sort%22%3A%22globalrelevanceex%22%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22customRegionId%22%3A%221095b66a9eX1-CRmt13j7zyeyra_znvef%22%7D', 'TX');
+}, {
+    scheduled: true,
+    timezone: "America/New_York" // Set the timezone to Eastern Time
+});
+
+
+// Schedule the cron job to run at 1:40 AM every day (Fairfield, NJ time) / 7:40AM Serbia time
+cron.schedule('40 1 * * *', () => {
+    console.log('Running the cron job to trigger the script at 4:00 AM');
+    triggerScript('https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-96.23800374414061%2C%22east%22%3A-94.63125325585936%2C%22south%22%3A29.366468858307613%2C%22north%22%3A30.300427680002166%7D%2C%22usersSearchTerm%22%3A%22%22%2C%22filterState%22%3A%7B%22sort%22%3A%22globalrelevanceex%22%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22customRegionId%22%3A%221095b66a9eX1-CRmt13j7zyeyra_znvef%22%7D', 'TX');
+}, {
+    scheduled: true,
+    timezone: "America/New_York" // Set the timezone to Eastern Time
+});
+
+
+// Schedule the cron job to run at the same time every day (e.g., at 2:10 AM) / 8:10am serbia time
+cron.schedule('10 2 * * *', () => {
     console.log('Running the cron job to trigger the script');
-    triggerScript();
+    triggerScript('https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-96.23800374414061%2C%22east%22%3A-94.63125325585936%2C%22south%22%3A29.366468858307613%2C%22north%22%3A30.300427680002166%7D%2C%22usersSearchTerm%22%3A%22%22%2C%22filterState%22%3A%7B%22sort%22%3A%22globalrelevanceex%22%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22customRegionId%22%3A%221095b66a9eX1-CRmt13j7zyeyra_znvef%22%7D', 'TX');
 }, {
     scheduled: true,
     timezone: "America/New_York" // Set the timezone as needed 
 });
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
