@@ -943,10 +943,8 @@ const sendUrls = async (urls) => {
             .catch(error => console.error(`Error processing URL ${url}:`, error));
     });
 };
-
+/*
 app.post('/trigger3', async (req, res) => {
-
-
 
     // Helper function to create a delay
     /*
@@ -963,8 +961,7 @@ app.post('/trigger3', async (req, res) => {
             // Wait for 1 second before processing the next URL
             await delay(1000);
         }
-    };
-    */
+    }; 
 
     const database = await connectDB();
     const propertiesCollection = database.collection('properties');
@@ -992,6 +989,49 @@ app.post('/trigger3', async (req, res) => {
 
         sendUrls(urls);
         res.status(200).json({ message: 'All URLs are being processed.' });
+    } catch (error) {
+        console.error('Error processing URLs:', error);
+        res.status(500).json({ error: 'Failed to process URLs' });
+    }
+});
+*/
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+
+app.post('/trigger3', async (req, res) => {
+    try {
+        for (let i = 0; i < 50; i++) {
+            const database = await connectDB();
+            const propertiesCollection = database.collection('properties');
+
+            const filteringQuery = {
+                current_status: { $in: ["ForSale", "ComingSoon"] },
+                verified: { $in: ["Full", "NoPhotos"] },
+                last_status_check: { $exists: false },
+                companyOwned: { $in: [false, null] },
+                branch: "NJ"
+            };
+
+            // Fetch the first 75 properties
+            const properties = await propertiesCollection.find(filteringQuery).limit(75).toArray();
+            console.log("PROPERTIES: ", properties);
+
+            // Extract the URL field
+            const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
+            console.log("URLS:", urls);
+
+            if (!Array.isArray(urls)) {
+                return res.status(400).json({ error: 'URLs should be an array' });
+            }
+
+            await sendUrls(urls);
+
+            console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
+            // Wait for 30 seconds before the next iteration
+            await delay(30000);
+        }
+
+        res.status(200).json({ message: 'All iterations completed.' });
     } catch (error) {
         console.error('Error processing URLs:', error);
         res.status(500).json({ error: 'Failed to process URLs' });
