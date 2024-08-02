@@ -148,6 +148,22 @@
                 </div>
             </div>
 
+            <div class="bg-blue-50 flex flex-col justify-center">
+                <form id="triggerForm" action="/trigger" method="POST">
+                    <div class="mb-4">
+                        <input type="text" id="requrl" name="requrl" placeholder="Enter URL"
+                            value="https://www.zillow.com/homes/for_sale/?searchQueryState=%7B%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-96.23800374414061%2C%22east%22%3A-94.63125325585936%2C%22south%22%3A29.366468858307613%2C%22north%22%3A30.300427680002166%7D%2C%22usersSearchTerm%22%3A%22%22%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22customRegionId%22%3A%221095b66a9eX1-CRmt13j7zyeyra_znvef%22%7D"
+                            hidden>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" value="TX" name="branch" hidden>
+                    </div>
+                    <button type="submit"
+                        class="w-full px-4 py-2 bg-green-700 text-white rounded-md font-bold hover:bg-opacity-80">Run
+                        Pending
+                        Scrapping</button>
+                </form>
+            </div>
 
         </body>
 
