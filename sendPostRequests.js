@@ -144,11 +144,19 @@ async function sendPostRequests(req, res) {
                         updateFields.$set.contingent_listing_type = listing.contingent_listing_type;
                         //console.log("Update fields object: ", updateFields);
                         // Perform the update based on zpid
-                        await collection.updateOne(
-                            { zpid: Number(listing.zpid) },
-                            updateFields
-                        );
-                        console.log("Updated status for: ", listing.zpid)
+                        if (hdpTypeDimension === exists.current_status) {
+                            await collection.updateOne(
+                                { zpid: Number(listing.zpid) },
+                                { $set: { last_status_check: new Date() } }
+                            );
+                            console.log("No Status Changes for: ", listing.zpid)
+                        } else {
+                            await collection.updateOne(
+                                { zpid: Number(listing.zpid) },
+                                updateFields
+                            );
+                            console.log("Updated status for: ", listing.zpid)
+                        }
                     }
                     else {
                         // Handle the case where the property does not exist
