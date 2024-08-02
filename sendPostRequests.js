@@ -123,10 +123,10 @@ const processUrl = async (url) => {
                         );
                         console.log("No Status Changes for: ", listing.zpid)
                     } else {
+                        updateFields.$set.last_status_check = new Date();
                         await collection.updateOne(
                             { zpid: Number(listing.zpid) },
-                            updateFields,
-                            { $set: { last_status_check: new Date() } }
+                            updateFields
                         );
                         console.log("Updated status for: ", listing.zpid)
                     }
