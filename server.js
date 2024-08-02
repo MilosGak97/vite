@@ -935,6 +935,7 @@ app.post('/handle-url', async (req, res) => {
 });
 
 app.post('/trigger3', async (req, res) => {
+    /*
     const sendUrls = async (urls) => {
         urls.forEach(url => {
             axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url })
@@ -942,7 +943,23 @@ app.post('/trigger3', async (req, res) => {
                 .catch(error => console.error(`Error processing URL ${url}:`, error));
         });
     };
+*/
 
+    // Helper function to create a delay
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const sendUrls = async (urls) => {
+        for (const url of urls) {
+            try {
+                const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url });
+                console.log(`URL ${url} processed successfully:`, response.data);
+            } catch (error) {
+                console.error(`Error processing URL ${url}:`, error);
+            }
+            // Wait for 1 second before processing the next URL
+            await delay(1000);
+        }
+    };
 
     const database = await connectDB();
     const propertiesCollection = database.collection('properties');
@@ -956,7 +973,7 @@ app.post('/trigger3', async (req, res) => {
     };
 
     // Fetch the first 200 properties
-    const properties = await propertiesCollection.find(filteringQuery).limit(50).toArray();
+    const properties = await propertiesCollection.find(filteringQuery).limit(250).toArray();
     console.log("PROPERTIES: ", properties);
 
     // Extract the URL field
