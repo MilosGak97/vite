@@ -932,7 +932,7 @@ app.post('/handle-url', async (req, res) => {
 app.post('/trigger3', async (req, res) => {
     const sendUrls = async (urls) => {
         urls.forEach(url => {
-            axios.post('http://localhost:3000/handle-url', { url })
+            axios.post('https://worker-847b6ac96356.herokuapp.com/handle-url', { url })
                 .then(response => console.log(`URL ${url} processed successfully:`, response.data))
                 .catch(error => console.error(`Error processing URL ${url}:`, error));
         });
