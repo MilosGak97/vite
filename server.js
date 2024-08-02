@@ -83,17 +83,19 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
 
         const filteringQuery = {
-            verified: { $in: ["NoPhotos", "Full"] },
-            companyOwned: { $in: [null, false] },
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            last_status_check: { $exists: true },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
+                { current_status: "Pending", pending_reachout: null }
+
             ],
-            initial_scrape: { $exists: false }
+            companyOwned: false
         };
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -670,7 +672,6 @@ app.get('/listings', async (req, res) => {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             last_status_check: { $exists: true },
-            initial_scrape: true,
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -679,7 +680,8 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
 
-            ]
+            ],
+            companyOwned: false
             /*
                                  current_status: { $in: ["ForSale", "ComingSoon"] },
                                  verified: { $in: ["Full", "NoPhotos"] },
