@@ -396,10 +396,7 @@ app.post('/fixing-updateOne', async (req, res) => {
 
 
         const filteringQuery = {
-            verified: { $in: ["NoPhotos", "Full"] },
-            companyOwned: { $in: [null, false] },
-            branch: "NJ",
-            initial_scrape: true
+            last_status_check: { $exists: true }
         };
 
         // Connect to the database
@@ -412,19 +409,11 @@ app.post('/fixing-updateOne', async (req, res) => {
 
         for (const property of properties) {
             try {
-                let updateField = {};
-                if (property.current_status === "ForSale") {
-                    updateField.for_sale_reachout = "Initial_Scrape";
-                } else if (property.current_status === "ComingSoon") {
-                    updateField.coming_soon_reachout = "Initial_Scrape";
-                } else if (property.current_status === "Pending") {
-                    updateField.pending_reachout = "Initial_Scrape";
-                }
 
                 // Update the respective reachout field
                 await propertiesCollection.updateOne(
                     { _id: property._id },
-                    { $set: updateField }
+                    { $unset: { last_status_check: "" } }
                 );
                 console.log("SCRIPT IS DONE");
             }
@@ -967,7 +956,7 @@ app.post('/trigger3', async (req, res) => {
     };
 
     // Fetch the first 200 properties
-    const properties = await propertiesCollection.find(filteringQuery).limit(200).toArray();
+    const properties = await propertiesCollection.find(filteringQuery).limit(50).toArray();
     console.log("PROPERTIES: ", properties);
 
     // Extract the URL field
