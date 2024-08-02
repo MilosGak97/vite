@@ -82,17 +82,18 @@ app.get('/export-csv', async (req, res) => {
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('shippings');
 
+        // Convert snapshot_id to ObjectId
+        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
+
         const filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+
+            current_status: { $in: ["Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             last_status_check: { $exists: true },
             $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
+                { for_sale_reachout: objectId },
+                { pending_reachout: objectId },
+                { coming_soon_reachout: objectId }
 
             ],
             companyOwned: false
@@ -663,22 +664,19 @@ app.get('/listings', async (req, res) => {
 
 
         // Convert snapshot_id to ObjectId
-        // const objectId = new ObjectId('66aa215a4cedc36cccb68e44');
+        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
 
         // Build query object
 
         const filteringQuery = {
 
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            current_status: { $in: ["Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             last_status_check: { $exists: true },
             $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
+                { for_sale_reachout: objectId },
+                { pending_reachout: objectId },
+                { coming_soon_reachout: objectId }
 
             ],
             companyOwned: false
