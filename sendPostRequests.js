@@ -3,25 +3,27 @@ const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 async function sendPostRequests(req, res) {
-    try {
+    try {/*
         body = [
             { "url": "https://www.zillow.com/homedetails/13810-Longview-St-Houston-TX-77015/84027384_zpid/" }, //84027384
             { "url": "https://www.zillow.com/homedetails/1003-E-Wallisville-Rd-Highlands-TX-77562/27837391_zpid/" }, //27837391 
             { "url": "https://www.zillow.com/homedetails/45-Berkshire-Pl-D-Irvington-NJ-07111/2065210358_zpid/" } //2065210358
         ]
-
+*/
         const collection2 = client.db().collection('properties');
         // Query MongoDB for records with current_type as "forsale" or "comingsoon"
-        /*
-          const records = await collection2.find({
-              current_status: { $in: ["ForSale", "ComingSoon"] },
-              verified: {$in: ["Full", "NoPhotos"]}
-          }).toArray();
-  
-          // Create the body for the POST request
-          const body = records.map(record => ({ url: record.url }));
-          console.log("Body: ", body)
-  */
+
+        const records = await collection2.find({
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            branch: "TX"
+
+        }).toArray();
+
+        // Create the body for the POST request
+        const body = records.map(record => ({ url: record.url }));
+        console.log("Body: ", body)
+
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
         const format = 'json';
@@ -153,7 +155,8 @@ async function sendPostRequests(req, res) {
                         } else {
                             await collection.updateOne(
                                 { zpid: Number(listing.zpid) },
-                                updateFields
+                                updateFields,
+                                { $set: { last_status_check: new Date() } }
                             );
                             console.log("Updated status for: ", listing.zpid)
                         }
