@@ -148,6 +148,7 @@ async function sendPostRequests(req, res) {
                             { zpid: Number(listing.zpid) },
                             updateFields
                         );
+                        console.log("Updated status for: ", listing.zpid)
                     }
                     else {
                         // Handle the case where the property does not exist
