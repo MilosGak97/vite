@@ -692,7 +692,8 @@ app.get('/listings', async (req, res) => {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             last_status_check: { $exists: false },
-            companyOwned: { $in: [false, null] }
+            companyOwned: { $in: [false, null] },
+            branch: "NJ"
 
             /*
             verified: { $in: ["NoPhotos", "Full"] },
@@ -962,8 +963,9 @@ app.post('/trigger3', async (req, res) => {
     const filteringQuery = {
         current_status: { $in: ["ForSale", "ComingSoon"] },
         verified: { $in: ["Full", "NoPhotos"] },
-        branch: "TX",
-        last_status_check: { $exists: true }
+        last_status_check: { $exists: false },
+        companyOwned: { $in: [false, null] },
+        branch: "NJ"
     };
 
     const properties = await propertiesCollection.find(filteringQuery).toArray();
