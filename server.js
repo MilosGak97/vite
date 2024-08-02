@@ -673,9 +673,26 @@ app.get('/listings', async (req, res) => {
         // Build query object
 
         const filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon"] },
+
+            /*
+            THE ONE THAT CHANGED STATUS
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            branch: "TX"
+            last_status_check: { $exists: true },
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ]
+                */
+
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            last_status_check: { $exists: false },
+            companyOwned: { $in: [false, null] }
 
             /*
             verified: { $in: ["NoPhotos", "Full"] },
@@ -937,6 +954,20 @@ app.post('/trigger3', async (req, res) => {
                 .catch(error => console.error(`Error processing URL ${url}:`, error));
         });
     };
+
+
+    const database = await connectDB();
+    const propertiesCollection = database.collection('properties');
+
+    const filteringQuery = {
+        current_status: { $in: ["ForSale", "ComingSoon"] },
+        verified: { $in: ["Full", "NoPhotos"] },
+        branch: "TX",
+        last_status_check: { $exists: true }
+    };
+
+    const properties = await propertiesCollection.find(filteringQuery).toArray();
+
     try {
         const urls = [
             "https://www.zillow.com/homedetails/13-Delaware-Ct-APT-D-Matawan-NJ-07747/61841735_zpid/",
