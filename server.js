@@ -110,28 +110,7 @@ app.get('/export-csv', async (req, res) => {
         // Define the fields you want to include in the CSV
         const fields = ['owner_fullname', 'current_resident', 'address', 'city', 'state', 'zipcode'];
 
-        // Function to generate owner_fullname based on owners array
-        /*
-         const generateOwnerFullname = (owners) => {
-             if (!owners || owners.length === 0) {
-                 return '';
-             }
- 
-             const owner = owners[0];
-             const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ? owner.ownerName : "";
-             const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
-             const middleName = owner.middleName && owner.middleName !== "Undefined" ? owner.middleName : "";
-             const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
- 
-             if (ownerName) {
-                 return ownerName; // Display ownerName if available
-             } else if (firstName || middleName || lastName) {
-                 return `${firstName} ${middleName} ${lastName}`.trim();
-             } else {
-                 return '';
-             }
-         };
- */
+
         // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
             if (!owners || owners.length === 0) {
@@ -181,6 +160,13 @@ app.get('/export-csv', async (req, res) => {
                 owner_fullname = "Current";
                 current_resident = "Resident";
             }
+            function formatZipcode(property) {
+                if (property.zipcode.length === 4) {
+                    property.zipcode = '0' + property.zipcode;
+                }
+                return property;
+            }
+            let zipcode = formatZipcode(property.zipcode);
 
             return {
                 owner_fullname: owner_fullname,
@@ -188,7 +174,7 @@ app.get('/export-csv', async (req, res) => {
                 address: property.address,
                 city: property.city,
                 state: property.state,
-                zipcode: property.zipcode
+                zipcode: zipcode
             };
         });
 
@@ -224,13 +210,16 @@ app.get('/export-csv', async (req, res) => {
 
         // Convert filtered properties to CSV format
         const csv = parse(filteredProperties, { fields });
+        // Add the header row
+        const header = 'owner_fullname,current_resident,address,city,state,zipcode\n';
+        const csvWithHeader = header + csv;
 
-        console.log(csv); // or save the CSV to a file
+        console.log(csvWithHeader); // or save the CSV to a file
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
         res.attachment('Postcards: ', shippingDate, ' ID: ', shippingId);
-        res.send(csv);
+        res.send(csvWithHeader);
     } catch (error) {
         console.error("Error exporting properties:", error);
         res.status(500).send("Internal Server Error");
