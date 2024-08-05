@@ -25,7 +25,14 @@
             </div>
 
             <div class="w-full flex flex-col justify-center text-center">
-                <p class=" font-medium bg-white rounded-lg border"> Delete field value per selected parameter</p>
+                <p class=" font-medium bg-white rounded-lg border"> UpdateOne Query</p>
+                <form action="/fixing-updateTwo" method="post" target="_blank" class="flex flex-col w-full">
+                    <textarea placeholder="Filtering Query" name="filteringQuery" class="h-36"></textarea>
+
+                    <textarea placeholder="Update Query" name="updateQuery" class="h-36"></textarea>
+                    <input type="text" name="objectid1" placeholder="Object Id 1 (if required)">
+                    <button type="submit"> Submit</button>
+                </form>
             </div>
             <div class="w-full flex flex-col justify-center text-center">
                 <p class=" font-medium bg-white rounded-lg border"> Delete field value per selected parameter</p>
