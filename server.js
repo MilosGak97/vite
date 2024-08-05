@@ -10,6 +10,7 @@ const { parse } = require('json2csv');
 const moment = require('moment'); // To handle date operations
 const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
+const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 
 const { ObjectId } = require('mongodb');
 
