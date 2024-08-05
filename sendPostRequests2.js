@@ -113,6 +113,8 @@ async function fetchData(snapshotId, branch) {
 }
 
 async function listAllListings(data, branch, snapshot_id) {
+
+
     if (Array.isArray(data)) {
         const dataArray = data;
         const collection = client.db().collection('properties');
