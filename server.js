@@ -89,18 +89,20 @@ app.get('/export-csv', async (req, res) => {
         // Convert snapshot_id to ObjectId
         const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
 
+
         const filteringQuery = {
 
-            current_status: { $in: ["Pending"] },
-            verified: { $in: ["Full", "NoPhotos"] },
-            last_status_check: { $exists: true },
+            verified: { $in: ["NoPhotos", "Full"] },
+            companyOwned: { $in: [null, false] },
             $or: [
-                { for_sale_reachout: objectId },
-                { pending_reachout: objectId },
-                { coming_soon_reachout: objectId }
-
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
             ],
-            companyOwned: false
+            branch: { $in: ["TX", "NJ"] }
         };
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -109,6 +111,28 @@ app.get('/export-csv', async (req, res) => {
         const fields = ['owner_fullname', 'current_resident', 'address', 'city', 'state', 'zipcode'];
 
         // Function to generate owner_fullname based on owners array
+        /*
+         const generateOwnerFullname = (owners) => {
+             if (!owners || owners.length === 0) {
+                 return '';
+             }
+ 
+             const owner = owners[0];
+             const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ? owner.ownerName : "";
+             const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+             const middleName = owner.middleName && owner.middleName !== "Undefined" ? owner.middleName : "";
+             const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
+ 
+             if (ownerName) {
+                 return ownerName; // Display ownerName if available
+             } else if (firstName || middleName || lastName) {
+                 return `${firstName} ${middleName} ${lastName}`.trim();
+             } else {
+                 return '';
+             }
+         };
+ */
+        // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
             if (!owners || owners.length === 0) {
                 return '';
@@ -116,19 +140,38 @@ app.get('/export-csv', async (req, res) => {
 
             const owner = owners[0];
             const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ? owner.ownerName : "";
-            const firstName = owner.firstName !== "Undefined" ? owner.firstName : "";
+            const firstName = owner.firstName && owner.firstName !== "Undefined" ? owner.firstName : "";
             const middleName = owner.middleName && owner.middleName !== "Undefined" ? owner.middleName : "";
-            const lastName = owner.lastName !== "Undefined" ? owner.lastName : "";
+            const lastName = owner.lastName && owner.lastName !== "Undefined" ? owner.lastName : "";
 
             if (ownerName) {
                 return ownerName; // Display ownerName if available
-            } else if (firstName || middleName || lastName) {
-                return `${firstName} ${middleName} ${lastName}`.trim();
             } else {
-                return '';
+                // Trim the input to remove extra spaces
+                const firstNameTrimmed = firstName.trim();
+                const middleNameTrimmed = middleName.trim();
+                const lastNameTrimmed = lastName.trim();
+
+                // Check if the parts are non-empty
+                const nameParts = [firstNameTrimmed, middleNameTrimmed, lastNameTrimmed].filter(part => part.length > 0);
+
+                // Count the number of parts
+                const namePartsCount = nameParts.length;
+
+                // Check if any part contains more than one word
+                const hasMultipleWords = nameParts.some(part => part.split(' ').length > 1);
+
+                // If only one part is provided and it doesn't have multiple words, return "Current Resident"
+                if (namePartsCount === 1 && !hasMultipleWords) {
+                    return 'Current Resident';
+                } else if (namePartsCount > 0) {
+                    // Concatenate and trim the name parts
+                    return nameParts.join(' ').trim();
+                } else {
+                    return '';
+                }
             }
         };
-
         // Map properties to include only the specified fields and generate owner_fullname
         const filteredProperties = properties.map(property => {
             let owner_fullname = generateOwnerFullname(property.owners);
@@ -186,7 +229,7 @@ app.get('/export-csv', async (req, res) => {
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
-        res.attachment('properties.csv');
+        res.attachment('Postcards: ', shippingDate, ' ID: ', shippingId);
         res.send(csv);
     } catch (error) {
         console.error("Error exporting properties:", error);
@@ -392,55 +435,56 @@ app.get('/fixing', async (req, res) => {
 app.post('/fixing-updateOne', async (req, res) => {
     let client;
     try {
-
-
-
-
         // Convert snapshot_id to ObjectId
-        //  const objectId = new ObjectId('66aa33c9c9eaa7e8b58ba9f9');
-
-        // const objectId2 = new ObjectId('66aba170ec4f71d232a4e237');
-
+        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
 
         const filteringQuery = {
-            last_status_check: { $exists: true }
+            $or: [
+                { pending_reachout: objectId },
+                { coming_soon_reachout: objectId },
+                { for_sale_reachout: objectId }
+            ]
         };
 
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-
-
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
         for (const property of properties) {
-            try {
-
-                // Update the respective reachout field
-                await propertiesCollection.updateOne(
-                    { _id: property._id },
-                    { $unset: { last_status_check: "" } }
-                );
-                console.log("SCRIPT IS DONE");
+            let updateQuery = {};
+            if (property.pending_reachout && ObjectId.isValid(property.pending_reachout) && new ObjectId(property.pending_reachout).equals(objectId)) {
+                updateQuery = { $unset: { pending_reachout: "" } };
+            } else if (property.coming_soon_reachout && ObjectId.isValid(property.coming_soon_reachout) && new ObjectId(property.coming_soon_reachout).equals(objectId)) {
+                updateQuery = { $unset: { coming_soon_reachout: "" } };
+            } else if (property.for_sale_reachout && ObjectId.isValid(property.for_sale_reachout) && new ObjectId(property.for_sale_reachout).equals(objectId)) {
+                updateQuery = { $unset: { for_sale_reachout: "" } };
             }
-            catch (error) {
-                console.log("Error in Catch of listing property: ", error)
+
+            if (Object.keys(updateQuery).length > 0) {
+                try {
+                    await propertiesCollection.updateOne(
+                        { _id: property._id },
+                        updateQuery
+                    );
+                    console.log(`Updated property ${property._id}`);
+                } catch (updateError) {
+                    console.error(`Error updating property ${property._id}:`, updateError);
+                }
             }
         }
 
-
-        res.send("Good Job!");
+        res.send('Properties updated successfully');
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error updating properties:', error);
         res.status(500).send('Internal Server Error');
     } finally {
-        // Ensure the client is closed when done
         if (client) {
-            await client.close();
+            client.close();
         }
     }
-})
+});
 
 app.post('/fetchbysnapshotid', async (req, res) => {
     const { snapshot_id, branch } = req.body;
@@ -816,7 +860,7 @@ app.get('/fixing2', async (req, res) => {
     try {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
-
+ 
         const properties = await propertiesCollection.find({ branch: "TX", verified: null, address_valid: { $exists: false } }).toArray();
         let counter;
         for (property of properties) {
@@ -842,21 +886,21 @@ app.get('/fixing2', async (req, res) => {
     } catch (error) {
         console.log("Error: ", error);
         res.status(500).send(error);
-
+ 
     } finally {
         if (client) {
             await client.close();
         }
     }
 })
-
+ 
 app.get('/fixing3', async (req, res) => {
     const database = await connectDB();
     const propertiesCollection = database.collection('properties');
-
+ 
     const properties = await propertiesCollection.find({ branches: "NJ", verified: null }).toArray();
     console.log(`Found ${properties.length} properties to process.`); // Log how many properties are found
-
+ 
     let counter = 0;
     for (const property of properties) {
         console.log(`Processing property with ID: ${property._id}`); // Detailed log for each property
@@ -884,7 +928,7 @@ app.get('/fixing3', async (req, res) => {
         }
     }
     console.log(`${counter} properties were processed.`);
-
+ 
 })
 */
 app.get('/listings', async (req, res) => {
@@ -941,6 +985,8 @@ app.get('/shippings', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+
 app.get('/shipping/:id', async (req, res) => {
     try {
         const shippingId = new ObjectId(req.params.id); // Convert shippingId to ObjectId
@@ -959,11 +1005,11 @@ app.get('/shipping/:id', async (req, res) => {
         // Add the shipped_at_status field based on the matching condition
         const propertiesWithStatus = properties.map(property => {
             let shipped_at_status = '';
-            if (property.for_sale_reachout && property.for_sale_reachout.equals(shippingId)) {
+            if (property.for_sale_reachout && property.for_sale_reachout instanceof ObjectId && property.for_sale_reachout.equals(shippingId)) {
                 shipped_at_status = 'For Sale';
-            } else if (property.pending_reachout && property.pending_reachout.equals(shippingId)) {
+            } else if (property.pending_reachout && property.pending_reachout instanceof ObjectId && property.pending_reachout.equals(shippingId)) {
                 shipped_at_status = 'Pending';
-            } else if (property.coming_soon_reachout && property.coming_soon_reachout.equals(shippingId)) {
+            } else if (property.coming_soon_reachout && property.coming_soon_reachout instanceof ObjectId && property.coming_soon_reachout.equals(shippingId)) {
                 shipped_at_status = 'Coming Soon';
             }
             return {
@@ -981,6 +1027,7 @@ app.get('/shipping/:id', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
 
 app.get('/skiptracing', (req, res) => {
     res.render('skiptracing.ejs');
@@ -1229,7 +1276,7 @@ cron.schedule('40 1 * * *', () => {
 // Schedule the cron job to run at the same time every day (e.g., at 2:10 AM) / 8:10am serbia time
 cron.schedule('10 2 * * *', () => {
     console.log('Running the cron job to trigger the script');
-    triggerScript('https://www.zillow.com/hudson-county-nj/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-76.04974748828124%2C%22east%22%3A-72.83624651171874%2C%22south%22%3A40.18319814696894%2C%22north%22%3A41.80829765600374%7D%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1106%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A874%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1964%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1413%2C%22regionType%22%3A4%7D%5D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A9%2C%22usersSearchTerm%22%3A%22Hudson%20County%20NJ%2C%20Bergen%20County%20NJ%2C%20Passaic%20County%20NJ%2C%20Sussex%20County%20NJ%22%7D', 'MD');
+    triggerScript('https://www.zillow.com/hudson-county-nj/?searchQueryState=%7B%22pagination%22%3A%7B%7D%2C%22isMapVisible%22%3Atrue%2C%22mapBounds%22%3A%7B%22west%22%3A-76.04974748828124%2C%22east%22%3A-72.83624651171874%2C%22south%22%3A40.18319814696894%2C%22north%22%3A41.80829765600374%7D%2C%22regionSelection%22%3A%5B%7B%22regionId%22%3A1106%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A874%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1964%2C%22regionType%22%3A4%7D%2C%7B%22regionId%22%3A1413%2C%22regionType%22%3A4%7D%5D%2C%22filterState%22%3A%7B%22sort%22%3A%7B%22value%22%3A%22globalrelevanceex%22%7D%2C%22nc%22%3A%7B%22value%22%3Afalse%7D%2C%22auc%22%3A%7B%22value%22%3Afalse%7D%2C%22pnd%22%3A%7B%22value%22%3Atrue%7D%2C%22land%22%3A%7B%22value%22%3Afalse%7D%2C%22ah%22%3A%7B%22value%22%3Atrue%7D%2C%22manu%22%3A%7B%22value%22%3Afalse%7D%2C%22doz%22%3A%7B%22value%22%3A%221%22%7D%2C%22fore%22%3A%7B%22value%22%3Afalse%7D%7D%2C%22isListVisible%22%3Atrue%2C%22mapZoom%22%3A9%2C%22usersSearchTerm%22%3A%22Hudson%20County%20NJ%2C%20Bergen%20County%20NJ%2C%20Passaic%20County%20NJ%2C%20Sussex%20County%20NJ%22%7D', 'NJ');
 }, {
     scheduled: true,
     timezone: "America/New_York" // Set the timezone as needed 
