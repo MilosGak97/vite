@@ -166,6 +166,27 @@
                 </form>
             </div>
 
+
+            <div class="w-full flex flex-col justify-center text-center">
+                <p class=" font-medium bg-white rounded-lg border"> Fetch By Snapshot ID</p>
+                <form action="/fixing-updateTwo" method="post" target="_blank" class="flex flex-col w-full">
+                    <div class="mb-4">
+                        <label for="snapshot_id" class="block text-gray-700">Snapshot ID:</label>
+                        <input type="text" id="snapshot_id" name="snapshot_id" placeholder="Enter URL" required
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="mb-4">
+                        <label for="branch" class="block text-gray-700">Branch:</label>
+                        <select id="branch" name="branch"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="TX">TX Branch</option>
+                            <option value="NJ">NJ Branch</option>
+                        </select>
+                    </div>
+                    <button type="submit"> Submit</button>
+                </form>
+            </div>
+
         </body>
 
         </html>

@@ -442,12 +442,11 @@ app.post('/fixing-updateOne', async (req, res) => {
     }
 })
 
-app.post('/fixing-updateTwo', async (req, res) => {
-    const snapshotId = 's_lzgldrd88ra0k126o';
-    const branch = 'NJ';
-    async function fetchData(snapshotId, branch) {
+app.post('/fetchbysnapshotid', async (req, res) => {
+    const { snapshot_id, branch } = req.body;
+    async function fetchData(snapshot_id, branch) {
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
-        const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
+        const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshot_id}?format=json`;
 
         while (true) {
             try {
@@ -458,11 +457,11 @@ app.post('/fixing-updateTwo', async (req, res) => {
                 });
 
                 if (response.data.status === 'running') {
-                    console.log(snapshotId, ': Not ready yet, trying again in 10 seconds...');
+                    console.log(snapshot_id, ': Not ready yet, trying again in 10 seconds...');
                     await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                 } else {
                     console.log('Response data:', response.data);
-                    await listAllListings(response.data, branch, snapshotId);
+                    await listAllListings(response.data, branch, snapshot_id);
                     return response.data;
                 }
             } catch (error) {
@@ -666,7 +665,7 @@ app.post('/fixing-updateTwo', async (req, res) => {
             console.log(error);
         }
     }
-    fetchData(snapshotId, branch);
+    fetchData(snapshot_id, branch);
 })
 
 
