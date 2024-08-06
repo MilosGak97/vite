@@ -965,15 +965,17 @@ app.get('/listings', async (req, res) => {
 
 
         const filteringQuery = {
-            /*
-            current_status: { $in: ["ForSale", "ComingSoon"] },
+
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
-            current_status_date: { $lt: fiveDaysAgo }
-*/
             $or: [
-                { last_status_check_snapshot: "s_lzigaa6e185di5yc20" },
-                { last_status_check_snapshot: "s_lzigahnn2h26j6iq3u" }
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
             ]
         };
         // Fetch filtered properties
