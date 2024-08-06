@@ -1353,27 +1353,17 @@ app.post('/trigger-worker', async (req, res) => {
         const snapshotId = req.body.snapshot_id;
         console.log("Sending snapshot ID:", snapshotId);
 
-        // Trigger the worker process with snapshot_id as argument
-        const worker = spawn('node', ['worker.js', snapshotId]);
-
-        worker.stdout.on('data', (data) => {
-            console.log(`Worker stdout: ${data}`);
+        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/process-snapshot', {
+            snapshot_id: snapshotId
         });
 
-        worker.stderr.on('data', (data) => {
-            console.error(`Worker stderr: ${data}`);
-        });
-
-        worker.on('close', (code) => {
-            console.log(`Worker process exited with code ${code}`);
-        });
-
-        res.status(200).json({ message: `Worker triggered with snapshot ID: ${snapshotId}` });
+        res.status(200).json({ message: `Worker triggered with snapshot ID: ${snapshotId}`, data: response.data });
     } catch (error) {
         console.error('Error triggering worker:', error);
         res.status(500).json({ message: 'Failed to trigger worker', error: error.message });
     }
 });
+
 
 // GET endpoint to trigger the worker via POST request
 app.get('/trigger-worker-get', async (req, res) => {
