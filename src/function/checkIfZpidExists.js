@@ -6,10 +6,10 @@ const checkIfZpidExists = async (zpid) => {
         const collection = client.db().collection('properties');
         const existingProperty = await collection.findOne({ zpid: zpid });
         if (existingProperty) {
-            console.log('Property with this zpid already exists:', existingProperty);
+            //console.log('Property with this zpid already exists:', existingProperty);
             return existingProperty; // or you can return the existingProperty itself
         } else {
-            console.log('No property with this zpid found.');
+            //console.log('No property with this zpid found.');
             return false;
         }
     } catch (error) {
