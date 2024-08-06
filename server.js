@@ -30,10 +30,10 @@ app.set('views', path.join(__dirname, 'src/public')); // Set views directory
 
 
 // Middleware to parse URL-encoded bodies
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
 
 // Middleware to parse JSON bodies (if needed)
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '100mb' }));
 
 app.use(express.static(path.join(__dirname, 'src/public')));
 
