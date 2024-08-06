@@ -1,4 +1,5 @@
 const { checkIfZpidExists } = require('./checkIfZpidExists');
+const { client } = require('../config/mongodb');
 
 async function checkPending(data, status_check_snapshot_id) {
     if (Array.isArray(data)) {
