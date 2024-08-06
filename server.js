@@ -1270,6 +1270,35 @@ app.post('/pending-check', async (req, res) => {
 
 })
 
+
+
+app.post('/pending-check', async (req, res) => {
+    try {
+        const snapshot_id = req.body.snapshot_id;
+        console.log("SNAPSHOT ID: ", snapshot_id);
+
+        // Trigger the worker process
+        const worker = spawn('node', ['worker.js']);
+
+        worker.stdout.on('data', (data) => {
+            console.log(`Worker stdout: ${data}`);
+        });
+
+        worker.stderr.on('data', (data) => {
+            console.error(`Worker stderr: ${data}`);
+        });
+
+        worker.on('close', (code) => {
+            console.log(`Worker process exited with code ${code}`);
+        });
+
+        res.status(200).json({ message: `Great Job ${snapshot_id} is Successfully sent` });
+    } catch (error) {
+        console.error('Error processing pending check:', error);
+        res.status(500).json({ message: 'Failed to process pending check', error: error.message });
+    }
+});
+
 app.get('/pendingtrigger', async (req, res) => {
     try {
         await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
