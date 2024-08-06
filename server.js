@@ -87,7 +87,7 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
 
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
+        const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
 
 
         const filteringQuery = {
@@ -102,7 +102,9 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null },
             ],
-            branch: { $in: ["TX", "NJ"] }
+
+            branch: { $in: ["TX", "NJ"] },
+
         };
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -161,8 +163,18 @@ app.get('/export-csv', async (req, res) => {
                 current_resident = "Resident";
             }
             function formatZipcode(property) {
-                if (property.zipcode.length === 4) {
-                    property.zipcode = '0' + property.zipcode;
+                if (property.zipcode !== undefined) {
+                    // Convert zipcode to a string if it is not already
+                    let zipcode = property.zipcode.toString();
+
+                    // Check the length of the zipcode and format if necessary
+                    if (zipcode.length === 4) {
+                        property.zipcode = '0' + zipcode;
+                    } else {
+                        property.zipcode = zipcode; // Ensure it's stored as a string
+                    }
+                } else {
+                    property.zipcode = ''; // Set a default value if zipcode is undefined
                 }
                 return property;
             }
@@ -218,7 +230,8 @@ app.get('/export-csv', async (req, res) => {
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
-        res.attachment('Postcards: ', shippingDate, ' ID: ', shippingId);
+        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        res.attachment(filename);
         res.send(csvWithHeader);
     } catch (error) {
         console.error("Error exporting properties:", error);
@@ -927,22 +940,35 @@ app.get('/listings', async (req, res) => {
 
 
         // Build query object
+        /*
+                const filteringQuery = {
+        
+                    verified: { $in: ["NoPhotos", "Full"] },
+                    companyOwned: { $in: [null, false] },
+                    $or: [
+                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                        { current_status: "ForSale", for_sale_reachout: null },
+                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                        { current_status: "ComingSoon", coming_soon_reachout: null },
+                        { current_status: "Pending", pending_reachout: { $exists: false } },
+                        { current_status: "Pending", pending_reachout: null },
+                    ],
+                    branch: { $in: ["TX", "NJ"] }
+                };
+        */
+        const now = new Date();
+        const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+        const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
+
+
 
         const filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [false, null] },
+            current_status_date: { $lt: fiveDaysAgo }
 
-            verified: { $in: ["NoPhotos", "Full"] },
-            companyOwned: { $in: [null, false] },
-            $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
-            ],
-            branch: { $in: ["TX", "NJ"] }
         };
-
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
         const totalResults = properties.length;
@@ -1180,31 +1206,40 @@ app.post('/trigger3', async (req, res) => {
         const limit = 250;
         let hasMore = true;
 
+        const now = new Date();
+        const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+        const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
+
+
+
         const filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            last_status_check: { $exists: false },
-            companyOwned: { $in: [false, null] }
+            companyOwned: { $in: [false, null] },
+            current_status_date: { $lt: fiveDaysAgo }
+
         };
 
-        while (hasMore) {
-            const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
-            if (properties.length === 0) {
-                hasMore = false;
-                break;
-            }
-            // Extract the URL field
-            const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null
+        // while (hasMore) {
+        const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
+        //if (properties.length === 0) {
+        //   hasMore = false;
+        //     break;
+        //   }
+        // Extract the URL field
+        //        const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
 
-            console.log("URLS:", urls);
-        }
+        const urls = properties.map(property => ({ url: property.url }));
+
+        console.log("URLS:", urls);
+        // }
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
 
         await processUrl(urls);
 
-        console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
+        //console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
         // Wait for 30 seconds before the next iteration
         await delay(1000);
 
@@ -1217,6 +1252,12 @@ app.post('/trigger3', async (req, res) => {
         res.status(500).json('Failed to process URLs');
     }
 });
+
+
+
+
+
+
 
 // Function to trigger the script
 const triggerScript = async (url, branch) => {

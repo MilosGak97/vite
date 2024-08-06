@@ -11,6 +11,22 @@ const processUrl = async (url) => {
         return { error: 'Invalid URL' };
     }
         */
+
+
+    /*
+
+    [
+    {
+        "url": "https://www.zillow.com/homedetails/2506-Gordon-Cir-South-Bend-IN-46635/77050198_zpid/?t=for_sale"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/93-Chetwood-Ter-Fanwood-NJ-07023/40001724_zpid/"
+    },
+    {
+        "url": "https://www.zillow.com/homedetails/67-Mount-Lucas-Rd-Princeton-NJ-08540/39011653_zpid/"
+    }
+]
+    */
     console.log(url);
 
     const body = [{ url }];
