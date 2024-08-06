@@ -1256,6 +1256,7 @@ app.post('/trigger3', async (req, res) => {
 app.post('/pending-check', async (req, res) => {
     const snapshot_id = req.body.snapshot_id;
     console.log("SNAPSHOT ID: ", snapshot_id);
+    return snapshot_id;
 })
 
 app.get('/pendingtrigger', async (req, res) => {
