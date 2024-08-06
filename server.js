@@ -1255,10 +1255,15 @@ app.post('/trigger3', async (req, res) => {
 });
 
 app.post('/pending-check', async (req, res) => {
-    const snapshot_id = req.body.snapshot_id;
-    console.log("SNAPSHOT ID: ", snapshot_id);
-    await fetchData(snapshot_id);
-    //return "DONE FOR: ", snapshot_id;
+    try {
+        const snapshot_id = req.body.snapshot_id;
+        console.log("SNAPSHOT ID: ", snapshot_id);
+        await fetchData(snapshot_id);
+        res.status(200).json({ message: "Great Job ${snapshot_id} is Successfully sent" });
+    } catch (error) {
+        res.status(500).json({ message: error })
+    }
+
 })
 
 app.get('/pendingtrigger', async (req, res) => {
