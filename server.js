@@ -1353,7 +1353,7 @@ app.post('/trigger-worker', async (req, res) => {
         const snapshotId = req.body.snapshot_id;
         console.log("Sending snapshot ID:", snapshotId);
 
-        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/process-snapshot', {
+        const response = await axios.post('http://localhost:3001/process-snapshot', {
             snapshot_id: snapshotId
         });
 
@@ -1364,11 +1364,10 @@ app.post('/trigger-worker', async (req, res) => {
     }
 });
 
-
 // GET endpoint to trigger the worker via POST request
 app.get('/trigger-worker-get', async (req, res) => {
     try {
-        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/trigger-worker', {
+        const response = await axios.post('http://localhost:3001/trigger-worker', {
             snapshot_id: 's_lzigbbcj10mlwi9ybt'
         });
         console.log('Response:', response.data);
