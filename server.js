@@ -1259,7 +1259,7 @@ app.post('/trigger3', async (req, res) => {
         res.status(500).json('Failed to process URLs');
     }
 });
-
+/*
 app.post('/pending-check', async (req, res) => {
     try {
         const snapshot_id = req.body.snapshot_id;
@@ -1273,7 +1273,7 @@ app.post('/pending-check', async (req, res) => {
 
 
 
-})
+})*/
 
 
 
