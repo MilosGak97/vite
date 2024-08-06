@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { connectDB } = require('./src/config/mongodb');
-const { checkPending } = require('./src/checkPending');
+const { checkPending } = require('./src/function/checkPending');
 const { fetchData } = require('./src/function/fetchData');
 
 // Create an Express application
