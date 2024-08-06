@@ -1,6 +1,6 @@
 
 const { client } = require('../config/mongodb');
-const { checkPending } = require('./checkPending');
+const { checkPending } = require('./src/function/checkPending');
 
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -19,8 +19,11 @@ async function fetchData(snapshotId) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
             } else {
                 console.log('Response data:', response.data);
+                /*
                 await checkPending(response.data, snapshotId);
+
                 return response.data;
+                */
             }
         } catch (error) {
             throw error; // or handle gracefully
