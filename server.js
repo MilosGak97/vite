@@ -1233,20 +1233,21 @@ app.post('/trigger3', async (req, res) => {
 
             const urls = properties.map(property => ({ url: property.url }));
 
-            console.log("URLS:", urls);
+            await processUrl(urls);
+            await delay(1000);
+            // Update the skip for the next batch
+            skip += limit;
+            //console.log("URLS:", urls);
         }
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
 
-        await processUrl(urls);
 
         //console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
         // Wait for 30 seconds before the next iteration
-        await delay(1000);
 
-        // Update the skip for the next batch
-        skip += limit;
+
 
         res.status(200).json({ message: 'All URLs are being processed.' });
     } catch (error) {
