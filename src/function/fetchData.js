@@ -16,16 +16,18 @@ async function fetchData(snapshotId) {
                 maxBodyLength: Infinity
             });
 
-            console.log("THIS RESPONSE:", response.data);
-
-            if (response.data.status === 'running') {
-                console.log('Snapshot is not ready yet, trying again in 10 seconds...');
-                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+            //console.log("THIS RESPONSE:", response.data);
+            if (Array.isArray(response.data)) {
+                console.log("Response is an array with length:", response.data.length);
             } else {
-                console.log('Response data2:', response.data);
-                await checkPending(response.data, snapshotId);
-                return response.data;
+                console.log("Response is not an array");
             }
+            console.log("Type of response.data:", typeof response.data);
+
+            const responseSize = JSON.stringify(response.data).length;
+            console.log("Size of JSON response in bytes:", responseSize);
+
+
         } catch (error) {
             console.error('Error fetching data:', error);
             throw error; // or handle gracefully
