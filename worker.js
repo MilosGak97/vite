@@ -1,4 +1,4 @@
-const { checkPending } = require('./checkPending'); // Ensure this path is correct
+const { checkPending } = require('./src/function/checkPending'); // Ensure this path is correct
 const { fetchData } = require('./src/function/fetchData');
 const { connectDB } = require('./src/config/mongodb');
 
