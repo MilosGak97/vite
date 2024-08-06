@@ -2,32 +2,10 @@ const { checkPending } = require('./checkPending'); // Ensure this path is corre
 const { fetchData } = require('./src/function/fetchData');
 const { connectDB } = require('./src/config/mongodb');
 
-async function processPendingChecks() {
-    // Example: Fetching a list of snapshot IDs to process
-    const snapshotIds = [
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj',
-        's_lzi8wgf91rd6m05rjj' // Add more snapshot IDs as needed
-    ];
+// Read the snapshot_id array from command line arguments
+const snapshotIds = process.argv.slice(2);
 
+async function processPendingChecks(snapshotIds) {
     for (const snapshotId of snapshotIds) {
         try {
             const data = await fetchData(snapshotId);
@@ -41,7 +19,7 @@ async function processPendingChecks() {
 
 // Connect to the database and start processing
 connectDB().then(() => {
-    processPendingChecks().then(() => {
+    processPendingChecks(snapshotIds).then(() => {
         console.log('All snapshots processed');
         process.exit(0);
     }).catch((error) => {

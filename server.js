@@ -1277,8 +1277,8 @@ app.post('/pending-check', async (req, res) => {
         const snapshot_id = req.body.snapshot_id;
         console.log("SNAPSHOT ID: ", snapshot_id);
 
-        // Trigger the worker process
-        const worker = spawn('node', ['worker.js']);
+        // Trigger the worker process with snapshot_ids as arguments
+        const worker = spawn('node', ['worker.js', ...snapshot_id]);
 
         worker.stdout.on('data', (data) => {
             console.log(`Worker stdout: ${data}`);
@@ -1307,12 +1307,13 @@ app.get('/pendingtrigger', async (req, res) => {
 
 
         // Fetch filtered properties
-        const snapshots = await propertiesCollection.find();
+        const snapshots = await pendingSnapshots.find();
 
         const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
 
 
         console.log(typeof snapshotIds);
+
         await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
             snapshot_id: snapshotIds
         })
