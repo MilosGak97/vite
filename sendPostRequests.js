@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
-const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
+//const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
+
 
 const processUrl = async (urls) => {
     const body = urls.map(urlObj => ({ url: urlObj.url }));

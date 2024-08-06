@@ -1253,8 +1253,21 @@ app.post('/trigger3', async (req, res) => {
     }
 });
 
+app.post('/pending-check', async (req, res) => {
+    const snapshot_id = req.body.snapshot_id;
+    console.log("SNAPSHOT ID: ", snapshot_id);
+})
 
-
+app.get('/pendingtrigger', async (req, res) => {
+    try {
+        axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
+            snapshot_id: 's_lzi56pmh9qfg68teg'
+        })
+    } catch (error) {
+        console.log(error);
+        return error;
+    }
+})
 
 
 
