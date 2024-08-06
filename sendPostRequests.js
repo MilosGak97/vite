@@ -244,7 +244,7 @@ async function listAllListings(data) {
     }
 }
 */
-await client.connect();
-await fetchData(snapshotId);
+//await client.connect();
+//await fetchData(snapshotId);
 
 module.exports = processUrl;
