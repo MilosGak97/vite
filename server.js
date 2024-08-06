@@ -94,9 +94,8 @@ app.get('/export-csv', async (req, res) => {
 
 
         const filteringQuery = {
-
             verified: { $in: ["NoPhotos", "Full"] },
-            companyOwned: { $in: [null, false] },
+
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -105,8 +104,7 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null },
             ],
-
-            branch: { $in: ["TX", "NJ"] },
+            branch: "TX"
 
         };
 
@@ -193,8 +191,11 @@ app.get('/export-csv', async (req, res) => {
             };
         });
 
+
+
         // Create a new shipping document
         const shippingDate = new Date().toISOString().split('T')[0];
+        /*
         const shippingDocument = {
             created_at: new Date(),
             shipping_date: shippingDate,
@@ -223,6 +224,8 @@ app.get('/export-csv', async (req, res) => {
             }
         }
 
+        */
+
         // Convert filtered properties to CSV format
         const csv = parse(filteredProperties, { fields });
         // Add the header row
@@ -233,8 +236,8 @@ app.get('/export-csv', async (req, res) => {
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
-        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
-        res.attachment(filename);
+        //let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        res.attachment("pendings.csv");
         res.send(csvWithHeader);
     } catch (error) {
         console.error("Error exporting properties:", error);
@@ -941,11 +944,10 @@ app.get('/listings', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-
         // Build query object
-
-        const filteringQuery = {
-            verified: { $in: ["NoPhotos", "Full"] },
+        let filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
@@ -953,16 +955,16 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
-            ],
-            branch: { $in: ["TX", "NJ"] }
+                { current_status: "Pending", pending_reachout: null }
+
+            ]
         };
+
         /*
         const now = new Date();
         const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
         const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
-
-
+    
         const filteringQuery = {
             last_status_check_snapshot: { $exists: true }
             */
@@ -1117,6 +1119,30 @@ app.post('/refresh-count', async (req, res) => {
     }
 });
 
+app.post('/refresh-count-pending', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const snapshotsCollection = database.collection('snapshotsPending');
+        const propertiesCollection = database.collection('properties');
+        //last_status_check_snapshot
+        const snapshot_id = req.body.snapshot_id;
+        console.log("SNAPSHOT: ", snapshot_id)
+        // Count properties with the given snapshot_id
+        const count = await propertiesCollection.countDocuments({ last_status_check_snapshot: snapshot_id });
+        console.log("COUNT: ", count)
+        // Update the snapshot with the count
+        await snapshotsCollection.updateOne(
+            { snapshot_id: snapshot_id },
+            { $set: { count: count } }
+        );
+
+        res.redirect('/snapshotsallpending');
+    } catch (error) {
+        console.error("Error updating count:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 app.get('/snapshots', async (req, res) => {
     try {
@@ -1196,6 +1222,27 @@ app.get('/snapshotsall', async (req, res) => {
 
         // Render the EJS template with the snapshots data
         res.render('snapshotsall', {
+            snapshots
+        });
+    } catch (error) {
+        console.error("Error fetching snapshots:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+app.get('/snapshotsallpending', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const snapshotsCollection = database.collection('snapshotsPending');
+
+
+        // Find snapshots requested today
+        const snapshots = await snapshotsCollection.find().sort({ requested_time: - 1 }).toArray();
+
+
+        // Render the EJS template with the snapshots data
+        res.render('snapshotsallpending', {
             snapshots
         });
     } catch (error) {
