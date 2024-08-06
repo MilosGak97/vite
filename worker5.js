@@ -5,12 +5,9 @@ const { connectDB } = require('./src/config/mongodb');
 async function processPendingChecks() {
     // Example: Fetching a list of snapshot IDs to process
     const snapshotIds = [
-        's_lziggzgqcdp106w74',
-        's_lzigh61e2qebumpbcs',
-        's_lzighc8q20ujju9a1d',
-        's_lzighibc2apa075wno',
-        's_lzighond2e86bbersn',
-        's_lzighuwy1ibm2t047w'
+        's_lzigj76n29aeozbher',
+        's_lzigjdjh13t8h8v0ow',
+        's_lzigjhff2411dzreqq'
     ];
 
     for (const snapshotId of snapshotIds) {
