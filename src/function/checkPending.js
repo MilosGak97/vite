@@ -37,9 +37,11 @@ async function checkPending(data, status_check_snapshot_id) {
                     updateFields.$set.last_status_check_snapshot = status_check_snapshot_id;
 
                     if (hdpTypeDimension === exists.current_status) {
+
+                        updateFields.$set.last_status_check = new Date();
                         await collection.updateOne(
                             { zpid: Number(zpid) },
-                            { $set: { last_status_check: new Date() } }
+                            updateFields
                         );
                         console.log("No Status Changes for:", zpid);
                     } else {
