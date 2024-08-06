@@ -1,4 +1,4 @@
-const { checkIfZpidExists } = require('./src/function/checkifZpidExists');
+const { checkIfZpidExists } = require('./checkifZpidExists');
 
 async function checkPending(data, status_check_snapshot_id) {
     if (Array.isArray(data)) {
@@ -41,7 +41,7 @@ async function checkPending(data, status_check_snapshot_id) {
 
                 updateFields.$set.current_status = hdpTypeDimension;
                 updateFields.$set.contingent_listing_type = listing.contingent_listing_type;
-                updateFields.$set.last_status_check_snapshot = status_check_snapshot_id;
+                updateFields.$set.last_status_check_snapshot = status_check_snapshot_id
                 if (hdpTypeDimension === exists.current_status) {
                     await collection.updateOne(
                         { zpid: Number(listing.zpid) },
