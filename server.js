@@ -1260,7 +1260,7 @@ app.post('/pending-check', async (req, res) => {
         const snapshot_id = req.body.snapshot_id;
         console.log("SNAPSHOT ID: ", snapshot_id);
         await fetchData(snapshot_id);
-        res.status(200).json({ message: "Great Job ${snapshot_id} is Successfully sent" });
+        res.status(200).json({ message: "Great Job  is Successfully sent" });
     } catch (error) {
         res.status(500).json({ message: error })
     }
@@ -1269,12 +1269,12 @@ app.post('/pending-check', async (req, res) => {
 
 app.get('/pendingtrigger', async (req, res) => {
     try {
-        axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
+        await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
             snapshot_id: 's_lzi56pmh9qfg68teg'
         })
     } catch (error) {
         console.log(error);
-        return error;
+        res.status(500).json({ error: error });
     }
 })
 
