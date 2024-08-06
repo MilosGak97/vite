@@ -943,22 +943,21 @@ app.get('/listings', async (req, res) => {
 
 
         // Build query object
+
+        const filteringQuery = {
+            verified: { $in: ["NoPhotos", "Full"] },
+            companyOwned: { $in: [null, false] },
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null },
+            ],
+            branch: { $in: ["TX", "NJ"] }
+        };
         /*
-                const filteringQuery = {
-        
-                    verified: { $in: ["NoPhotos", "Full"] },
-                    companyOwned: { $in: [null, false] },
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null },
-                    ],
-                    branch: { $in: ["TX", "NJ"] }
-                };
-        */
         const now = new Date();
         const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
         const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
@@ -966,20 +965,21 @@ app.get('/listings', async (req, res) => {
 
         const filteringQuery = {
             last_status_check_snapshot: { $exists: true }
-            /*
-                        current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-                        verified: { $in: ["Full", "NoPhotos"] },
-                        companyOwned: { $in: [false, null] },
-                        $or: [
-                            { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                            { current_status: "ForSale", for_sale_reachout: null },
-                            { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                            { current_status: "ComingSoon", coming_soon_reachout: null },
-                            { current_status: "Pending", pending_reachout: { $exists: false } },
-                            { current_status: "Pending", pending_reachout: null },
-                        ]
-                            */
-        };
+            */
+        /*
+                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+                    verified: { $in: ["Full", "NoPhotos"] },
+                    companyOwned: { $in: [false, null] },
+                    $or: [
+                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                        { current_status: "ForSale", for_sale_reachout: null },
+                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                        { current_status: "ComingSoon", coming_soon_reachout: null },
+                        { current_status: "Pending", pending_reachout: { $exists: false } },
+                        { current_status: "Pending", pending_reachout: null },
+                    ]
+                        
+    };*/
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
         const totalResults = properties.length;
