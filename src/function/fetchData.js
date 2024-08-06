@@ -1,6 +1,6 @@
 
 const { client } = require('../config/mongodb');
-const { checkPending } = require('./src/function/checkPending.js');
+const { checkPending } = require('./src/function/checkPending');
 
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';

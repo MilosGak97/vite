@@ -12,6 +12,7 @@ const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 const { fetchData } = require('./src/function/fetchData');
+const { checkPending } = require('./src/function/checkPending');
 
 const { ObjectId } = require('mongodb');
 
