@@ -31,6 +31,8 @@ async function fetchData(snapshotId) {
             console.log("Response is an object with keys:", Object.keys(response.data));
         }
 
+        await checkPending(response.data);
+
     } catch (error) {
         console.error('Error fetching data:', error);
         throw error; // or handle gracefully
