@@ -1259,6 +1259,7 @@ app.post('/pending-check', async (req, res) => {
     try {
         const snapshot_id = req.body.snapshot_id;
         console.log("SNAPSHOT ID: ", snapshot_id);
+
         await fetchData(snapshot_id);
         res.status(200).json({ message: "Great Job  is Successfully sent" });
     } catch (error) {

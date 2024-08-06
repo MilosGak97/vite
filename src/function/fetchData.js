@@ -19,11 +19,11 @@ async function fetchData(snapshotId) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
             } else {
                 console.log('Response data:', response.data);
-                /*
+
                 await checkPending(response.data, snapshotId);
 
                 return response.data;
-                */
+
             }
         } catch (error) {
             throw error; // or handle gracefully
