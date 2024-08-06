@@ -14,6 +14,7 @@ async function fetchData(snapshotId) {
                 }
             });
 
+            console.log("THIS RESPONE:", response.data);
             if (response.data.status === 'running') {
                 console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
