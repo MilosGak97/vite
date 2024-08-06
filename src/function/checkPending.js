@@ -1,5 +1,4 @@
-// @ts-ignore
-const { checkIfZpidExists } = require('./checkifZpidExists');
+const { checkIfZpidExists } = require('./checkIfZpidExists');
 
 async function checkPending(data, status_check_snapshot_id) {
     if (Array.isArray(data)) {
