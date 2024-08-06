@@ -1282,7 +1282,7 @@ app.post('/pending-check', async (req, res) => {
         const snapshot_id = req.body.snapshot_id;
         console.log("SNAPSHOT ID: ", snapshot_id);
 
-        // Trigger the worker process with snapshot_ids as arguments
+        // Trigger the worker process
         const worker = spawn('node', ['worker.js']);
 
         worker.stdout.on('data', (data) => {
@@ -1306,28 +1306,18 @@ app.post('/pending-check', async (req, res) => {
 
 app.get('/pendingtrigger', async (req, res) => {
     try {
-
-        const database = await connectDB();
-        const pendingSnapshots = database.collection('snapshotsPending');
-
-
-        // Fetch filtered properties
-        const snapshots = await pendingSnapshots.find();
-
-        const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
-
-
-        console.log(typeof snapshotIds);
-
-        await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
-            snapshot_id: snapshotIds
-        })
+        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
+            snapshot_id: 'dummy_id' // You can put a dummy ID since it's not used
+        }, {
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity
+        });
+        res.status(200).json({ message: 'Pending trigger sent successfully', data: response.data });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: error });
+        console.error('Error triggering pending check:', error);
+        res.status(500).json({ message: 'Failed to trigger pending check', error: error.message });
     }
-})
-
+});
 
 
 
