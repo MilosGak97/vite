@@ -27,6 +27,10 @@ async function fetchData(snapshotId) {
         console.log("Size of JSON response in bytes:", responseSize);
 
 
+        if (typeof response.data === 'object' && response.data !== null) {
+            console.log("Response is an object with keys:", Object.keys(response.data));
+        }
+
     } catch (error) {
         console.error('Error fetching data:', error);
         throw error; // or handle gracefully

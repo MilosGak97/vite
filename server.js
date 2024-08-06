@@ -1266,9 +1266,7 @@ app.post('/pending-check', async (req, res) => {
         res.status(500).json({ message: error })
     }
 
-    if (typeof response.data === 'object' && response.data !== null) {
-        console.log("Response is an object with keys:", Object.keys(response.data));
-    }
+
 
 })
 
