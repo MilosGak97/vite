@@ -1271,7 +1271,7 @@ app.post('/pending-check', async (req, res) => {
 app.get('/pendingtrigger', async (req, res) => {
     try {
         await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
-            snapshot_id: 's_lzi56pmh9qfg68teg'
+            snapshot_id: 's_lzi8wgf91rd6m05rjj'
         })
     } catch (error) {
         console.log(error);
