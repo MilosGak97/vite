@@ -11,6 +11,7 @@ const moment = require('moment'); // To handle date operations
 const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
+const { fetchData } = require('./src/function/fetchData');
 
 const { ObjectId } = require('mongodb');
 
@@ -1256,7 +1257,8 @@ app.post('/trigger3', async (req, res) => {
 app.post('/pending-check', async (req, res) => {
     const snapshot_id = req.body.snapshot_id;
     console.log("SNAPSHOT ID: ", snapshot_id);
-    return snapshot_id;
+    await fetchData(snapshot_id);
+    //return "DONE FOR: ", snapshot_id;
 })
 
 app.get('/pendingtrigger', async (req, res) => {
