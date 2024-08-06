@@ -1205,7 +1205,7 @@ app.post('/trigger3', async (req, res) => {
         const propertiesCollection = database.collection('properties');
 
         let skip = 0;
-        const limit = 20;
+        const limit = 200;
         let hasMore = true;
 
         const now = new Date();
@@ -1222,19 +1222,19 @@ app.post('/trigger3', async (req, res) => {
 
         };
 
-        // while (hasMore) {
-        const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
-        //if (properties.length === 0) {
-        //   hasMore = false;
-        //     break;
-        //   }
-        // Extract the URL field
-        //        const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
+        while (hasMore) {
+            const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
+            if (properties.length === 0) {
+                hasMore = false;
+                break;
+            }
+            // Extract the URL field
+            //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
 
-        const urls = properties.map(property => ({ url: property.url }));
+            const urls = properties.map(property => ({ url: property.url }));
 
-        console.log("URLS:", urls);
-        // }
+            console.log("URLS:", urls);
+        }
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
