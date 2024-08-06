@@ -1,6 +1,6 @@
 
 const { client } = require('../config/mongodb');
-const { checkPending } = require('./src/function/checkPending');
+const { checkPending } = require('./checkPending');
 
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -15,6 +15,7 @@ async function fetchData(snapshotId) {
             });
 
             console.log("THIS RESPONE:", response.data);
+            /*
             if (response.data.status === 'running') {
                 console.log('Snapshot is not ready yet, trying again in 10 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
@@ -26,6 +27,7 @@ async function fetchData(snapshotId) {
                 return response.data;
 
             }
+                */
         } catch (error) {
             throw error; // or handle gracefully
         }
