@@ -963,7 +963,6 @@ app.get('/listings', async (req, res) => {
         const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
 
 
-
         const filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
@@ -1302,8 +1301,20 @@ app.post('/pending-check', async (req, res) => {
 
 app.get('/pendingtrigger', async (req, res) => {
     try {
+
+        const database = await connectDB();
+        const pendingSnapshots = database.collection('snapshotsPending');
+
+
+        // Fetch filtered properties
+        const snapshots = await propertiesCollection.find();
+
+        const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
+
+
+        console.log(typeof snapshotIds);
         await axios.post('https://worker-847b6ac96356.herokuapp.com/pending-check', {
-            snapshot_id: 's_lzi8wgf91rd6m05rjj'
+            snapshot_id: snapshotIds
         })
     } catch (error) {
         console.log(error);
