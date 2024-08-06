@@ -956,32 +956,9 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
-
             ]
         };
 
-        /*
-        const now = new Date();
-        const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
-        const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
-    
-        const filteringQuery = {
-            last_status_check_snapshot: { $exists: true }
-            */
-        /*
-                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-                    verified: { $in: ["Full", "NoPhotos"] },
-                    companyOwned: { $in: [false, null] },
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null },
-                    ]
-                        
-    };*/
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
         const totalResults = properties.length;
@@ -1371,6 +1348,46 @@ app.get('/pendingtrigger', async (req, res) => {
     }
 });
 
+app.post('/trigger-worker', async (req, res) => {
+    try {
+        const snapshotId = req.body.snapshot_id;
+        console.log("Sending snapshot ID:", snapshotId);
+
+        // Trigger the worker process with snapshot_id as argument
+        const worker = spawn('node', ['worker.js', snapshotId]);
+
+        worker.stdout.on('data', (data) => {
+            console.log(`Worker stdout: ${data}`);
+        });
+
+        worker.stderr.on('data', (data) => {
+            console.error(`Worker stderr: ${data}`);
+        });
+
+        worker.on('close', (code) => {
+            console.log(`Worker process exited with code ${code}`);
+        });
+
+        res.status(200).json({ message: `Worker triggered with snapshot ID: ${snapshotId}` });
+    } catch (error) {
+        console.error('Error triggering worker:', error);
+        res.status(500).json({ message: 'Failed to trigger worker', error: error.message });
+    }
+});
+
+// GET endpoint to trigger the worker via POST request
+app.get('/trigger-worker-get', async (req, res) => {
+    try {
+        const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/trigger-worker', {
+            snapshot_id: 's_lzigbbcj10mlwi9ybt'
+        });
+        console.log('Response:', response.data);
+        res.status(200).json({ message: 'Worker triggered via GET request', data: response.data });
+    } catch (error) {
+        console.error('Error triggering worker via GET request:', error);
+        res.status(500).json({ message: 'Failed to trigger worker via GET request', error: error.message });
+    }
+});
 
 
 // Function to trigger the script
