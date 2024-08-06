@@ -3,14 +3,13 @@ const { client } = require('../config/mongodb');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function checkPending(data, status_check_snapshot_id) {
-    if (Array.isArray(data, status_check_snapshot_id)) {
+    if (Array.isArray(data)) {
         const dataArray = data;
         const collection = client.db().collection('properties');
 
         for (let i = 0; i < dataArray.length; i++) {
             const listing = dataArray[i];
             const { zpid, hdpTypeDimension, contingent_listing_type } = listing;
-            let status_check_snapshot_id;
             console.log(status_check_snapshot_id);
             try {
                 const exists = await checkIfZpidExists(zpid);
