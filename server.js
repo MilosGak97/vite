@@ -964,11 +964,16 @@ app.get('/listings', async (req, res) => {
 
 
         const filteringQuery = {
+            /*
             current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: { $lt: fiveDaysAgo }
-
+*/
+            $or: [
+                { last_status_check_snapshot: "s_lzigaa6e185di5yc20" },
+                { last_status_check_snapshot: "s_lzigahnn2h26j6iq3u" }
+            ]
         };
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -1278,7 +1283,7 @@ app.post('/pending-check', async (req, res) => {
         console.log("SNAPSHOT ID: ", snapshot_id);
 
         // Trigger the worker process with snapshot_ids as arguments
-        const worker = spawn('node', ['worker.js', ...snapshot_id]);
+        const worker = spawn('node', ['worker.js']);
 
         worker.stdout.on('data', (data) => {
             console.log(`Worker stdout: ${data}`);
