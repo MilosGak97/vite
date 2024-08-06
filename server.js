@@ -1205,7 +1205,7 @@ app.post('/trigger3', async (req, res) => {
         const propertiesCollection = database.collection('properties');
 
         let skip = 0;
-        const limit = 200;
+        const limit = 20;
         let hasMore = true;
 
         const now = new Date();
