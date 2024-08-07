@@ -10,9 +10,11 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+
 app.get('/tester', (req, res) => {
     res.send('Worker server is running!');
 });
+
 app.post('/process-snapshot', async (req, res) => {
     const snapshotId = req.body.snapshot_id;
     if (!snapshotId) {
