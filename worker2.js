@@ -5,20 +5,20 @@ const { connectDB } = require('./src/config/mongodb');
 async function processPendingChecks() {
     // Example: Fetching a list of snapshot IDs to process
     const snapshotIds = [
-        's_lzigglhqd1o69mk9h',
-        's_lziggszg17shnhsqub',
-        's_lziggzgqcdp106w74',
-        's_lzigh61e2qebumpbcs',
-        's_lzighc8q20ujju9a1d',
-        's_lzighibc2apa075wno',
-        's_lzighond2e86bbersn',
-        's_lzighuwy1ibm2t047w',
-        's_lzigi1ei26r9wc9kvo',
-        's_lzigi87i15mxpjc4ab',
-        's_lzigiflr1g126yk85r',
-        's_lzigin2sa6v8tqpg1',
-        's_lzigitcg1w19chtw21',
-        's_lzigizw3ze0dih9o8'
+        's_lzkucwlt1pdg58xeo4',
+        's_lzkud3wu2btsqpyb1y',
+        's_lzkudb0m10b3jmtovl',
+        's_lzkuditco8wafu036',
+        's_lzkudqxlgypp2w5ko',
+        's_lzkudylr17p41ke8mv',
+        's_lzkue74c19gkiq3je4',
+        's_lzkuef75w8l68oxbq',
+        's_lzkuemta1qnjq9mzv',
+        's_lzkueuoi1z7o94dh2m',
+        's_lzkuf2iv29sbi4c28j',
+        's_lzkufagn1a5k205cg2',
+        's_lzkufhy38n0zv3nbw',
+        's_lzkufp1g1q7ixyi2r0'
     ];
 
     for (const snapshotId of snapshotIds) {

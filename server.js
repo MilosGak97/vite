@@ -90,23 +90,23 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
 
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
+        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
 
-
-        const filteringQuery = {
-            verified: { $in: ["NoPhotos", "Full"] },
-
+        let filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null },
+                { current_status: "Pending", pending_reachout: null }
             ],
-            branch: "TX"
-
+            branch: { $in: ["TX", "NJ"] }
         };
+
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
@@ -195,7 +195,7 @@ app.get('/export-csv', async (req, res) => {
 
         // Create a new shipping document
         const shippingDate = new Date().toISOString().split('T')[0];
-        /*
+
         const shippingDocument = {
             created_at: new Date(),
             shipping_date: shippingDate,
@@ -224,7 +224,7 @@ app.get('/export-csv', async (req, res) => {
             }
         }
 
-        */
+
 
         // Convert filtered properties to CSV format
         const csv = parse(filteredProperties, { fields });
@@ -236,15 +236,162 @@ app.get('/export-csv', async (req, res) => {
 
         // Send CSV file as response
         res.header('Content-Type', 'text/csv');
-        //let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
-        res.attachment("pendings.csv");
+        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        res.attachment(filename);
         res.send(csvWithHeader);
     } catch (error) {
         console.error("Error exporting properties:", error);
         res.status(500).send("Internal Server Error");
     }
 });
+// Endpoint to export properties as CSV
+app.get('/export-csv-skiptracing', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+        const shippingsCollection = database.collection('exportSkipTracing');
 
+        // Convert snapshot_id to ObjectId
+        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
+
+        let filteringQuery = {
+            current_status: "Pending",
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [false, null] },
+            current_status_date: {
+                $gte: today,
+                $lt: tomorrow
+            }
+        }
+
+
+
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
+
+        // Define the fields you want to include in the CSV
+        const fields = ['owner_fullname', 'current_resident', 'address', 'city', 'state', 'zipcode'];
+
+
+        // Function to generate owner_fullname based on owners array
+        const generateOwnerFullname = (owners) => {
+            if (!owners || owners.length === 0) {
+                return '';
+            }
+
+            const owner = owners[0];
+            const ownerName = owner.ownerName && owner.ownerName !== "Undefined" ? owner.ownerName : "";
+            const firstName = owner.firstName && owner.firstName !== "Undefined" ? owner.firstName : "";
+            const middleName = owner.middleName && owner.middleName !== "Undefined" ? owner.middleName : "";
+            const lastName = owner.lastName && owner.lastName !== "Undefined" ? owner.lastName : "";
+
+            if (ownerName) {
+                return ownerName; // Display ownerName if available
+            } else {
+                // Trim the input to remove extra spaces
+                const firstNameTrimmed = firstName.trim();
+                const middleNameTrimmed = middleName.trim();
+                const lastNameTrimmed = lastName.trim();
+
+                // Check if the parts are non-empty
+                const nameParts = [firstNameTrimmed, middleNameTrimmed, lastNameTrimmed].filter(part => part.length > 0);
+
+                // Count the number of parts
+                const namePartsCount = nameParts.length;
+
+                // Check if any part contains more than one word
+                const hasMultipleWords = nameParts.some(part => part.split(' ').length > 1);
+
+                // If only one part is provided and it doesn't have multiple words, return "Current Resident"
+                if (namePartsCount === 1 && !hasMultipleWords) {
+                    return 'Current Resident';
+                } else if (namePartsCount > 0) {
+                    // Concatenate and trim the name parts
+                    return nameParts.join(' ').trim();
+                } else {
+                    return '';
+                }
+            }
+        };
+        // Map properties to include only the specified fields and generate owner_fullname
+        const filteredProperties = properties.map(property => {
+            let owner_fullname = generateOwnerFullname(property.owners);
+            let current_resident = "Or Current Resident";
+
+            if (owner_fullname === '') {
+                owner_fullname = "Current";
+                current_resident = "Resident";
+            }
+            function formatZipcode(property) {
+                if (property.zipcode !== undefined) {
+                    // Convert zipcode to a string if it is not already
+                    let zipcode = property.zipcode.toString();
+
+                    // Check the length of the zipcode and format if necessary
+                    if (zipcode.length === 4) {
+                        property.zipcode = '0' + zipcode;
+                    } else {
+                        property.zipcode = zipcode; // Ensure it's stored as a string
+                    }
+                } else {
+                    property.zipcode = ''; // Set a default value if zipcode is undefined
+                }
+                return property;
+            }
+            let zipcode = formatZipcode(property.zipcode);
+
+            return {
+                owner_fullname: owner_fullname,
+                current_resident: current_resident,
+                address: property.address,
+                city: property.city,
+                state: property.state,
+                zipcode: zipcode
+            };
+        });
+
+
+
+        // Create a new shipping document
+        const shippingDate = new Date().toISOString().split('T')[0];
+
+        const shippingDocument = {
+            created_at: new Date(),
+            shipping_date: shippingDate,
+            total_count: properties.length
+        };
+
+        const shippingResult = await shippingsCollection.insertOne(shippingDocument);
+        const shippingId = shippingResult.insertedId;
+
+        // Update properties with the new shippingId in the appropriate field
+        for (const property of properties) {
+            await propertiesCollection.updateOne(
+                { _id: property._id },
+                { $set: { exportSkipTracing: shippingId } }
+            );
+
+        }
+
+
+
+        // Convert filtered properties to CSV format
+        const csv = parse(filteredProperties, { fields });
+        // Add the header row
+        const header = 'owner_fullname,current_resident,address,city,state,zipcode\n';
+        const csvWithHeader = header + csv;
+
+        console.log(csvWithHeader); // or save the CSV to a file
+
+        // Send CSV file as response
+        res.header('Content-Type', 'text/csv');
+        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        res.attachment(filename);
+        res.send(csvWithHeader);
+    } catch (error) {
+        console.error("Error exporting properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 app.get('/filtering', async (req, res) => {
     try {
@@ -767,7 +914,7 @@ app.get('/fixing-precisely', async (req, res) => {
                         }
                     });
                     let companyOwned = false;
-                    console.log("API RESULT: ", response.data);
+                    //console.log("API RESULT: ", response.data);
                     // Extract owner details
                     const owners = response.data.propertyAttributes.owners;
 
@@ -803,8 +950,8 @@ app.get('/fixing-precisely', async (req, res) => {
                     },
                         { $set: { owners: formattedOwners, companyOwned: companyOwned } })
 
-                    console.log("Owners: ", owners);
-                    console.log("Company Owned: ", companyOwned);
+                    //console.log("Owners: ", owners);
+                    //console.log("Company Owned: ", companyOwned);
                 } catch (error) {
                     console.log("Catch error2: ", error)
                 }
@@ -939,12 +1086,36 @@ app.get('/fixing3', async (req, res) => {
  
 })
 */
+
+
+// Create a date instance for today
+const today = new Date();
+// Set the time to the beginning of the day
+today.setHours(0, 0, 0, 0);
+
+// Create a date instance for the end of today
+const tomorrow = new Date(today);
+tomorrow.setDate(today.getDate() + 1);
+
 app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
+        /* THIS IF FOR PENDING
+                let filteringQuery = {
+                    current_status: "Pending",
+                    verified: { $in: ["Full", "NoPhotos"] },
+                    companyOwned: { $in: [false, null] },
+                    current_status_date: {
+                        $gte: today,
+                        $lt: tomorrow
+                    }
+                }
+          
+          */
 
         // Build query object
+        /*
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
@@ -956,17 +1127,17 @@ app.get('/listings', async (req, res) => {
                 { current_status: "ComingSoon", coming_soon_reachout: null },
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
-            ]
+            ],
+            branch: { $in: ["TX", "NJ"] }
         };
-
+*/
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
-        const totalResults = properties.length;
+
 
         // Render the template with parameters
         res.render('listings', {
-            properties,
-            totalResults // Pass totalResults to the EJS template
+            properties
         });
     } catch (error) {
         console.error("Error fetching properties:", error);
