@@ -108,6 +108,8 @@ app.get('/export-csv', async (req, res) => {
         };
 
 
+
+
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
         // Define the fields you want to include in the CSV
@@ -1114,8 +1116,7 @@ app.get('/listings', async (req, res) => {
           
           */
 
-        // Build query object
-        /*
+        // THIS IS FOR NOT SHIPPED YET
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
@@ -1130,7 +1131,7 @@ app.get('/listings', async (req, res) => {
             ],
             branch: { $in: ["TX", "NJ"] }
         };
-*/
+
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
