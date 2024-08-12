@@ -3,7 +3,6 @@ const { connectDB, client } = require('./src/config/mongodb');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 const tokenManager = require('./tokenManager');
 
-await fetchData('s_lzqlgq9325sd18pqar', 'NJ');
 
 async function fetchData(snapshotId, branch) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';

@@ -77,7 +77,8 @@ app.post('/trigger', async (req, res) => {
 app.post('/trigger2', sendPostRequests2);
 
 // Endpoint to trigger sendPostRequests
-app.post('/trigger3', fetchData2);
+app.post('/trigger3', fetchData('s_lzqlgq9325sd18pqar', 'NJ')
+);
 
 // Endpoint to trigger sendPostRequests 
 
