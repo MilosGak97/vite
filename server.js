@@ -273,16 +273,22 @@ app.get('/export-csv-skiptracing', async (req, res) => {
 
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to the start of the current day
+
+        const fiveDaysAgo = new Date(today);
+        fiveDaysAgo.setDate(today.getDate() - 5); // Move to 5 days before today
 
         let filteringQuery = {
             current_status: "Pending",
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: today,
-                $lt: tomorrow
+                $gte: fiveDaysAgo, // From 5 days ago
+                $lt: today // Until the start of today
             }
-        }
+        };
+
 
 
 
