@@ -277,7 +277,7 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         today.setHours(0, 0, 0, 0); // Set to the start of the current day
 
         const fiveDaysAgo = new Date(today);
-        fiveDaysAgo.setDate(today.getDate() - 5); // Move to 5 days before today
+        fiveDaysAgo.setDate(today.getDate() - 4); // Move to 5 days before today
 
         let filteringQuery = {
             current_status: "Pending",
