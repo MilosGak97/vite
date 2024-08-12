@@ -77,8 +77,15 @@ app.post('/trigger', async (req, res) => {
 app.post('/trigger2', sendPostRequests2);
 
 // Endpoint to trigger sendPostRequests
-app.post('/trigger3', fetchData2('s_lzqlgq9325sd18pqar', 'NJ')
-);
+app.post('/trigger3', async (req, res) => {
+    try {
+        const result = await fetchData2('s_lzqlgq9325sd18pqar', 'NJ');
+        res.json(result);  // or handle the result as needed
+    } catch (error) {
+        res.status(500).send(error.message);  // handle errors
+    }
+});
+
 
 // Endpoint to trigger sendPostRequests 
 
