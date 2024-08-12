@@ -4,7 +4,7 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 const tokenManager = require('./tokenManager');
 
 
-async function fetchData(snapshotId, branch) {
+async function fetchData2(snapshotId, branch) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
