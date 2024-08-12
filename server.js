@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const webhookHandler = require('./webhookHandler');
 const processUrl = require('./sendPostRequests');
 const sendPostRequests2 = require('./sendPostRequests2');
+const fetchData2 = require('./fetchData');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
@@ -74,6 +75,9 @@ app.post('/trigger', async (req, res) => {
 
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
+
+// Endpoint to trigger sendPostRequests
+app.post('/trigger3', fetchData2);
 
 // Endpoint to trigger sendPostRequests 
 
@@ -1556,6 +1560,10 @@ app.get('/trigger-worker-get', async (req, res) => {
         res.status(500).json({ message: 'Failed to trigger worker via GET request', error: error.message });
     }
 });
+
+
+
+
 
 
 // Function to trigger the script
