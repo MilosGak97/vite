@@ -88,7 +88,7 @@ app.get('/export-csv', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('shippings');
-
+        // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
 
@@ -106,8 +106,15 @@ app.get('/export-csv', async (req, res) => {
             ],
             branch: { $in: ["TX", "NJ"] }
         };
-
-
+        /*
+        let filteringQuery = {
+            $or: [
+                { for_sale_reachout: objectId },
+                { coming_soon_reachout: objectId },
+                { pending_reachout: objectId }
+            ]
+        }
+*/
 
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
