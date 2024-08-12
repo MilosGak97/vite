@@ -224,4 +224,4 @@ async function listAllListings(data, branch, snapshot_id) {
     }
 }
 
-module.exports = sendPostRequests2;
+module.exports = fetchData2;
