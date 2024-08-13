@@ -7,9 +7,9 @@ const moment = require('moment');
 async function processPendingChecks() {
     // Example: Fetching a list of snapshot IDs to process
     const snapshotIds = [
-        's_lzsb0app132a7pfuh',
+        's_lzsb07vt2len9w197i',
         's_lzsb09k31az2v87ib8',
-        's_lzsb07vt2len9w197i'
+        's_lzsb0app132a7pfuh'
     ];
 
     /*
