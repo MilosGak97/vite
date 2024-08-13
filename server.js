@@ -76,6 +76,7 @@ app.post('/trigger', async (req, res) => {
 // Endpoint to trigger sendPostRequests
 app.post('/trigger2', sendPostRequests2);
 
+/*
 // Endpoint to trigger sendPostRequests
 app.post('/trigger3', async (req, res) => {
     try {
@@ -85,7 +86,7 @@ app.post('/trigger3', async (req, res) => {
         res.status(500).send(error.message);  // handle errors
     }
 });
-
+*/
 
 // Endpoint to trigger sendPostRequests 
 
