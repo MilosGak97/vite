@@ -1156,6 +1156,8 @@ app.get('/listings', async (req, res) => {
             branch: { $in: ["TX", "NJ"] }
         };
 
+
+
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
@@ -1448,7 +1450,6 @@ app.post('/trigger3', async (req, res) => {
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: { $lt: fiveDaysAgo }
-
         };
 
         while (hasMore) {
