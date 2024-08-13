@@ -41,19 +41,8 @@ async function processPendingChecks() {
            's_lzkulz3e16g8obwq57',
            's_lzkum5zq1mkugwivpw',
            's_lzkumcfc2k15m8ls12'
-       ];
-       
-       
-   
-       for (const snapshotId of snapshotIds) {
-           try {
-               const data = await fetchData(snapshotId);
-               await checkPending(data, snapshotId);
-               console.log(`Processed snapshot: ${snapshotId}`);
-           } catch (error) {
-               console.error(`Error processing snapshot ${snapshotId}:`, error);
-           }
-       }*/
+       ];*/
+
 
     // Connect to MongoDB
     const db = await connectDB();
@@ -72,6 +61,20 @@ async function processPendingChecks() {
         const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
 
         console.log('Snapshot IDs:', snapshotIds);
+
+
+
+        for (const snapshotId of snapshotIds) {
+            try {
+                const data = await fetchData(snapshotId);
+                await checkPending(data, snapshotId);
+                console.log(`Processed snapshot: ${snapshotId}`);
+            } catch (error) {
+                console.error(`Error processing snapshot ${snapshotId}:`, error);
+            }
+        }
+
+
 
     } catch (error) {
         console.error('Error processing pending checks:', error);
