@@ -1466,6 +1466,7 @@ app.post('/trigger3', async (req, res) => {
             await delay(1000);
             // Update the skip for the next batch
             skip += limit;
+            console.log("SKIP:", skip);
             //console.log("URLS:", urls);
         }
         if (!Array.isArray(urls)) {
