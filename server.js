@@ -1439,7 +1439,7 @@ app.post('/trigger3', async (req, res) => {
 
         const now = new Date();
         const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
-        const fiveDaysAgo = new Date(now.getTime() - (5 * 24 * 60 * 60 * 1000));
+        const fiveDaysAgo = new Date(now.getTime() - (6 * 24 * 60 * 60 * 1000));
 
 
 
