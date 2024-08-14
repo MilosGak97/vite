@@ -10,9 +10,10 @@ module.exports = {
     extend: {
       colors: {
         // Add your custom colors here
-        'primary': '#FFAD03', // Example custom color
+        'themeOrange': '#E76F24', // Example custom color
         'secondary': '#1B1B1B', // Example custom color
-        'third': '#fffff2'
+        'third': '#fffff2',
+        'themeBlue': '#'
       }
     },
   },
