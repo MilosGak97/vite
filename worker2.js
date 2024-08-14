@@ -15,35 +15,32 @@ async function processPendingChecks() {
     const db = await connectDB();
     const collection = db.collection('snapshotsPending');
 
-    // Define the start and end of today
-    const startOfDay = moment().startOf('day').toDate();
-    const endOfDay = moment().endOf('day').toDate();
+    // Define the start and end of yesterday
+    const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
+    const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
 
-    try {
-        // Query for snapshot_ids with today's requested_time
-        const snapshots = await collection.find({
-            requested_time: { $gte: startOfDay, $lte: endOfDay }
-        }).toArray();
 
-        const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
-
-        console.log('Snapshot IDs:', snapshotIds);
+    // Query for snapshot_ids with yesterday's requested_time
+    const snapshots = await collection.find({
+        requested_time: { $gte: startOfYesterday, $lte: endOfYesterday }
+    }).toArray();
 
 
 
-        for (const snapshotId of snapshotIds) {
-            try {
-                const data = await fetchData(snapshotId);
-                await checkPending(data, snapshotId);
-                console.log(`Processed snapshot: ${snapshotId}`);
-            } catch (error) {
-                console.error(`Error processing snapshot ${snapshotId}:`, error);
-            }
+    const snapshotIds = snapshots.map(snapshot => snapshot.snapshot_id);
+
+    console.log('Snapshot IDs:', snapshotIds);
+
+
+
+    for (const snapshotId of snapshotIds) {
+        try {
+            const data = await fetchData(snapshotId);
+            await checkPending(data, snapshotId);
+            console.log(`Processed snapshot: ${snapshotId}`);
+        } catch (error) {
+            console.error(`Error processing snapshot ${snapshotId}:`, error);
         }
-
-
-    } catch (error) {
-        console.error('Error processing pending checks:', error);
     }
 }
 // Connect to the database and start processing
