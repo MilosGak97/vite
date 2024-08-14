@@ -106,8 +106,9 @@ app.get('/export-csv', async (req, res) => {
         // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
 
         let filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            current_status: { $in: ["ForSale", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },

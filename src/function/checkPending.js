@@ -3,7 +3,7 @@ const { client } = require('../config/mongodb');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function checkPending(data, status_check_snapshot_id) {
-    if (Array.isArray(data)) {
+    if (data && Array.isArray(data)) {
         const dataArray = data;
         const collection = client.db().collection('properties');
 
@@ -63,7 +63,7 @@ async function checkPending(data, status_check_snapshot_id) {
             await delay(100); // Adjust the delay as needed
         }
     } else {
-        console.log('Data is not in the expected array format');
+        console.log("Invalid data format:", data);
     }
 }
 
