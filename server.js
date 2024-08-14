@@ -904,14 +904,19 @@ app.get('/fixing-precisely', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
         // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
+        //const objectIdSnapshotId = new ObjectId('66ab82a3ddcc33e60fbb130b');
         let query = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            last_status_check: { $exists: true },
             initial_scrape: true,
-            $or: [
+            current_status_date: {
+                $gte: startOfDay,
+                $lte: endOfDay
+            }
+            /* $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
@@ -919,7 +924,7 @@ app.get('/fixing-precisely', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
 
-            ]
+            ]*/
         };
 
         const properties = await propertiesCollection.find(query).toArray();
@@ -1143,6 +1148,7 @@ app.get('/listings', async (req, res) => {
           */
 
         // THIS IS FOR NOT SHIPPED YET
+        /*
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
@@ -1157,7 +1163,20 @@ app.get('/listings', async (req, res) => {
             ],
             branch: { $in: ["TX", "NJ"] }
         };
+*/
 
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
+
+        let filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            initial_scrape: true,
+            current_status_date: {
+                $gte: startOfDay,
+                $lte: endOfDay
+            }
+        }
 
 
         // Fetch filtered properties
