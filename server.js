@@ -103,10 +103,10 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
         // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
-        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
+        const objectId = new ObjectId('66bc5bb54cf50516ef692ec8');
 
         let filteringQuery = {
-            current_status: { $in: ["ForSale", "Pending"] },
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
             $or: [
@@ -274,20 +274,17 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         const shippingsCollection = database.collection('exportSkipTracing');
 
         // Convert snapshot_id to ObjectId
-        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // Set to the start of the current day
-
-        const fiveDaysAgo = new Date(today);
-        fiveDaysAgo.setDate(today.getDate() - 4); // Move to 5 days before today
+        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37'); 
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
 
         let filteringQuery = {
             current_status: "Pending",
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: fiveDaysAgo, // From 5 days ago
-                $lt: today // Until the start of today
+                $gte: startOfDay, // From 5 days ago
+                $lt: endOfDay // Until the start of today
             }
         };
 
@@ -1148,7 +1145,7 @@ app.get('/listings', async (req, res) => {
           */
 
         // THIS IS FOR NOT SHIPPED YET
-        /*
+
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
@@ -1163,20 +1160,8 @@ app.get('/listings', async (req, res) => {
             ],
             branch: { $in: ["TX", "NJ"] }
         };
-*/
 
-        const startOfDay = moment().startOf('day').toDate();
-        const endOfDay = moment().endOf('day').toDate();
 
-        let filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-            verified: { $in: ["Full", "NoPhotos"] },
-            initial_scrape: true,
-            current_status_date: {
-                $gte: startOfDay,
-                $lte: endOfDay
-            }
-        }
 
 
         // Fetch filtered properties
