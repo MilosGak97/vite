@@ -16,13 +16,13 @@ async function processPendingChecks() {
     const collection = db.collection('snapshotsPending');
 
     // Define the start and end of yesterday
-    const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
-    const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
+    const startOfDay = moment().startOf('day').toDate();
+    const endOfDay = moment().endOf('day').toDate();
 
 
     // Query for snapshot_ids with yesterday's requested_time
     const snapshots = await collection.find({
-        requested_time: { $gte: startOfYesterday, $lte: endOfYesterday }
+        requested_time: { $gte: startOfDay, $lte: endOfDay }
     }).toArray();
 
 
