@@ -1470,7 +1470,7 @@ app.post('/trigger3', async (req, res) => {
             const urls = properties.map(property => ({ url: property.url }));
 
             await processUrl(urls);
-            await delay(1000);
+            await delay(5000);
             // Update the skip for the next batch
             skip += limit;
             console.log("SKIP:", skip);
