@@ -278,13 +278,17 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
 
+
+        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
+        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
+
         let filteringQuery = {
             current_status: "Pending",
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: startOfDay, // From 5 days ago
-                $lt: endOfDay // Until the start of today
+                $gte: startOfYesterday, // From 5 days ago
+                $lt: endOfYesterday // Until the start of today
             }
         };
 
