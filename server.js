@@ -103,12 +103,12 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
         // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66bc5bb54cf50516ef692ec8');
+        //const objectId = new ObjectId('66bc5bb54cf50516ef692ec8');
 
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
+            //companyOwned: { $in: [null, false] },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -1153,7 +1153,7 @@ app.get('/listings', async (req, res) => {
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
+            // companyOwned: { $in: [null, false] },
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -1162,7 +1162,7 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
             ],
-            branch: { $in: ["TX", "NJ"] }
+            branch: { $in: ["NJ"] }
         };
 
 
