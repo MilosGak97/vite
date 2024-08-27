@@ -103,32 +103,32 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
         // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66c89fc786924a180e057d9c');
-        /*
-                let filteringQuery = {
-                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-                    verified: { $in: ["Full", "NoPhotos"] },
-                    companyOwned: { $in: [null, false] },
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null }
-                    ],
-                    branch: { $in: ["TX", "NJ"] }
-                };
-                */
+        //const objectId = new ObjectId('66c89fc786924a180e057d9c');
 
         let filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
             $or: [
-                { for_sale_reachout: objectId },
-                { coming_soon_reachout: objectId },
-                { pending_reachout: objectId }
-            ]
-        }
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ],
+            branch: { $in: ["TX", "NJ", "NY"] }
+        };
 
+        /*
+                let filteringQuery = {
+                    $or: [
+                        { for_sale_reachout: objectId },
+                        { coming_soon_reachout: objectId },
+                        { pending_reachout: objectId }
+                    ]
+              }
+        */
 
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -909,22 +909,23 @@ app.get('/fixing-precisely', async (req, res) => {
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
         // Convert snapshot_id to ObjectId
-        const objectIdSnapshotId = new ObjectId('66c89fc786924a180e057d9c');
+        //const objectIdSnapshotId = new ObjectId('66c89fc786924a180e057d9c');
         let query = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             initial_scrape: true,
+            /*
             $or: [
                 { for_sale_reachout: objectIdSnapshotId },
                 { coming_soon_reachout: objectIdSnapshotId },
                 { pending_reachout: objectIdSnapshotId }
-            ]
-            /*
+            ]*/
+
             current_status_date: {
                 $gte: startOfDay,
                 $lte: endOfDay
             }
-                */
+
             /* $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -1170,7 +1171,7 @@ app.get('/listings', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
             ],
-            branch: { $in: ["TX", "NJ"] }
+            branch: { $in: ["TX", "NJ", "NY"] }
         };
 
 
