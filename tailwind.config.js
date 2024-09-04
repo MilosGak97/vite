@@ -12,8 +12,7 @@ module.exports = {
         // Add your custom colors here
         'themeOrange': '#E76F24', // Example custom color
         'secondary': '#1B1B1B', // Example custom color
-        'third': '#fffff2',
-        'themeBlue': '#'
+        'third': '#fffff2'
       }
     },
   },
