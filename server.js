@@ -103,7 +103,7 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
         // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66d6f44c2b99179c95ae82e3');
+        //const objectId = new ObjectId('66d6f44c2b99179c95ae82e3');
         /*
                 let filteringQuery = {
                     current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
