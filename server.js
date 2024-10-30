@@ -7,7 +7,7 @@ const fetchData2 = require('./fetchData');
 const axios = require('axios');
 const { connectDB, client } = require('./src/config/mongodb');
 const path = require('path');
-const { parse } = require('json2csv');
+const { parse, Parser } = require('json2csv');
 const moment = require('moment'); // To handle date operations
 const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
@@ -103,31 +103,46 @@ app.get('/export-csv', async (req, res) => {
         const shippingsCollection = database.collection('shippings');
         // const objectId = new ObjectId('66b5fca291ce97939ca6de30');
         // Convert snapshot_id to ObjectId
-        //const objectId = new ObjectId('66d6f44c2b99179c95ae82e3');
-        /*
-                let filteringQuery = {
-                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-                    verified: { $in: ["Full", "NoPhotos"] },
-                    companyOwned: { $in: [null, false] },
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null }
-                    ],
-                    branch: { $in: ["TX", "NJ", "NY"] }
-                };
-        */
+        // const objectId = new ObjectId('66f41573b49a03641d047d4f');
+
+        // Get the start of last Friday
+        const startOfLastFriday = moment().day(-1).startOf('day').toDate(); // Adjusting day(-2) for last Friday
+
+        // Get the end of today
+        const endOfToday = moment().endOf('day').toDate();
 
         let filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
+            
             $or: [
-                { for_sale_reachout: objectId },
-                { coming_soon_reachout: objectId },
-                { pending_reachout: objectId }
-            ]
-        }
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ],
+            
+
+            branch: { $in: ["TX", "NJ", "NY"] },
+/*             current_status_date: {
+                 $gte: startOfLastFriday,
+                 $lt: endOfToday
+             }
+  */               
+        };
+
+        /*
+let filteringQuery = {
+    $or: [
+        { for_sale_reachout: objectId },
+        { coming_soon_reachout: objectId },
+        { pending_reachout: objectId }
+    ]
+}
+    */
 
 
 
@@ -276,20 +291,25 @@ app.get('/export-csv-skiptracing', async (req, res) => {
 
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66b0a768f61059ddfaf44f37'); 
-        const startOfDay = moment().startOf('day').toDate();
-        const endOfDay = moment().endOf('day').toDate();
 
+        //const startOfDay = moment().startOf('day').toDate();
+        //const endOfDay = moment().endOf('day').toDate();
 
         const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
         const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
 
+        //const lastFridayStart = moment().day(-2).startOf('day').toDate(); // Start of last Friday
+        //const lastFridayEnd = moment().day(-2).endOf('day').toDate();     // End of last Friday
+
+
+
         let filteringQuery = {
-            current_status: "Pending",
+            current_status: { $in: ["Pending", "ForSale"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: startOfYesterday, // From 5 days ago
-                $lt: endOfYesterday // Until the start of today
+                $gte: startOfYesterday,
+                $lt: endOfYesterday
             }
         };
 
@@ -422,6 +442,7 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
 // Endpoint to export properties as CSV
 app.get('/export-csv-doortodoor', async (req, res) => {
     try {
@@ -429,35 +450,29 @@ app.get('/export-csv-doortodoor', async (req, res) => {
         const propertiesCollection = database.collection('properties');
         const shippingsCollection = database.collection('exportSkipTracing');
 
-        // Convert snapshot_id to ObjectId
-        // const objectId = new ObjectId('66b0a768f61059ddfaf44f37'); 
-        /*
-        const startOfDay = moment().startOf('day').toDate();
-        const endOfDay = moment().endOf('day').toDate();
-        */
+        // Calculate the date range for last Friday
+        const lastFriday = moment().startOf('day').toDate();
+        const lastFridayEnd = moment().endOf('day').toDate();
 
-        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
-        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
-
+        // Create the filtering query
         let filteringQuery = {
             current_status: "Pending",
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: startOfYesterday, // From 5 days ago
-                $lt: endOfYesterday // Until the start of today
+                $gte: lastFriday,
+                $lt: lastFridayEnd
             },
-            branch: "TX"
+            branch: { $in: ["NJ"] } // Ensure this is formatted correctly for querying arrays
         };
 
-
-
-
+        // Fetch properties from the database based on the query
         const properties = await propertiesCollection.find(filteringQuery).toArray();
 
-        // Define the fields you want to include in the CSV
-        const fields = ['owner_fullname', 'full_address', 'longitude', 'latitude'];
-
+        // If no properties are found, return a message
+        if (properties.length === 0) {
+            return res.status(404).json({ error: 'No properties found for export' });
+        }
 
         // Function to generate owner_fullname based on owners array
         const generateOwnerFullname = (owners) => {
@@ -473,75 +488,43 @@ app.get('/export-csv-doortodoor', async (req, res) => {
 
             if (ownerName) {
                 return ownerName; // Display ownerName if available
-            } else {
-                // Trim the input to remove extra spaces
-                const firstNameTrimmed = firstName.trim();
-                const middleNameTrimmed = middleName.trim();
-                const lastNameTrimmed = lastName.trim();
-
-                // Check if the parts are non-empty
-                const nameParts = [firstNameTrimmed, middleNameTrimmed, lastNameTrimmed].filter(part => part.length > 0);
-
-                // Count the number of parts
-                const namePartsCount = nameParts.length;
-
-                // Check if any part contains more than one word
-                const hasMultipleWords = nameParts.some(part => part.split(' ').length > 1);
-
-                // If only one part is provided and it doesn't have multiple words, return "Current Resident"
-                if (namePartsCount === 1 && !hasMultipleWords) {
-                    return 'Current Resident';
-                } else if (namePartsCount > 0) {
-                    // Concatenate and trim the name parts
-                    return nameParts.join(' ').trim();
-                } else {
-                    return '';
-                }
             }
+
+            const nameParts = [firstName.trim(), middleName.trim(), lastName.trim()].filter(part => part.length > 0);
+
+            if (nameParts.length === 1 && !nameParts[0].includes(' ')) {
+                return 'Current Resident';
+            }
+
+            return nameParts.length > 0 ? nameParts.join(' ').trim() : '';
         };
-        // Map properties to include only the specified fields and generate owner_fullname
+
+        // Format properties data for CSV export
         const filteredProperties = properties.map(property => {
             let owner_fullname = generateOwnerFullname(property.owners);
-            let current_resident = "Or Current Resident";
-
             if (owner_fullname === '') {
-                owner_fullname = "Current";
-                current_resident = "Resident";
+                owner_fullname = "Current Resident";
             }
-            function formatZipcode(property) {
-                if (property.zipcode !== undefined) {
-                    // Convert zipcode to a string if it is not already
-                    let zipcode = property.zipcode.toString();
 
-                    // Check the length of the zipcode and format if necessary
-                    if (zipcode.length === 4) {
-                        property.zipcode = '0' + zipcode;
-                    } else {
-                        property.zipcode = zipcode; // Ensure it's stored as a string
-                    }
-                } else {
-                    property.zipcode = ''; // Set a default value if zipcode is undefined
-                }
-                return property;
-            }
-            let zipcode = formatZipcode(property.zipcode);
+            const formatZipcode = (zipcode) => {
+                if (!zipcode) return '';
+                return zipcode.toString().padStart(5, '0');
+            };
 
-            let longitude = property.longitude;
-            let latitude = property.latitude;
-            let full_address = `${property.address}, ${property.city}, ${property.state}, ${property.zipcode}`;
+            const zipcode = formatZipcode(property.zipcode);
+            const full_address = `${property.address}, ${property.city}, ${property.state}, ${zipcode}`;
+            const { longitude, latitude } = property;
+
             return {
-                owner_fullname: owner_fullname,
-                full_address: full_address,
-                longitude: longitude,
-                latitude: latitude,
+                owner_fullname,
+                full_address,
+                longitude,
+                latitude
             };
         });
 
-
-
         // Create a new shipping document
         const shippingDate = new Date().toISOString().split('T')[0];
-
         const shippingDocument = {
             created_at: new Date(),
             shipping_date: shippingDate,
@@ -551,35 +534,96 @@ app.get('/export-csv-doortodoor', async (req, res) => {
         const shippingResult = await shippingsCollection.insertOne(shippingDocument);
         const shippingId = shippingResult.insertedId;
 
-        // Update properties with the new shippingId in the appropriate field
+        // Update properties with the new shippingId
         for (const property of properties) {
             await propertiesCollection.updateOne(
                 { _id: property._id },
                 { $set: { exportSkipTracing: shippingId } }
             );
+        }
 
+        // Use json2csv to convert filtered properties to CSV
+        const fields = ['owner_fullname', 'full_address', 'longitude', 'latitude'];
+        const json2csvParser = new Parser({ fields });
+        const csv = json2csvParser.parse(filteredProperties);
+
+        // Send the CSV file as a response
+        res.header('Content-Type', 'text/csv');
+        const filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`;
+        res.attachment(filename);
+        return res.send(csv);
+
+    } catch (error) {
+        console.error("Error exporting properties:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
+// Endpoint to export properties as CSV
+app.get('/export-csv-images', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('properties');
+
+        // Calculate the date range for last Friday
+        const lastFriday = moment().startOf('day').toDate();
+        const lastFridayEnd = moment().endOf('day').toDate();
+
+        // Create the filtering query
+        let filteringQuery = {
+            current_status: "Pending",
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [false, null] },
+            current_status_date: {
+                $gte: lastFriday,
+                $lt: lastFridayEnd
+            }
+        };
+
+        // Fetch properties from the database based on the query
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
+
+        // If no properties are found, return a message
+        if (properties.length === 0) {
+            return res.status(404).json({ error: 'No properties found for export' });
         }
 
 
+        // Format properties data for CSV export
+        const filteredProperties = properties.map(property => {
+            const zpid = property.zpid
+            const photo = property.photo
+            const photoCount = property.photoCount
 
-        // Convert filtered properties to CSV format
-        const csv = parse(filteredProperties);
-        // Add the header row
-        const header = 'owner_fullname, full_address, longitude, latitude\n';
-        const csvWithHeader = csv; //header +
+            return {
+                zpid,
+                photo,
+                photoCount
+            };
+        });
 
-        //console.log(csvWithHeader); // or save the CSV to a file
 
-        // Send CSV file as response
+
+
+        // Use json2csv to convert filtered properties to CSV
+        const fields = ['zpid', 'photo', 'photoCount'];
+        const json2csvParser = new Parser({ fields });
+        const csv = json2csvParser.parse(filteredProperties);
+
+        // Send the CSV file as a response
         res.header('Content-Type', 'text/csv');
-        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        const filename = `PropertyPhotos.csv`;
         res.attachment(filename);
-        res.send(csvWithHeader);
+        return res.send(csv);
+
     } catch (error) {
         console.error("Error exporting properties:", error);
-        res.status(500).send("Internal Server Error");
+        return res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+/*
 app.get('/filtering', async (req, res) => {
     try {
         const database = await connectDB();
@@ -616,6 +660,93 @@ app.get('/filtering', async (req, res) => {
         } else {
             // Handle the case where no property was found
             res.render('filtering', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
+        }
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+*/
+
+app.get('/filtering2', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const Property = database.collection('listingslas');
+
+        const query = {
+            verified: null 
+        }
+        const totalCount = await Property.countDocuments(query)
+
+        const property = await Property.findOne(query);
+
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photos === 'string') {
+                try {
+                    property.photos = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photos = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photos.slice(0, 15);
+            const propertyOtherPhoto = property.photos.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering2', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering2', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
+        }
+    } catch (error) {
+        console.error("Error fetching properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+app.get('/filtering3', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const Property = database.collection('listingslas');
+
+        const query = {
+            verified: null 
+        }
+        const totalCount = await Property.countDocuments(query)
+
+         // Fetch the first document sorted by `zpid` in descending order
+         const property = await Property.find(query).sort({ zpid: -1 }).limit(1).next();
+
+        if (property) {
+            // Convert photo strings to arrays if needed
+            if (typeof property.photos === 'string') {
+                try {
+                    property.photos = JSON.parse(property.photo);
+                } catch (e) {
+                    console.error('Error parsing photos JSON:', e);
+                    property.photos = [];
+                }
+            }
+
+            // Extract the first 15 photos and the rest
+            const propertyFirst15 = property.photos.slice(0, 15);
+            const propertyOtherPhoto = property.photos.slice(15);
+
+            // Extract the zpid
+            const PropertyZpid = property.zpid;
+
+            // Render the EJS template with property data
+            res.render('filtering3', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
+        } else {
+            // Handle the case where no property was found
+            res.render('filtering3', { propertyFirst15: [], propertyOtherPhoto: [], PropertyZpid: null, totalCount: 0 });
         }
     } catch (error) {
         console.error("Error fetching properties:", error);
@@ -737,6 +868,85 @@ app.post('/update-verified/:zpid', async (req, res) => {
 
         }
         res.redirect('/filtering');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/update-verified2/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        } 
+
+
+        const database = await connectDB();
+        const Property = database.collection('listingslas'); 
+
+
+            let companyOwned = false; // Initialize the flag
+
+            const result = await Property.findOne({ zpid: zpid})
+            //console.log(result)
+            console.log("RES: " + result.zpid)
+
+            const updateResult = await Property.updateOne(
+                { zpid: zpid}, // Ensure zpid is a number
+                { $set: { verified: verified, companyOwned: companyOwned } }
+            );
+        console.log("Updated Result: " + updateResult.zpid)
+
+
+        res.redirect('/filtering2');
+    } catch (error) {
+        console.error('Error updating property:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+app.post('/update-verified3/:zpid', async (req, res) => {
+
+    try {
+        const { zpid } = req.params;
+        const { verified } = req.body;
+
+        console.log('Received ZPID:', zpid);
+        console.log('Received Verified:', verified);
+
+        if (verified === undefined) {
+            console.error('Error: Verified field is undefined');
+            return res.status(400).send('Invalid form submission');
+        } 
+
+
+        const database = await connectDB();
+        const Property = database.collection('listingslas'); 
+
+
+            let companyOwned = false; // Initialize the flag
+
+            const result = await Property.findOne({ zpid: zpid})
+            //console.log(result)
+            console.log("RES: " + result.zpid)
+
+            const updateResult = await Property.updateOne(
+                { zpid: zpid}, // Ensure zpid is a number
+                { $set: { verified: verified, companyOwned: companyOwned } }
+            );
+        console.log("Updated Result: " + updateResult.zpid)
+
+
+        res.redirect('/filtering3');
     } catch (error) {
         console.error('Error updating property:', error);
         res.status(500).send('Internal Server Error');
@@ -1315,6 +1525,16 @@ app.get('/listings', async (req, res) => {
           */
 
         // THIS IS FOR NOT SHIPPED YET
+
+        // Define start and end of yesterday
+
+        // Define start of Thursday, 9/12/2024 (12:00 AM)
+        const startOfDay = moment("2024-09-12").startOf('day').toDate();
+
+        // Define end of Sunday, 9/15/2024 (11:59:59 PM)
+        const endOfDay = moment("2024-09-15").endOf('day').toDate();
+
+
 
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
