@@ -106,7 +106,7 @@ app.get('/export-csv', async (req, res) => {
         // const objectId = new ObjectId('66f41573b49a03641d047d4f');
 
         // Get the start of last Friday
-        const startOfLastFriday = moment().day(-1).startOf('day').toDate(); // Adjusting day(-2) for last Friday
+        const startOfLastFriday = moment().startOf('day').toDate(); // Adjusting day(-2) for last Friday
 
         // Get the end of today
         const endOfToday = moment().endOf('day').toDate();
@@ -115,7 +115,7 @@ app.get('/export-csv', async (req, res) => {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [null, false] },
-            
+
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
                 { current_status: "ForSale", for_sale_reachout: null },
@@ -124,14 +124,15 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: { $exists: false } },
                 { current_status: "Pending", pending_reachout: null }
             ],
-            
+
 
             branch: { $in: ["TX", "NJ", "NY"] },
-/*             current_status_date: {
-                 $gte: startOfLastFriday,
-                 $lt: endOfToday
-             }
-  */               
+           /*
+            current_status_date: {
+                             $gte: startOfLastFriday,
+                             $lt: endOfToday
+                         }
+             */ 
         };
 
         /*
@@ -292,11 +293,11 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66b0a768f61059ddfaf44f37'); 
 
-        //const startOfDay = moment().startOf('day').toDate();
-        //const endOfDay = moment().endOf('day').toDate();
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
 
-        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
-        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
+       // const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
+       // const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
 
         //const lastFridayStart = moment().day(-2).startOf('day').toDate(); // Start of last Friday
         //const lastFridayEnd = moment().day(-2).endOf('day').toDate();     // End of last Friday
@@ -304,12 +305,12 @@ app.get('/export-csv-skiptracing', async (req, res) => {
 
 
         let filteringQuery = {
-            current_status: { $in: ["Pending", "ForSale"] },
+            current_status: { $in: ["Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
             companyOwned: { $in: [false, null] },
             current_status_date: {
-                $gte: startOfYesterday,
-                $lt: endOfYesterday
+                $gte: startOfDay,
+                $lt: endOfDay
             }
         };
 
@@ -574,7 +575,7 @@ app.get('/export-csv-images', async (req, res) => {
         let filteringQuery = {
             current_status: "Pending",
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [false, null] },
+            //companyOwned: { $in: [false, null] },
             current_status_date: {
                 $gte: lastFriday,
                 $lt: lastFridayEnd
@@ -623,7 +624,7 @@ app.get('/export-csv-images', async (req, res) => {
     }
 });
 
-/*
+
 app.get('/filtering', async (req, res) => {
     try {
         const database = await connectDB();
@@ -667,7 +668,7 @@ app.get('/filtering', async (req, res) => {
     }
 });
 
-*/
+
 
 app.get('/filtering2', async (req, res) => {
     try {
@@ -675,7 +676,7 @@ app.get('/filtering2', async (req, res) => {
         const Property = database.collection('listingslas');
 
         const query = {
-            verified: null 
+            verified: null
         }
         const totalCount = await Property.countDocuments(query)
 
@@ -717,12 +718,12 @@ app.get('/filtering3', async (req, res) => {
         const Property = database.collection('listingslas');
 
         const query = {
-            verified: null 
+            verified: null
         }
         const totalCount = await Property.countDocuments(query)
 
-         // Fetch the first document sorted by `zpid` in descending order
-         const property = await Property.find(query).sort({ zpid: -1 }).limit(1).next();
+        // Fetch the first document sorted by `zpid` in descending order
+        const property = await Property.find(query).sort({ zpid: -1 }).limit(1).next();
 
         if (property) {
             // Convert photo strings to arrays if needed
@@ -886,23 +887,23 @@ app.post('/update-verified2/:zpid', async (req, res) => {
         if (verified === undefined) {
             console.error('Error: Verified field is undefined');
             return res.status(400).send('Invalid form submission');
-        } 
+        }
 
 
         const database = await connectDB();
-        const Property = database.collection('listingslas'); 
+        const Property = database.collection('listingslas');
 
 
-            let companyOwned = false; // Initialize the flag
+        let companyOwned = false; // Initialize the flag
 
-            const result = await Property.findOne({ zpid: zpid})
-            //console.log(result)
-            console.log("RES: " + result.zpid)
+        const result = await Property.findOne({ zpid: zpid })
+        //console.log(result)
+        console.log("RES: " + result.zpid)
 
-            const updateResult = await Property.updateOne(
-                { zpid: zpid}, // Ensure zpid is a number
-                { $set: { verified: verified, companyOwned: companyOwned } }
-            );
+        const updateResult = await Property.updateOne(
+            { zpid: zpid }, // Ensure zpid is a number
+            { $set: { verified: verified, companyOwned: companyOwned } }
+        );
         console.log("Updated Result: " + updateResult.zpid)
 
 
@@ -926,23 +927,23 @@ app.post('/update-verified3/:zpid', async (req, res) => {
         if (verified === undefined) {
             console.error('Error: Verified field is undefined');
             return res.status(400).send('Invalid form submission');
-        } 
+        }
 
 
         const database = await connectDB();
-        const Property = database.collection('listingslas'); 
+        const Property = database.collection('listingslas');
 
 
-            let companyOwned = false; // Initialize the flag
+        let companyOwned = false; // Initialize the flag
 
-            const result = await Property.findOne({ zpid: zpid})
-            //console.log(result)
-            console.log("RES: " + result.zpid)
+        const result = await Property.findOne({ zpid: zpid })
+        //console.log(result)
+        console.log("RES: " + result.zpid)
 
-            const updateResult = await Property.updateOne(
-                { zpid: zpid}, // Ensure zpid is a number
-                { $set: { verified: verified, companyOwned: companyOwned } }
-            );
+        const updateResult = await Property.updateOne(
+            { zpid: zpid }, // Ensure zpid is a number
+            { $set: { verified: verified, companyOwned: companyOwned } }
+        );
         console.log("Updated Result: " + updateResult.zpid)
 
 
