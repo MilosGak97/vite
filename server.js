@@ -127,12 +127,12 @@ app.get('/export-csv', async (req, res) => {
 
 
             branch: { $in: ["TX", "NJ", "NY"] },
-           /*
-            current_status_date: {
-                             $gte: startOfLastFriday,
-                             $lt: endOfToday
-                         }
-             */ 
+            /*
+             current_status_date: {
+                              $gte: startOfLastFriday,
+                              $lt: endOfToday
+                          }
+              */
         };
 
         /*
@@ -296,8 +296,8 @@ app.get('/export-csv-skiptracing', async (req, res) => {
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
 
-       // const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
-       // const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
+        // const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate();
+        // const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate();
 
         //const lastFridayStart = moment().day(-2).startOf('day').toDate(); // Start of last Friday
         //const lastFridayEnd = moment().day(-2).endOf('day').toDate();     // End of last Friday
@@ -870,7 +870,7 @@ app.post('/update-verified2/:zpid', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
- 
+
 
 app.get('/fix/:zpid', async (req, res) => {
     const { zpid } = req.params;
@@ -1871,7 +1871,7 @@ app.post('/trigger5', async (req, res) => {
             //current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
             //companyOwned: { $in: [false, null] },
-           // current_status_date: { $lt: fiveDaysAgo }
+            // current_status_date: { $lt: fiveDaysAgo }
         };
 
         while (hasMore) {
@@ -1882,9 +1882,17 @@ app.post('/trigger5', async (req, res) => {
             }
             // Extract the URL field
             //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
-          
-            const urls = properties.map(property => ({ url: property.additionalInfo.url }));
-            console.log("URL LOG: " +  properties.additionalInfo.url)
+
+            // Extract the URL field safely
+            const urls = properties
+                .map(property => {
+                    // Use optional chaining to safely access additionalInfo.url
+                    const url = property.additionalInfo?.url;
+                    return url ? { url } : null; // Return null if the URL is not defined
+                })
+                .filter(Boolean); // Filter out any null values
+            //const urls = properties.map(property => ({ url: property.additionalInfo.url }));
+            //console.log("URL LOG: " + properties.additionalInfo.url)
             await processUrl(urls);
             await delay(5000);
             // Update the skip for the next batch
