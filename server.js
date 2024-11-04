@@ -1802,7 +1802,6 @@ app.post('/trigger3', async (req, res) => {
     }
 });
 
-
 app.post('/trigger4', async (req, res) => {
     try {
         const database = await connectDB();
@@ -1817,7 +1816,6 @@ app.post('/trigger4', async (req, res) => {
             verified: { $in: ["Full", "NoPhotos"] },
         };
 
-        // Declare urls outside the loop
         let urls = []; // Initialize urls as an empty array
 
         while (hasMore) {
@@ -1826,15 +1824,18 @@ app.post('/trigger4', async (req, res) => {
                 hasMore = false;
                 break;
             }
-            // Extract the URL field
-            const batchUrls = properties.map(property => ({ url: property.additionalInfo.url })).filter(Boolean); // Ensure URLs are valid
 
-            // Process the URLs for the current batch
+            // Extract the URL field
+            const batchUrls = properties
+                .map(property => property.additionalInfo && property.additionalInfo.url ? { url: property.additionalInfo.url } : null)
+                .filter(Boolean); // Ensure URLs are valid
+
+            console.log("Processing URLs:", batchUrls); // Log URLs being processed
             await processUrl(batchUrls);
+            console.log("Finished processing URLs:", batchUrls); // Log after processing
             urls = urls.concat(batchUrls); // Append batch URLs to the main urls array
-            await delay(5000);
-            // Update the skip for the next batch
-            skip += limit;
+            await delay(5000); // Delay between batches
+            skip += limit; // Update the skip for the next batch
             console.log("SKIP:", skip);
         }
 
@@ -1849,6 +1850,7 @@ app.post('/trigger4', async (req, res) => {
         res.status(500).json(error);
     }
 });
+
 
 /*
 app.post('/pending-check', async (req, res) => {
