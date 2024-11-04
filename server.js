@@ -1892,10 +1892,11 @@ app.post('/trigger5', async (req, res) => {
             console.log("SKIP:", skip);
             //console.log("URLS:", urls);
         }
+        /*
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
-
+        */
 
         //console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
         // Wait for 30 seconds before the next iteration
