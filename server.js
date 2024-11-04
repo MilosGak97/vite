@@ -1835,7 +1835,7 @@ app.post('/trigger4', async (req, res) => {
             // Extract the URL field
             //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
 
-            const urls = properties.map(property => ({ url: property.url }));
+            const urls = properties.map(property => ({ url: property.additionalInfo.url }));
 
             await processUrl(urls);
             await delay(5000);
@@ -1857,7 +1857,7 @@ app.post('/trigger4', async (req, res) => {
         res.status(200).json({ message: 'All URLs are being processed.' });
     } catch (error) {
         console.error('Error processing URLs:', error);
-        res.status(500).json('Failed to process URLs');
+        res.status(500).json(err);
     }
 });
 /*
