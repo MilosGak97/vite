@@ -84,12 +84,14 @@ async function checkPending2(data, status_check_snapshot_id) {
         for (let i = 0; i < dataArray.length; i++) {
             const listing = dataArray[i];
             const { zpid, hdpTypeDimension } = listing;
-            console.log(status_check_snapshot_id);
+            console.log("ZPID: " + zpid);
+            console.log("STATUS: " + hdpTypeDimension)
+            console.log("COUNTER: " + i);
             try {
                 const exists = await checkIfZpidExists2(zpid);
                 if (exists) {
 
-                    if ((hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract")) {
+                    if (( hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract")) {
 
 
                         const last_status_check_snapshot = status_check_snapshot_id

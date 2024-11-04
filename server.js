@@ -1428,23 +1428,8 @@ tomorrow.setDate(today.getDate() + 1);
 app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
-        const propertiesCollection = database.collection('properties');
-        /* THIS IF FOR PENDING
-                let filteringQuery = {
-                    current_status: "Pending",
-                    verified: { $in: ["Full", "NoPhotos"] },
-                    companyOwned: { $in: [false, null] },
-                    current_status_date: {
-                        $gte: today,
-                        $lt: tomorrow
-                    }
-                }
-          
-          */
+        const propertiesCollection = database.collection('listingslas');
 
-        // THIS IS FOR NOT SHIPPED YET
-
-        // Define start and end of yesterday
 
         // Define start of Thursday, 9/12/2024 (12:00 AM)
         const startOfDay = moment("2024-09-12").startOf('day').toDate();
@@ -1452,24 +1437,29 @@ app.get('/listings', async (req, res) => {
         // Define end of Sunday, 9/15/2024 (11:59:59 PM)
         const endOfDay = moment("2024-09-15").endOf('day').toDate();
 
+        //REGULAR
+        /*
+                let filteringQuery = {
+                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+                    verified: { $in: ["Full", "NoPhotos"] },
+                    companyOwned: { $in: [null, false] },
+                    $or: [
+                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                        { current_status: "ForSale", for_sale_reachout: null },
+                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                        { current_status: "ComingSoon", coming_soon_reachout: null },
+                        { current_status: "Pending", pending_reachout: { $exists: false } },
+                        { current_status: "Pending", pending_reachout: null }
+                    ],
+                    branch: { $in: ["TX", "NJ", "NY"] }
+                };
+        */
 
-
-        let filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-            verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
-            $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ],
-            branch: { $in: ["TX", "NJ", "NY"] }
-        };
-
-
+                let filteringQuery = {
+                  //  current_status:   "Pending",
+                    verified: { $in: ["Full", "NoPhotos"] },
+                };
+        
 
 
         // Fetch filtered properties
