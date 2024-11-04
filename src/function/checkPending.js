@@ -83,7 +83,10 @@ async function checkPending2(data, status_check_snapshot_id) {
 
         for (let i = 0; i < dataArray.length; i++) {
             const listing = dataArray[i];
-            const { zpid, hdpTypeDimension } = listing;
+            const { hdpTypeDimension } = listing;
+
+            const zpid = String(listing.zpid); // Ensure zpid is a string
+
             console.log("ZPID: " + zpid);
             console.log("STATUS: " + hdpTypeDimension)
             console.log("COUNTER: " + i);
@@ -99,7 +102,7 @@ async function checkPending2(data, status_check_snapshot_id) {
                         // Update the document to add a new field
                         await collection.updateOne(
                             { zpid: zpid },
-                            { $set: { pending_status, pending_status_date, last_status_check_snapshot } } // Replace 'newFieldName' with the actual field name
+                            { $set: { pending_status: pending_status, pending_status_date: pending_status_date, last_status_check_snapshot: last_status_check_snapshot } } // Replace 'newFieldName' with the actual field name
                         );
 
                         console.log("Added new field to:", zpid);
