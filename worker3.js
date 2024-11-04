@@ -4,13 +4,7 @@ const { connectDB } = require('./src/config/mongodb');
 const moment = require('moment');
 
 
-async function processPendingChecks() {
-    // Example: Fetching a list of snapshot IDs to process
-    /* const snapshotIds = [
-         's_lzsb0d3r144gxlbq1i'
-     ];
- */
-
+async function processPendingChecks() { 
     // Connect to MongoDB
     const db = await connectDB();
     const collection = db.collection('snapshotsPending');

@@ -1,4 +1,4 @@
-const { checkIfZpidExists } = require('./checkIfZpidExists');
+const { checkIfZpidExists, checkIfZpidExists2 } = require('./checkIfZpidExists');
 const { client } = require('../config/mongodb');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -69,35 +69,43 @@ async function checkPending(data, status_check_snapshot_id) {
 
 
 async function checkPending2(data, status_check_snapshot_id) {
-    if (data && Array.isArray(data)) {
+    if (data) {
         const dataArray = data;
-        const collection = client.db().collection('properties');
+
+        // Log the type of dataArray
+        console.log("Type of dataArray:", typeof dataArray); // This will return 'object' since arrays are objects in JavaScript
+
+        // Log whether it is an array
+        console.log("Is dataArray an array?:", Array.isArray(dataArray)); // This will return true if it's an array
+
+
+        const collection = client.db().collection('listingslas');
 
         for (let i = 0; i < dataArray.length; i++) {
             const listing = dataArray[i];
             const { zpid, hdpTypeDimension } = listing;
             console.log(status_check_snapshot_id);
             try {
-                const exists = await checkIfZpidExists(zpid);
-                if (exists) { 
+                const exists = await checkIfZpidExists2(zpid);
+                if (exists) {
 
-                 if ((hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract") ) {
-                     
- 
-                    const last_status_check_snapshot = status_check_snapshot_id
+                    if ((hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract")) {
+
+
+                        const last_status_check_snapshot = status_check_snapshot_id
                         const pending_status = true; // Set this to the value you want to add for the new field
-                        const pending_status_date =  new Date();
+                        const pending_status_date = new Date();
                         // Update the document to add a new field
                         await collection.updateOne(
                             { zpid: Number(zpid) },
                             { $set: { pending_status, pending_status_date, last_status_check_snapshot } } // Replace 'newFieldName' with the actual field name
                         );
-                    
-                        console.log("Added new field to:", zpid);
-                    } 
 
-                   
-                  
+                        console.log("Added new field to:", zpid);
+                    }
+
+
+
                 } else {
                     continue;  // Skip to the next iteration if the property does not exist
                 }
