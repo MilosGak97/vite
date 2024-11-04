@@ -1803,7 +1803,6 @@ app.post('/trigger3', async (req, res) => {
 });
 
 
-
 app.post('/trigger4', async (req, res) => {
     try {
         const database = await connectDB();
@@ -1813,18 +1812,13 @@ app.post('/trigger4', async (req, res) => {
         const limit = 200;
         let hasMore = true;
 
-      //  const now = new Date();
-       // const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
-       // const fiveDaysAgo = new Date(now.getTime() - (6 * 24 * 60 * 60 * 1000));
-
-
-
         const filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
-         //   companyOwned: { $in: [false, null] },
-        //  current_status_date: { $lt: fiveDaysAgo }
         };
+
+        // Declare urls outside the loop
+        let urls = []; // Initialize urls as an empty array
 
         while (hasMore) {
             const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
@@ -1833,26 +1827,21 @@ app.post('/trigger4', async (req, res) => {
                 break;
             }
             // Extract the URL field
-            //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
+            const batchUrls = properties.map(property => ({ url: property.additionalInfo.url })).filter(Boolean); // Ensure URLs are valid
 
-            const urls = properties.map(property => ({ url: property.additionalInfo.url }));
-
-            await processUrl(urls);
+            // Process the URLs for the current batch
+            await processUrl(batchUrls);
+            urls = urls.concat(batchUrls); // Append batch URLs to the main urls array
             await delay(5000);
             // Update the skip for the next batch
             skip += limit;
             console.log("SKIP:", skip);
-            //console.log("URLS:", urls);
         }
+
+        // Check if urls is an array after processing
         if (!Array.isArray(urls)) {
             return res.status(400).json({ error: 'URLs should be an array' });
         }
-
-
-        //console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
-        // Wait for 30 seconds before the next iteration
-
-
 
         res.status(200).json({ message: 'All URLs are being processed.' });
     } catch (error) {
@@ -1860,6 +1849,7 @@ app.post('/trigger4', async (req, res) => {
         res.status(500).json(error);
     }
 });
+
 /*
 app.post('/pending-check', async (req, res) => {
     try {
