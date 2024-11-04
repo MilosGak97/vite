@@ -12,9 +12,7 @@ const moment = require('moment'); // To handle date operations
 const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
-const { fetchData } = require('./src/function/fetchData');
-const { checkPending } = require('./src/function/checkPending');
-
+const { fetchData } = require('./src/function/fetchData'); 
 const { spawn } = require('child_process');
 const { ObjectId } = require('mongodb');
 
