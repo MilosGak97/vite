@@ -123,4 +123,4 @@ async function checkPending2(data, status_check_snapshot_id) {
     }
 }
 
-module.exports = { checkPending, checkPending2 }
+module.exports = { checkPending2 }
