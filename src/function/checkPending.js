@@ -67,4 +67,50 @@ async function checkPending(data, status_check_snapshot_id) {
     }
 }
 
-module.exports = { checkPending }
+
+async function checkPending2(data, status_check_snapshot_id) {
+    if (data && Array.isArray(data)) {
+        const dataArray = data;
+        const collection = client.db().collection('properties');
+
+        for (let i = 0; i < dataArray.length; i++) {
+            const listing = dataArray[i];
+            const { zpid, hdpTypeDimension } = listing;
+            console.log(status_check_snapshot_id);
+            try {
+                const exists = await checkIfZpidExists(zpid);
+                if (exists) { 
+
+                 if ((hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract") ) {
+                     
+ 
+                    const last_status_check_snapshot = status_check_snapshot_id
+                        const pending_status = true; // Set this to the value you want to add for the new field
+                        const pending_status_date =  new Date();
+                        // Update the document to add a new field
+                        await collection.updateOne(
+                            { zpid: Number(zpid) },
+                            { $set: { pending_status, pending_status_date, last_status_check_snapshot } } // Replace 'newFieldName' with the actual field name
+                        );
+                    
+                        console.log("Added new field to:", zpid);
+                    } 
+
+                   
+                  
+                } else {
+                    continue;  // Skip to the next iteration if the property does not exist
+                }
+            } catch (error) {
+                console.error(`Error processing zpid ${zpid}:`, error);
+            }
+
+            // Add a delay to avoid overwhelming the server
+            await delay(100); // Adjust the delay as needed
+        }
+    } else {
+        console.log("Invalid data format:", data);
+    }
+}
+
+module.exports = { checkPending, checkPending2 }
