@@ -1882,9 +1882,9 @@ app.post('/trigger5', async (req, res) => {
             }
             // Extract the URL field
             //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
-            console.log("URL LOG: " +  property.additionalInfo.url)
+          
             const urls = properties.map(property => ({ url: property.additionalInfo.url }));
-
+            console.log("URL LOG: " +  properties.additionalInfo.url)
             await processUrl(urls);
             await delay(5000);
             // Update the skip for the next batch
