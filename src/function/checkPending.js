@@ -99,7 +99,7 @@ async function checkPending2(data, status_check_snapshot_id) {
                         const pending_status_date = new Date();
                         // Update the document to add a new field
                         await collection.updateOne(
-                            { zpid: Number(zpid) },
+                            { zpid: zpid },
                             { $set: { pending_status, pending_status_date, last_status_check_snapshot } } // Replace 'newFieldName' with the actual field name
                         );
 
