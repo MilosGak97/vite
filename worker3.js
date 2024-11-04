@@ -15,14 +15,14 @@ async function processPendingChecks() {
     const db = await connectDB();
     const collection = db.collection('snapshotsPending');
 
-// Define your start and end times
-const startTime = moment('11/4/2024, 11:29:00 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
-const endTime = moment('11/4/2024, 11:31:55 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
+    // Define your start and end times
+    const startTime = moment('11/4/2024, 11:29:00 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
+    const endTime = moment('11/4/2024, 11:31:55 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
 
-// Query for snapshot_ids with requested_time between the specified range
-const snapshots = await collection.find({
-    requested_time: { $gte: startTime, $lte: endTime }
-}).toArray();
+    // Query for snapshot_ids with requested_time between the specified range
+    const snapshots = await collection.find({
+        requested_time: { $gte: startTime, $lte: endTime }
+    }).toArray();
 
 
 
