@@ -90,8 +90,7 @@ async function checkPending2(data, status_check_snapshot_id) {
             try {
                 const exists = await checkIfZpidExists2(zpid);
                 if (exists) {
-
-                    if (( hdpTypeDimension == "Pending" || hdpTypeDimension == "UnderContract")) {
+                    if (hdpTypeDimension.toLowerCase() === "pending" || hdpTypeDimension.toLowerCase() === "undercontract") {
 
                         console.log("IM IN PENDING LOOP")
                         const last_status_check_snapshot = status_check_snapshot_id
