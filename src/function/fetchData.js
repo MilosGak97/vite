@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { client } = require('../config/mongodb');
-const { checkPending } = require('./checkPending');
+const { checkPending2 } = require('./checkPending');
 
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
