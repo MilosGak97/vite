@@ -88,8 +88,8 @@ async function checkPending2(data, status_check_snapshot_id) {
             console.log("STATUS: " + hdpTypeDimension)
             console.log("COUNTER: " + i);
             try {
-                const exists = await checkIfZpidExists2(zpid);
-                if (exists) {
+                // const exists = await checkIfZpidExists2(zpid);
+               // if (exists) {
                     if (hdpTypeDimension.toLowerCase() === "pending" || hdpTypeDimension.toLowerCase() === "undercontract") {
 
                         console.log("IM IN PENDING LOOP")
@@ -106,10 +106,11 @@ async function checkPending2(data, status_check_snapshot_id) {
                     }
 
 
-
+                /*
                 } else {
                     continue;  // Skip to the next iteration if the property does not exist
                 }
+                    */
             } catch (error) {
                 console.error(`Error processing zpid ${zpid}:`, error);
             }
