@@ -91,9 +91,9 @@ async function checkPending2(data, status_check_snapshot_id) {
                 const exists = await checkIfZpidExists2(zpid);
                 if (exists) {
 
-                    if (( hdpTypeDimension === "Pending" || hdpTypeDimension === "UnderContract")) {
+                    if (( hdpTypeDimension == "Pending" || hdpTypeDimension == "UnderContract")) {
 
-
+                        console.log("IM IN PENDING LOOP")
                         const last_status_check_snapshot = status_check_snapshot_id
                         const pending_status = true; // Set this to the value you want to add for the new field
                         const pending_status_date = new Date();
