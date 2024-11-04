@@ -1857,7 +1857,7 @@ app.post('/trigger4', async (req, res) => {
         res.status(200).json({ message: 'All URLs are being processed.' });
     } catch (error) {
         console.error('Error processing URLs:', error);
-        res.status(500).json(err);
+        res.status(500).json(error);
     }
 });
 /*
