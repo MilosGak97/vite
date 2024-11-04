@@ -24,7 +24,7 @@ const checkIfZpidExists2 = async (zpid) => {
         const existingProperty = await collection.findOne({ zpid: zpid });
         if (existingProperty) {
             //console.log('Property with this zpid already exists:', existingProperty);
-            return existingProperty; // or you can return the existingProperty itself
+            return true; // or you can return the existingProperty itself
         } else {
             //console.log('No property with this zpid found.');
             return false;

@@ -1,4 +1,4 @@
-const { checkIfZpidExists, checkIfZpidExists2 } = require('./checkIfZpidExists');
+const { checkIfZpidExists2 } = require('./checkIfZpidExists');
 const { client } = require('../config/mongodb');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 /*
