@@ -1852,6 +1852,63 @@ app.post('/trigger4', async (req, res) => {
 });
 
 
+app.post('/trigger5', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('listingslas');
+
+        let skip = 0;
+        const limit = 200;
+        let hasMore = true;
+
+        const now = new Date();
+        const fortyEightHoursAgo = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+        const fiveDaysAgo = new Date(now.getTime() - (6 * 24 * 60 * 60 * 1000));
+
+
+
+        const filteringQuery = {
+            current_status: { $in: ["ForSale", "ComingSoon"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            //companyOwned: { $in: [false, null] },
+           // current_status_date: { $lt: fiveDaysAgo }
+        };
+
+        while (hasMore) {
+            const properties = await propertiesCollection.find(filteringQuery).skip(skip).limit(limit).toArray();
+            if (properties.length === 0) {
+                hasMore = false;
+                break;
+            }
+            // Extract the URL field
+            //const urls = properties.map(property => property.url).filter(Boolean); // Ensure URL is not undefined or null - ARRAY
+
+            const urls = properties.map(property => ({ url: property.additionalInfo.url }));
+
+            await processUrl(urls);
+            await delay(5000);
+            // Update the skip for the next batch
+            skip += limit;
+            console.log("SKIP:", skip);
+            //console.log("URLS:", urls);
+        }
+        if (!Array.isArray(urls)) {
+            return res.status(400).json({ error: 'URLs should be an array' });
+        }
+
+
+        //console.log(`Iteration ${i + 1} completed. Waiting for 30 seconds before the next iteration.`);
+        // Wait for 30 seconds before the next iteration
+
+
+
+        res.status(200).json({ message: 'All URLs are being processed.' });
+    } catch (error) {
+        console.error('Error processing URLs:', error);
+        res.status(500).json('Failed to process URLs');
+    }
+});
+
 /*
 app.post('/pending-check', async (req, res) => {
     try {
