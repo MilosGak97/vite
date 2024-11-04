@@ -1868,7 +1868,7 @@ app.post('/trigger5', async (req, res) => {
 
 
         const filteringQuery = {
-            current_status: { $in: ["ForSale", "ComingSoon"] },
+            //current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
             //companyOwned: { $in: [false, null] },
            // current_status_date: { $lt: fiveDaysAgo }
