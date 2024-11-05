@@ -1426,7 +1426,7 @@ tomorrow.setDate(today.getDate() + 1);
 app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
-        const propertiesCollection = database.collection('listingslas');
+        const propertiesCollection = database.collection('properties');
 
 
         // Define start of Thursday, 9/12/2024 (12:00 AM)
@@ -1436,7 +1436,7 @@ app.get('/listings', async (req, res) => {
         const endOfDay = moment("2024-09-15").endOf('day').toDate();
 
         //REGULAR
-        /*
+        
                 let filteringQuery = {
                     current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
                     verified: { $in: ["Full", "NoPhotos"] },
@@ -1451,14 +1451,14 @@ app.get('/listings', async (req, res) => {
                     ],
                     branch: { $in: ["TX", "NJ", "NY"] }
                 };
-        */
-
+        
+/*
                 let filteringQuery = {
                   //  current_status:   "Pending",
                     verified: { $in: ["Full", "NoPhotos"] },
                 };
         
-
+*/
 
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
