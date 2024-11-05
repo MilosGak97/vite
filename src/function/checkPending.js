@@ -1,7 +1,7 @@
 const { checkIfZpidExists } = require('./checkIfZpidExists');
 const { client } = require('../config/mongodb');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
+/*
 async function checkPending(data, status_check_snapshot_id) {
     if (data && Array.isArray(data)) {
         const dataArray = data;
@@ -66,8 +66,8 @@ async function checkPending(data, status_check_snapshot_id) {
         console.log("Invalid data format:", data);
     }
 }
+*/
 
-/*
 async function checkPending2(data, status_check_snapshot_id) {
     if (data) {
         const dataArray = data;
@@ -121,6 +121,6 @@ async function checkPending2(data, status_check_snapshot_id) {
         console.log("Invalid data format:", data);
     }
 }
-*/
 
-module.exports = { checkPending }
+
+module.exports = { checkPending2 }

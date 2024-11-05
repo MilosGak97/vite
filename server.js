@@ -1450,10 +1450,10 @@ app.get('/listings', async (req, res) => {
                         { current_status: "Pending", pending_reachout: null }
                     ],
                     branch: { $in: ["TX", "NJ", "NY"] }
-                };
-                */
-        
+                }
 
+*/
+                
                 let filteringQuery = {
                    pending_status: true,
                     verified: { $in: ["Full", "NoPhotos"] },
