@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { client } = require('../config/mongodb');
-const { checkPending2 } = require('./checkPending');
+const { checkPending } = require('./checkPending');
 
 async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
@@ -32,7 +32,7 @@ async function fetchData(snapshotId) {
         }
 
         //await checkPending(response.data, snapshotId);
-        await checkPending2(response.data, snapshotId);
+        await checkPending(response.data, snapshotId);
 
     } catch (error) {
         console.error('Error fetching data:', error);

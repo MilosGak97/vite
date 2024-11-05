@@ -1,2 +1,2 @@
 web: npm start
-worker: node worker3.js
+worker: node worker2.js
