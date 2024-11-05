@@ -32,7 +32,7 @@ async function fetchData(snapshotId) {
         }
 
         //await checkPending(response.data, snapshotId);
-        await checkPending(response.data, snapshotId);
+        await checkPending2(response.data, snapshotId);
 
     } catch (error) {
         console.error('Error fetching data:', error);
