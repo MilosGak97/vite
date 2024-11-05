@@ -11,8 +11,10 @@ async function processPendingChecks() {
     const collection = db.collection('snapshotsPending');
 
     // Define your start and end times
-    const startTime = moment('11/4/2024, 11:29:00 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
-    const endTime = moment('11/4/2024, 11:31:55 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
+
+    //11/5/2024, 11:55:24 AM
+    const startTime = moment('11/5/2024, 11:40:00 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
+    const endTime = moment('11/5/2024, 11:59:55 AM', 'MM/DD/YYYY, hh:mm:ss A').utc().toDate();
 
     // Query for snapshot_ids with requested_time between the specified range
     const snapshots = await collection.find({
