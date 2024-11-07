@@ -442,6 +442,78 @@ app.get('/export-csv-skiptracing', async (req, res) => {
     }
 });
 
+
+// Endpoint to export properties as CSV
+app.get('/export-csv-skiptracing-ca', async (req, res) => {
+    try {
+        const database = await connectDB();
+        const propertiesCollection = database.collection('listingslas');
+        const shippingsCollection = database.collection('exportSkipTracing');
+
+        const startOfDay = moment().startOf('day').toDate();
+        const endOfDay = moment().endOf('day').toDate();
+
+        let filteringQuery = {
+          pending_status: true,
+          verified: { $in: ["Full", "NoPhotos"] },
+        };
+
+        const properties = await propertiesCollection.find(filteringQuery).toArray();
+
+        // Define the fields you want to include in the CSV
+        const fields = ['streetAddress', 'city', 'state', 'zipcode'];
+
+        // Map properties to include only the specified fields and generate the required CSV format
+        const filteredProperties = properties.map(property => {
+            return { 
+                streetAddress: property.streetAddress,
+                city: property.city,
+                state: property.state,
+                zipcode: property.zipcode
+            };
+        });
+
+        // Create a new shipping document
+        const shippingDate = new Date().toISOString().split('T')[0];
+
+        const shippingDocument = {
+            created_at: new Date(),
+            shipping_date: shippingDate,
+            total_count: properties.length
+        };
+
+        const shippingResult = await shippingsCollection.insertOne(shippingDocument);
+        const shippingId = shippingResult.insertedId;
+
+        // Update properties with the new shippingId in the appropriate field
+        for (const property of properties) {
+            await propertiesCollection.updateOne(
+                { _id: property._id },
+                { $set: { exportSkipTracing: shippingId } }
+            );
+        }
+
+        // Convert filtered properties to CSV format
+        const csv = parse(filteredProperties, { fields });
+
+        // Add the header row
+        const header = 'streetAddress,city,state,zipcode\n';
+        const csvWithHeader = header + csv;
+
+        console.log(csvWithHeader); // or save the CSV to a file
+
+        // Send CSV file as response
+        res.header('Content-Type', 'text/csv');
+        let filename = `Postcards_${shippingDate}_ID_${shippingId}.csv`; // Adjust the file extension as needed
+        res.attachment(filename);
+        res.send(csvWithHeader);
+    } catch (error) {
+        console.error("Error exporting properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 // Endpoint to export properties as CSV
 app.get('/export-csv-doortodoor', async (req, res) => {
     try {
@@ -462,7 +534,7 @@ app.get('/export-csv-doortodoor', async (req, res) => {
                 $gte: lastFriday,
                 $lt: lastFridayEnd
             },
-            branch: { $in: ["NJ"] } // Ensure this is formatted correctly for querying arrays
+            branch: { $in: ["TX"] } // Ensure this is formatted correctly for querying arrays
         };
 
         // Fetch properties from the database based on the query
@@ -1426,17 +1498,17 @@ tomorrow.setDate(today.getDate() + 1);
 app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
-        const propertiesCollection = database.collection('listingslas');
+        const propertiesCollection = database.collection('properties');
 
 
         // Define start of Thursday, 9/12/2024 (12:00 AM)
-        const startOfDay = moment("2024-09-12").startOf('day').toDate();
+       // const startOfDay = moment("2024-09-12").startOf('day').toDate();
 
         // Define end of Sunday, 9/15/2024 (11:59:59 PM)
-        const endOfDay = moment("2024-09-15").endOf('day').toDate();
+        //const endOfDay = moment("2024-09-15").endOf('day').toDate();
 
         //REGULAR
-        /*
+        
                 let filteringQuery = {
                     current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
                     verified: { $in: ["Full", "NoPhotos"] },
@@ -1452,13 +1524,13 @@ app.get('/listings', async (req, res) => {
                     branch: { $in: ["TX", "NJ", "NY"] }
                 }
 
-*/
-                
+
+                /*
                 let filteringQuery = {
                    pending_status: true,
                     verified: { $in: ["Full", "NoPhotos"] },
                 };
-        
+*/        
 
 
         // Fetch filtered properties
