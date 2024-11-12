@@ -743,7 +743,7 @@ app.get('/filtering', async (req, res) => {
 app.get('/filtering2', async (req, res) => {
     try {
         const database = await connectDB();
-        const Property = database.collection('listingslas');
+        const Property = database.collection('djallal_listings');
 
         const query = {
             verified: null
@@ -918,7 +918,7 @@ app.post('/update-verified2/:zpid', async (req, res) => {
 
 
         const database = await connectDB();
-        const Property = database.collection('listingslas');
+        const Property = database.collection('djallal_listings');
 
 
         let companyOwned = false; // Initialize the flag
