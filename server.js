@@ -281,6 +281,8 @@ let filteringQuery = {
         res.status(500).send("Internal Server Error");
     }
 });
+
+
 // Endpoint to export properties as CSV
 app.get('/export-csv-skiptracing', async (req, res) => {
     try {
@@ -1253,6 +1255,7 @@ app.post('/fetchbysnapshotid', async (req, res) => {
 })
 
 
+
 /* Running precisely again for selected query */
 app.get('/fixing-precisely', async (req, res) => {
     let client;
@@ -1260,7 +1263,7 @@ app.get('/fixing-precisely', async (req, res) => {
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
-
+       
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
         // Convert snapshot_id to ObjectId
@@ -1296,6 +1299,7 @@ app.get('/fixing-precisely', async (req, res) => {
 
         for (const property of properties) {
             try {
+                //const fullAddress = `${property.address} ${property.city}, ${property.state} ${property.zipcode}`;
                 const fullAddress = `${property.address} ${property.city}, ${property.state} ${property.zipcode}`;
                 console.log(fullAddress);
 
@@ -1398,92 +1402,7 @@ app.get('/fixing-precisely', async (req, res) => {
         }
     }
 });
-/*
-    _id
-66a8b9bd22559afd6bd8c882
-snapshot_id
-"s_lz88z1ncgx1ske4eb"
-requested_time
-2024-07-30T10:00:29.890+00:00
-branch
-"TX"
-THIS NEED TO BE FIXED, ALL ENTRIES WITH THIS SNAPSHOT ID ARE ACTUALLY BRANCH NJ
-app.get('/fixing2', async (req, res) => {
-    let client;
-    try {
-        const database = await connectDB();
-        const propertiesCollection = database.collection('properties');
- 
-        const properties = await propertiesCollection.find({ branch: "TX", verified: null, address_valid: { $exists: false } }).toArray();
-        let counter;
-        for (property of properties) {
-            try {
-                if (property.photoCount < 4) {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
-                        { $set: { verified: "NoPhotos", enoughphotos: false } }
-                    );
-                    console.log("Updated one...")
-                } else {
-                    await propertiesCollection.updateOne({
-                        _id: property._id
-                    },
-                        {
-                            $set: { enoughphotos: true }
-                        });
-                }
-            } catch (error) {
-                console.log("Error in foreach: ", error)
-            }
-        }
-    } catch (error) {
-        console.log("Error: ", error);
-        res.status(500).send(error);
- 
-    } finally {
-        if (client) {
-            await client.close();
-        }
-    }
-})
- 
-app.get('/fixing3', async (req, res) => {
-    const database = await connectDB();
-    const propertiesCollection = database.collection('properties');
- 
-    const properties = await propertiesCollection.find({ branches: "NJ", verified: null }).toArray();
-    console.log(`Found ${properties.length} properties to process.`); // Log how many properties are found
- 
-    let counter = 0;
-    for (const property of properties) {
-        console.log(`Processing property with ID: ${property._id}`); // Detailed log for each property
-        try {
-            if (property.photoCount < 4) {
-                console.log(`Property with ID ${property._id} has less than 4 photos.`);
-                console.log('PhotoCount: ', property.photoCount);
-                await propertiesCollection.updateOne(
-                    { _id: property._id },
-                    { $set: { verified: "NoPhotos", enoughphotos: false } }
-                );
-                console.log("Updated one (no photos or insufficient photos)...");
-            } else {
-                console.log('ELSE PhotoCount: ', property.photoCount);
-                console.log(`Property with ID ${property._id} meets photo criteria.`);
-                await propertiesCollection.updateOne(
-                    { _id: property._id },
-                    { $set: { enoughphotos: true } }
-                );
-                console.log("Updated one (sufficient photos)...");
-            }
-            counter++;
-        } catch (error) {
-            console.log("Error in foreach: ", error);
-        }
-    }
-    console.log(`${counter} properties were processed.`);
- 
-})
-*/
+
 
 
 // Create a date instance for today
@@ -1525,13 +1444,8 @@ app.get('/listings', async (req, res) => {
                 }
 
 
-                /*
-                let filteringQuery = {
-                   pending_status: true,
-                    verified: { $in: ["Full", "NoPhotos"] },
-                };
-*/        
-
+                
+              
 
         // Fetch filtered properties
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -1547,64 +1461,6 @@ app.get('/listings', async (req, res) => {
     }
 });
 
-// server.js or app.js
-app.get('/shippings', async (req, res) => {
-    try {
-        const database = await connectDB();
-        const shippingsCollection = database.collection('shippings');
-
-        // Fetch all shippings, sorted by created_at in descending order
-        const shippings = await shippingsCollection.find().sort({ created_at: -1 }).toArray();
-
-        // Render the EJS template with shippings data
-        res.render('shippings', { shippings });
-    } catch (error) {
-        console.error("Error fetching shippings:", error);
-        res.status(500).send("Internal Server Error");
-    }
-});
-
-
-app.get('/shipping/:id', async (req, res) => {
-    try {
-        const shippingId = new ObjectId(req.params.id); // Convert shippingId to ObjectId
-        const database = await connectDB();
-        const propertiesCollection = database.collection('properties');
-
-        // Fetch all properties with the given shipping ID
-        const properties = await propertiesCollection.find({
-            $or: [
-                { for_sale_reachout: shippingId },
-                { pending_reachout: shippingId },
-                { coming_soon_reachout: shippingId }
-            ]
-        }).toArray();
-
-        // Add the shipped_at_status field based on the matching condition
-        const propertiesWithStatus = properties.map(property => {
-            let shipped_at_status = '';
-            if (property.for_sale_reachout && property.for_sale_reachout instanceof ObjectId && property.for_sale_reachout.equals(shippingId)) {
-                shipped_at_status = 'For Sale';
-            } else if (property.pending_reachout && property.pending_reachout instanceof ObjectId && property.pending_reachout.equals(shippingId)) {
-                shipped_at_status = 'Pending';
-            } else if (property.coming_soon_reachout && property.coming_soon_reachout instanceof ObjectId && property.coming_soon_reachout.equals(shippingId)) {
-                shipped_at_status = 'Coming Soon';
-            }
-            return {
-                ...property,
-                shipped_at_status
-            };
-        });
-
-        console.log('Properties:', propertiesWithStatus); // Log properties for debugging
-
-        // Render the properties in a new template
-        res.render('shipping_properties', { properties: propertiesWithStatus });
-    } catch (error) {
-        console.error("Error fetching properties:", error);
-        res.status(500).send("Internal Server Error");
-    }
-});
 
 
 app.get('/skiptracing', (req, res) => {
@@ -1978,23 +1834,6 @@ app.post('/trigger5', async (req, res) => {
         res.status(500).json('Failed to process URLs');
     }
 });
-
-/*
-app.post('/pending-check', async (req, res) => {
-    try {
-        const snapshot_id = req.body.snapshot_id;
-        console.log("SNAPSHOT ID: ", snapshot_id);
-
-        await fetchData(snapshot_id);
-        res.status(200).json({ message: "Great Job  is Successfully sent" });
-    } catch (error) {
-        res.status(500).json({ message: error })
-    }
-
-
-
-})*/
-
 
 
 app.post('/pending-check', async (req, res) => {
