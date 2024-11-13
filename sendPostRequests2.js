@@ -5,7 +5,7 @@ const tokenManager = require('./tokenManager');
 
 async function sendPostRequests2(req, res) {
     try {
-        const { requrl, branch } = req.body;
+        const { requrl, } = req.body;
 
         // Validate URL
         if (!requrl || typeof requrl !== 'string') {
@@ -13,33 +13,26 @@ async function sendPostRequests2(req, res) {
             console.log("URL: ", requrl);
             return res.status(400).send('Invalid URL');
         }
-
-        // Validate Branch
-        if (!branch || typeof branch !== 'string') {
-            console.log("Type Of (BRANCH):", typeof branch);
-            console.log("Branch: ", branch);
-            return res.status(400).send('Invalid Branch');
-        }
+ 
 
         // Log received parameters
-        console.log("Received URL: ", requrl);
-        console.log("Received Branch: ", branch);
+        console.log("Received URL: ", requrl); 
 
         // Send immediate response to the client
         res.status(200).send({
             message: 'Parameters received successfully',
-            receivedData: { requrl, branch }
+            receivedData: { requrl }
         });
 
         // Perform background processing
-        processBackgroundTasks(requrl, branch);
+        processBackgroundTasks(requrl);
     } catch (error) {
         console.error('Error sending POST request:', error);
         res.status(500).json({ error: 'Failed to send POST request' });
     }
 }
 
-async function processBackgroundTasks(requrl, branch) {
+async function processBackgroundTasks(requrl) {
     try {
         const datasetId = "gd_lfqkr8wm13ixtbd8f5";
         const endpoint = 'https://propertylisting-d1c1e167e1b1.herokuapp.com/webh';
@@ -73,19 +66,18 @@ async function processBackgroundTasks(requrl, branch) {
 
         const snapshotData = {
             snapshot_id: snapshotId,
-            requested_time: new Date(),
-            branch: branch,
+            requested_time: new Date(), 
             url: bodyurl
         };
         await collection.insertOne(snapshotData);
 
-        await fetchData(snapshotId, branch);
+        await fetchData(snapshotId);
     } catch (error) {
         console.error('Error during background processing:', error);
     }
 }
 
-async function fetchData(snapshotId, branch) {
+async function fetchData(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
@@ -102,7 +94,7 @@ async function fetchData(snapshotId, branch) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
             } else {
                 console.log('Response data:', response.data);
-                await listAllListings(response.data, branch, snapshotId);
+                await listAllListings(response.data, snapshotId);
                 return response.data;
             }
         } catch (error) {
@@ -112,7 +104,7 @@ async function fetchData(snapshotId, branch) {
     }
 }
 
-async function listAllListings(data, branch, snapshot_id) {
+async function listAllListings(data, snapshot_id) {
 
 
     if (Array.isArray(data)) {
@@ -129,8 +121,7 @@ async function listAllListings(data, branch, snapshot_id) {
                 duplicateCount++;
                 // Handle the case where the property already exists
                 continue;
-            } else {
-                if (branch === listing.state) {
+            } else { 
                     // Handle the case where the property does not exist
                     const extractPhotoUrls = (photos) => {
                         if (!photos || !Array.isArray(photos)) {
@@ -286,15 +277,12 @@ async function listAllListings(data, branch, snapshot_id) {
                         current_status: current_status,
                         current_status_date: current_status_date,
                         notes: notes,
-                        companyOwned: companyOwned,
-                        branch: branch,
+                        companyOwned: companyOwned, 
                         snapshot_id: snapshot_id
                     };
 
                     await collection.insertOne(propertyData);
-                } else {
-                    continue;
-                }
+              
 
             }
             console.log("Total duplicates: ", duplicateCount)

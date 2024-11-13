@@ -4,7 +4,7 @@ const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
 const tokenManager = require('./tokenManager');
 
 
-async function fetchData2(snapshotId, branch) {
+async function fetchData2(snapshotId) {
     const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
     const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshotId}?format=json`;
 
@@ -21,7 +21,7 @@ async function fetchData2(snapshotId, branch) {
                 await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
             } else {
                 console.log('Response data:', response.data);
-                await listAllListings(response.data, branch, snapshotId);
+                await listAllListings(response.data,   snapshotId);
                 return response.data;
             }
         } catch (error) {
@@ -31,7 +31,7 @@ async function fetchData2(snapshotId, branch) {
     }
 }
 
-async function listAllListings(data, branch, snapshot_id) {
+async function listAllListings(data, snapshot_id) {
 
 
     if (Array.isArray(data)) {

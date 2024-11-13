@@ -123,8 +123,7 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null }
             ],
 
-
-            branch: { $in: ["TX", "NJ", "NY"] },
+ 
             /*
              current_status_date: {
                               $gte: startOfLastFriday,
@@ -535,8 +534,7 @@ app.get('/export-csv-doortodoor', async (req, res) => {
             current_status_date: {
                 $gte: lastFriday,
                 $lt: lastFridayEnd
-            },
-            branch: { $in: ["TX"] } // Ensure this is formatted correctly for querying arrays
+            }
         };
 
         // Fetch properties from the database based on the query
@@ -809,7 +807,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
             )
-
+/*
             const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
             console.log(fullAddress);
 
@@ -875,9 +873,11 @@ app.post('/update-verified/:zpid', async (req, res) => {
 
 
             console.log("Formatted Owners: ", formattedOwners);
+*/
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
-                { $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
+                { $set: { verified: verified, initial_scrape: true } }
+                //{ $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
             );
 
             if (updateResult.modifiedCount === 0) {
@@ -888,14 +888,12 @@ app.post('/update-verified/:zpid', async (req, res) => {
         } else {
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
-                { $set: { verified: verified } }
+                { $set: { verified: verified, initial_scrape: true} }
             );
             if (updateResult.modifiedCount === 0) {
                 console.error('Error updating property: No documents matched the query');
                 return res.status(404).send('Property not found');
             }
-
-
         }
         res.redirect('/filtering');
     } catch (error) {
@@ -1029,8 +1027,11 @@ app.post('/fixing-updateOne', async (req, res) => {
 });
 
 app.post('/fetchbysnapshotid', async (req, res) => {
-    const { snapshot_id, branch } = req.body;
-    async function fetchData(snapshot_id, branch) {
+    const { snapshot_id } = req.body;
+ 
+    console.log('Received snapshot_id:', snapshot_id);
+ 
+    async function fetchData(snapshot_id ) {
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
         const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshot_id}?format=json`;
 
@@ -1047,7 +1048,7 @@ app.post('/fetchbysnapshotid', async (req, res) => {
                     await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
                 } else {
                     console.log('Response data:', response.data);
-                    await listAllListings(response.data, branch, snapshot_id);
+                    await listAllListings(response.data, snapshot_id);
                     return response.data;
                 }
             } catch (error) {
@@ -1056,7 +1057,7 @@ app.post('/fetchbysnapshotid', async (req, res) => {
             }
         }
     }
-    async function listAllListings(data, branch, snapshot_id) {
+    async function listAllListings(data, snapshot_id) {
         try {
 
             if (Array.isArray(data)) {
@@ -1074,7 +1075,6 @@ app.post('/fetchbysnapshotid', async (req, res) => {
                         // Handle the case where the property already exists
                         continue;
                     } else {
-                        if (branch === listing.state) {
                             // Handle the case where the property does not exist
                             const extractPhotoUrls = (photos) => {
                                 if (!photos || !Array.isArray(photos)) {
@@ -1231,14 +1231,11 @@ app.post('/fetchbysnapshotid', async (req, res) => {
                                 current_status_date: current_status_date,
                                 notes: notes,
                                 companyOwned: companyOwned,
-                                branch: branch,
                                 snapshot_id: snapshot_id
                             };
 
                             await collection.insertOne(propertyData);
-                        } else {
-                            continue;
-                        }
+                       
 
                     }
                     console.log("Total duplicates: ", duplicateCount)
@@ -1251,7 +1248,7 @@ app.post('/fetchbysnapshotid', async (req, res) => {
             console.log(error);
         }
     }
-    fetchData(snapshot_id, branch);
+    fetchData(snapshot_id );
 })
 
 
@@ -1422,8 +1419,7 @@ app.get('/listings', async (req, res) => {
         let query = {}; // Fetch all documents with an empty query
 
         const properties = await propertiesCollection
-            .find(query)
-            .limit(10) // Limit the result to 10 documents
+            .find(query) 
             .toArray();
         
         
@@ -1897,15 +1893,14 @@ app.get('/trigger-worker-get', async (req, res) => {
 
 
 // Function to trigger the script
-const triggerScript = async (url, branch) => {
+const triggerScript = async (url) => {
     try {
         const response = await axios.post('https://worker-847b6ac96356.herokuapp.com/trigger2', {
-            requrl: url,
-            branch: branch
+            requrl: url
         });
-        console.log(`Script triggered successfully for branch ${branch}:`, response.data);
+        console.log(`Script triggered successfully:`, response.data);
     } catch (error) {
-        console.error(`Error triggering script for branch ${branch}:`, error.response ? error.response.data : error.message);
+        console.error(`Error triggering script:`, error.response ? error.response.data : error.message);
     }
 };
 
