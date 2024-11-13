@@ -10,7 +10,7 @@ const connectDB = async () => {
     if (!db) {
         try {
             await client.connect();
-            db = client.db('propertyListings'); // Ensure correct case
+            db = client.db('vitemoving'); // Ensure correct case
             console.log("Connected to MongoDB");
         } catch (error) {
             console.error("Could not connect to MongoDB", error);

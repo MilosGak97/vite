@@ -1419,36 +1419,19 @@ app.get('/listings', async (req, res) => {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
+        let query = {}; // Fetch all documents with an empty query
 
-        // Define start of Thursday, 9/12/2024 (12:00 AM)
-       // const startOfDay = moment("2024-09-12").startOf('day').toDate();
-
-        // Define end of Sunday, 9/15/2024 (11:59:59 PM)
-        //const endOfDay = moment("2024-09-15").endOf('day').toDate();
-
-        //REGULAR
+        const properties = await propertiesCollection
+            .find(query)
+            .limit(10) // Limit the result to 10 documents
+            .toArray();
         
-                let filteringQuery = {
-                    current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
-                    verified: { $in: ["Full", "NoPhotos"] },
-                    companyOwned: { $in: [null, false] },
-                    $or: [
-                        { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                        { current_status: "ForSale", for_sale_reachout: null },
-                        { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                        { current_status: "ComingSoon", coming_soon_reachout: null },
-                        { current_status: "Pending", pending_reachout: { $exists: false } },
-                        { current_status: "Pending", pending_reachout: null }
-                    ],
-                    branch: { $in: ["TX", "NJ", "NY"] }
-                }
-
-
+        
                 
               
 
         // Fetch filtered properties
-        const properties = await propertiesCollection.find(filteringQuery).toArray();
+        //const properties = await propertiesCollection.find(filteringQuery).toArray();
 
 
         // Render the template with parameters
