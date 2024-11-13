@@ -1,0 +1,460 @@
+<!-- src/public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Project</title>
+    <link href="output.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!----------------- START OF MENU --------------------->
+    <%- include('partials/menu') %>
+
+        <!----------------- END OF MENU ----------------------->
+
+        <!----------------- START OF CONTENT------------------->
+        <!DOCTYPE html>
+        <html lang="en">
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Trigger POST Request</title>
+        </head>
+
+        <body class="  bg-gray-700">
+            <div class=" bg-third  px-20 py-10 w-[100%-160px] grid grid-cols-3 gap-3 justify-between">
+                <div class="w-full flex flex-col">
+
+                    <p class="ml-4 font-black   text-primary   text-lg tracking-widest -mb-1  ">
+                        Ready for
+                        Filtering</p>
+                    <div class="rounded-lg border-2 border-primary bg-white  flex flex-col p-4">
+                        <table class="min-w-full text-center ">
+                            <thead class="  ">
+                                <tr class="text-left px-2 text-sm">
+                                    <th class="py-2 px-2 border-b-2 text-center  border-primary w-1/5"> Branches </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"> <a
+                                            href="#" class="hover:bg-gray-700 hover:text-white"> Coming
+                                            Soon </a> </th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"> <a
+                                            href="#" class="hover:bg-gray-700 hover:text-white"> For
+                                            Sales </a></th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"><a
+                                            href="#" class="hover:bg-gray-700 hover:text-white">Pending </a>
+                                    </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"><a
+                                            href="#" class="hover:bg-gray-700 hover:text-white">Total </a>
+                                    </th>
+
+                            </thead>
+                            <tbody>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2  border-primary  "><a href="#"
+                                            class="hover:bg-gray-700 hover:text-white"> New Jersey</a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">357 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">664 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">23 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">1067 </a>
+                                    </td>
+                                </tr>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2   border-primary  "><a href="#"
+                                            class="hover:bg-gray-700 hover:text-white">Texas</a></td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "><a href="#"
+                                            class="hover:bg-primary hover:text-white"> 125 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">287 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">191 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">603 </a>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td class="py-2 px-2   font-bold border-primary  ">
+                                        <a href="#" class="hover:bg-gray-700 hover:text-white"> Total </a>
+                                    </td>
+                                    <td class="py-2 px-2    border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">482 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">951 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">214 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <span class="bg-gray-700 font-black text-white tracking-wider "><a href="#"
+                                                class="hover:bg-primary hover:text-white">1647
+                                            </a></span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class=" w-full flex flex-col">
+
+                    <p class="ml-2 font-black   text-primary text-lg tracking-widest text-center -mb-1">Filter Actions
+                    </p>
+                    <div>
+
+                    </div>
+                </div>
+
+                <div class=" w-full flex flex-col">
+                    <div class="px-8  -mt-2 flex flex-row justify-between">
+                        <svg class="w-6  h-6  hover:bg-white hover:cursor-pointer" viewBox="0 0 32 32" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000" transform="">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <title>arrow-left-square</title>
+                                <desc>Created with Sketch Beta.</desc>
+                                <defs> </defs>
+                                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
+                                    sketch:type="MSPage">
+                                    <g id="Icon-Set" sketch:type="MSLayerGroup"
+                                        transform="translate(-412.000000, -983.000000)" fill="#FFAD03">
+                                        <path
+                                            d="M434,998 L423.414,998 L427.535,993.879 C427.926,993.488 427.926,992.855 427.535,992.465 C427.145,992.074 426.512,992.074 426.121,992.465 L420.465,998.121 C420.225,998.361 420.15,998.689 420.205,999 C420.15,999.311 420.225,999.639 420.465,999.879 L426.121,1005.54 C426.512,1005.93 427.145,1005.93 427.535,1005.54 C427.926,1005.15 427.926,1004.51 427.535,1004.12 L423.414,1000 L434,1000 C434.553,1000 435,999.553 435,999 C435,998.448 434.553,998 434,998 L434,998 Z M442,1011 C442,1012.1 441.104,1013 440,1013 L416,1013 C414.896,1013 414,1012.1 414,1011 L414,987 C414,985.896 414.896,985 416,985 L440,985 C441.104,985 442,985.896 442,987 L442,1011 L442,1011 Z M440,983 L416,983 C413.791,983 412,984.791 412,987 L412,1011 C412,1013.21 413.791,1015 416,1015 L440,1015 C442.209,1015 444,1013.21 444,1011 L444,987 C444,984.791 442.209,983 440,983 L440,983 Z"
+                                            id="arrow-left-square" sketch:type="MSShapeGroup"> </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                        <p class="ml-2 font-black   text-primary text-lg tracking-widest -mb-1 text-center">
+                            Filtered this
+                            <span class="bg-primary text-white hover:cursor-pointer "> &nbsp; month &nbsp;</span>
+                        </p>
+
+                        <svg class="w-6  h-6  hover:bg-white hover:cursor-pointer opacity-20" viewBox="0 0 32 32"
+                            version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                            xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"
+                            transform="rotate(180)">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <title>arrow-left-square</title>
+                                <desc>Created with Sketch Beta.</desc>
+                                <defs> </defs>
+                                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"
+                                    sketch:type="MSPage">
+                                    <g id="Icon-Set" sketch:type="MSLayerGroup"
+                                        transform="translate(-412.000000, -983.000000)" fill="#FFAD03">
+                                        <path
+                                            d="M434,998 L423.414,998 L427.535,993.879 C427.926,993.488 427.926,992.855 427.535,992.465 C427.145,992.074 426.512,992.074 426.121,992.465 L420.465,998.121 C420.225,998.361 420.15,998.689 420.205,999 C420.15,999.311 420.225,999.639 420.465,999.879 L426.121,1005.54 C426.512,1005.93 427.145,1005.93 427.535,1005.54 C427.926,1005.15 427.926,1004.51 427.535,1004.12 L423.414,1000 L434,1000 C434.553,1000 435,999.553 435,999 C435,998.448 434.553,998 434,998 L434,998 Z M442,1011 C442,1012.1 441.104,1013 440,1013 L416,1013 C414.896,1013 414,1012.1 414,1011 L414,987 C414,985.896 414.896,985 416,985 L440,985 C441.104,985 442,985.896 442,987 L442,1011 L442,1011 Z M440,983 L416,983 C413.791,983 412,984.791 412,987 L412,1011 C412,1013.21 413.791,1015 416,1015 L440,1015 C442.209,1015 444,1013.21 444,1011 L444,987 C444,984.791 442.209,983 440,983 L440,983 Z"
+                                            id="arrow-left-square" sketch:type="MSShapeGroup"> </path>
+                                    </g>
+                                </g>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="rounded-lg border-2 mt-2 border-primary bg-white  flex flex-col p-4">
+                        <table class="min-w-full text-center ">
+                            <thead class="  ">
+                                <tr class="text-left px-2 text-sm">
+                                    <th class="py-2 px-2 border-b-2 text-center  border-primary w-1/5"> Branches </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"> Full
+                                    </th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5">No
+                                        Photos</th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5">Empty
+                                    </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5">Total
+                                    </th>
+
+                            </thead>
+                            <tbody>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2  border-primary  "> New Jersey</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary "> 357</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 664</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 23</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 1067</td>
+                                </tr>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2   border-primary  ">Texas</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 125</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 287</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 191</td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> 603</td>
+                                </tr>
+                                <tr>
+
+                                    <td class="py-2 px-2   font-bold border-primary  ">
+                                        Total
+                                    </td>
+                                    <td class="py-2 px-2    border-l-2 border-primary  "> 482</td>
+                                    <td class="py-2 px-2  border-l-2 border-primary  "> 951</td>
+                                    <td class="py-2 px-2  border-l-2 border-primary  ">214</td>
+                                    <td class="py-2 px-2  border-l-2 border-primary  ">
+                                        <span class="bg-gray-700 font-black text-white tracking-wider">1647</span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class=" px-20 pt-4 flex flex-col bg-third text-primary ">
+                <p class="flex flex-row ml-4   tracking-widest font-black text-lg -mb-1"> Prepare for shipping</p>
+                <div class="flex flex-row w-full h-1 bg-primary rounded-lg">
+
+                </div>
+            </div>
+
+
+
+
+
+
+            <div class=" bg-third  px-20  w-[100%-160px] grid grid-cols-3 gap-3 justify-between">
+                <div class=" w-full flex flex-col">
+                    <div class="">
+                        <div
+                            class="w-3/4 border-b-2 border-primary justify-between mx-auto flex flex-row px-2 text-gray-700 mt-6">
+
+                            <p class="font-bold w-1/4 text-center"> New Jersey </p>
+                            <p class="text-center w-1/2"> Branches </p>
+                            <p class=" font-bold  w-1/4 text-center"> Texas </p>
+                        </div>
+                        <div
+                            class="w-3/4 border-b-2 border-primary justify-between mx-auto flex flex-row px-2 text-gray-700 mt-6">
+                            <p class="bg-green-700 text-white font-bold text-center  w-1/4"> 22hrs ago </p>
+
+                            <p class=" w-1/2 text-center"> Pending last check</p>
+                            <p class="bg-red-700 text-white text-center font-bold w-1/4"> 36hrs ago </p>
+                        </div>
+                        <div
+                            class="w-3/4 border-b-2 border-primary justify-between mx-auto flex flex-row px-2 text-gray-700 mt-6">
+
+                            <p class=" font-bold  w-1/4 text-center"> 4125 </p>
+                            <p class=" w-1/2 text-center"> Properties to check </p>
+                            <p class=" font-bold text-center  w-1/4"> 6502 </p>
+                        </div>
+                        <div
+                            class="w-3/4 border-b-2 border-primary justify-between mx-auto flex flex-row px-2 text-gray-700 mt-6">
+
+                            <p class=" font-bold w-1/4 text-center"> $4.57 </p>
+                            <p class=" w-1/2 text-center"> Cost to Run Script </p>
+                            <p class=" font-bold text-center w-1/4"> $7.21 </p>
+                        </div>
+                        <div class="w-3/4  justify-between items-end mx-auto flex flex-row text-gray-700 mt-6">
+                            <p
+                                class="hover:cursor-pointer hover:bg-opacity-80 bg-red-primary px-4 bg-primary py-2 rounded-lg text-white font-bold">
+                                Run Script
+                            </p>
+                            <p
+                                class="hover:cursor-pointer hover:bg-opacity-80 bg-red-primary px-4 bg-primary py-2 rounded-lg text-white font-bold">
+                                Run Script
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full flex flex-col">
+
+
+                    <div class="rounded-lg rounded-t-none border-b-2 border-l-2
+                        border-r-2 border-t-none border-primary bg-white  flex flex-col p-4 ">
+                        <div class="w-full flex flex-row items-center">
+                            <p class="text-primary font-bold tracking-widest text-center w-full pb-4"> Ready to ship</p>
+                            <div class="w-full flex flex-col justify-center items-center mb-4">
+                                <div
+                                    class="pl-4 pr-2 py-2 border-2 border-primary rounded-lg flex flex-row hover:bg-third hover:cursor-pointer">
+                                    <p class="pr-2"> 7/25/24 - 7/28/24 </p>
+                                    <svg class="w-6  h-6  hover:bg-white hover:cursor-pointer" viewBox="0 0 32 32"
+                                        version="1.1" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" fill="#000000"
+                                        transform="rotate(270)">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
+                                        </g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <title>arrow-left-square</title>
+                                            <desc>Created with Sketch Beta.</desc>
+                                            <defs> </defs>
+                                            <g id="Page-1" stroke="none" stroke-width="1" fill="none"
+                                                fill-rule="evenodd" sketch:type="MSPage">
+                                                <g id="Icon-Set" sketch:type="MSLayerGroup"
+                                                    transform="translate(-412.000000, -983.000000)" fill="#FFAD03">
+                                                    <path
+                                                        d="M434,998 L423.414,998 L427.535,993.879 C427.926,993.488 427.926,992.855 427.535,992.465 C427.145,992.074 426.512,992.074 426.121,992.465 L420.465,998.121 C420.225,998.361 420.15,998.689 420.205,999 C420.15,999.311 420.225,999.639 420.465,999.879 L426.121,1005.54 C426.512,1005.93 427.145,1005.93 427.535,1005.54 C427.926,1005.15 427.926,1004.51 427.535,1004.12 L423.414,1000 L434,1000 C434.553,1000 435,999.553 435,999 C435,998.448 434.553,998 434,998 L434,998 Z M442,1011 C442,1012.1 441.104,1013 440,1013 L416,1013 C414.896,1013 414,1012.1 414,1011 L414,987 C414,985.896 414.896,985 416,985 L440,985 C441.104,985 442,985.896 442,987 L442,1011 L442,1011 Z M440,983 L416,983 C413.791,983 412,984.791 412,987 L412,1011 C412,1013.21 413.791,1015 416,1015 L440,1015 C442.209,1015 444,1013.21 444,1011 L444,987 C444,984.791 442.209,983 440,983 L440,983 Z"
+                                                        id="arrow-left-square" sketch:type="MSShapeGroup"> </path>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="min-w-full text-center ">
+                            <thead class="  ">
+                                <tr class="text-left px-2 text-sm">
+                                    <th class="py-2 px-2 border-b-2 text-center  border-primary w-1/5"> Branches </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"> <a
+                                            href="#" class="hover:bg-gray-700 hover:text-white"> Coming
+                                            Soon </a> </th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"> <a
+                                            href="#" class="hover:bg-gray-700 hover:text-white"> For
+                                            Sales </a></th>
+
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"><a
+                                            href="#" class="hover:bg-gray-700 hover:text-white">Pending </a>
+                                    </th>
+                                    <th class="py-2 px-2 border-b-2 border-l-2 text-center border-primary w-1/5"><a
+                                            href="#" class="hover:bg-gray-700 hover:text-white">Total </a>
+                                    </th>
+
+                            </thead>
+                            <tbody>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2  border-primary  "><a href="#"
+                                            class="hover:bg-gray-700 hover:text-white"> New Jersey</a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">357 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">664 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">23 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">1067 </a>
+                                    </td>
+                                </tr>
+
+                                <tr>
+
+                                    <td class="py-2 px-2 border-b-2   border-primary  "><a href="#"
+                                            class="hover:bg-gray-700 hover:text-white">Texas</a></td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "><a href="#"
+                                            class="hover:bg-primary hover:text-white"> 125 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">287 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">191 </a>
+                                    </td>
+                                    <td class="py-2 px-2 border-b-2 border-l-2 border-primary  "> <a href="#"
+                                            class="hover:bg-primary hover:text-white">603 </a>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td class="py-2 px-2   font-bold border-primary  ">
+                                        <a href="#" class="hover:bg-gray-700 hover:text-white"> Total </a>
+                                    </td>
+                                    <td class="py-2 px-2    border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">482 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">951 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <a href="#" class="hover:bg-primary hover:text-white">214 </a>
+                                    </td>
+                                    <td class="py-2 px-2  border-l-2 border-primary   ">
+                                        <span class=" font-black   tracking-wider "><a href="#"
+                                                class="hover:bg-primary hover:text-white">1647
+                                            </a></span>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class=" w-full flex flex-col justify-start items-start p-8">
+
+                    <div class=" flex flex-row items-center justify-start h-full hover:cursor-pointer">
+                        <div class="w-5 h-5 ">
+
+                            <input type="checkbox" class="hover:cursor-pointer w-5 h-5 flex flex-row">
+                        </div>
+                        <p class=" text-gray-700 font-normal text-base text-justify ml-5">
+                            I understand that by selecting this option, the system will mark the selected properties as
+                            'Processed' and 'Shipped via USPS,' and a shipping record will be created in our database
+                            with
+                            today's date. If the shipment is not sent via USPS, I can cancel it but will not be able to
+                            edit
+                            the shipment in the database. Proceed with Exporting.
+                        </p>
+                    </div>
+                    <div class="w-full">
+                        <button
+                            class="bg-primary rounded-lg w-full py-4 text-center font-bold text-white border hover:opacity-80">
+                            Export
+                            .CSV</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class=" px-20 pt-10 flex flex-col bg-third text-primary ">
+                <p class="flex flex-row ml-4   tracking-widest font-black text-lg -mb-1">Shipping Records</p>
+                <div class="flex flex-row w-full h-1 bg-primary rounded-lg">
+
+                </div>
+            </div>
+            <div class=" bg-third  px-20 pb-60 w-[100%-160px] grid grid-cols-3 gap-3 justify-between">
+                <div class=" w-full flex flex-col">
+                </div>
+                <div class="w-full flex flex-col">
+                </div>
+
+                <div class=" w-full flex flex-col justify-start items-start p-8">
+                </div>
+            </div>
+
+        </body>
+
+        </html>
+        <!----------------- END OF CONTENT -------------------->
+</body>
+
+</html>

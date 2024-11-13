@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Project</title>
+    <link href="output.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-third">
+
+    <%- include('partials/menu') %>
+        <div class="grid grid-cols-4 p-8 gap-4">
+            <div class="w-full flex flex-col justify-center text-center">
+                <p class=" font-medium bg-white rounded-lg border"> UpdateOne Query</p>
+                <form action="/fixing-updateOne" method="post" target="_blank" class="flex flex-col w-full">
+                    <textarea placeholder="Filtering Query" name="filteringQuery" class="h-36"></textarea>
+
+                    <textarea placeholder="Update Query" name="updateQuery" class="h-36"></textarea>
+                    <input type="text" name="objectid1" placeholder="Object Id 1 (if required)">
+                    <button type="submit"> Submit</button>
+                </form>
+            </div>
+
+            <div class="w-full flex flex-col justify-center text-center">
+                <p class=" font-medium bg-white rounded-lg border"> Fetch By Snapshot ID</p>
+                <form action="/fetchbysnapshotid" method="post" target="_blank" class="flex flex-col w-full">
+                    <textarea placeholder="Filtering Query" name="filteringQuery" class="h-36"></textarea>
+
+                    <textarea placeholder="Update Query" name="updateQuery" class="h-36"></textarea>
+                    <input type="text" name="objectid1" placeholder="Object Id 1 (if required)">
+                    <button type="submit"> Submit</button>
+                </form>
+            </div>
+            <div class="w-full flex flex-col justify-center text-center">
+                <p class=" font-medium bg-white rounded-lg border"> Delete field value per selected parameter</p>
+            </div>
+            <div class="w-full flex flex-col justify-center text-center">
+                <p class=" font-medium bg-white rounded-lg border"> Delete field value per selected parameter</p>
+            </div>
+        </div>
+</body>

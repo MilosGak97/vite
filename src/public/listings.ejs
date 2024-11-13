@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listings</title>
+    <link href="output.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body class="bg-third">
+    <!----------------- START OF MENU --------------------->
+
+    <%- include('partials/menu') %>
+
+
+        <!----------------- LISTINGS TABLE ------------------->
+        <div class="flex  flex-col p-4 bg-third">
+            <div class="bg-third  w-full">
+                <table class="min-w-full  ">
+                    <thead class="bg-primary">
+                        <tr class="text-left px-2 text-sm">
+                            <th class="py-2 px-2 border border-white w-2"> </th>
+                            <th class="py-2 px-2 border border-white w-2">Zpid </th>
+                            <th class="py-2 px-2 border border-white">Address</th>
+                            <th class="py-2 px-2 border border-white">Owner</th>
+                            <th class="py-2 px-2 border border-white">Status</th>
+                            <th class="py-2 px-2 border border-white">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% properties.map((property, index)=> { %>
+                            <tr class="<%= index % 2 === 0 ? 'bg-gray-100' : 'bg-white' %>">
+                                <td class="py-2 px-2 border border-white w-2 text-xs font-bold">
+                                    <%= index + 1 %>
+                                </td>
+                                <td class="py-2 px-2 border border-white w-2">
+                                    <%= property.zpid %>
+                                </td>
+                                <td class="py-2 px-2 border border-white">
+                                    <%= property.address %>, <%= property.city %>, <%= property.state %>, <%=
+                                                    property.zipcode %>
+                                </td>
+                                <td class="py-2 px-2 border border-white">
+                                    <% if (property.owners && property.owners.length> 0) { %>
+                                        <% const owner=property.owners[0]; const ownerName=owner.ownerName &&
+                                            owner.ownerName !=="Undefined" ? owner.ownerName : "" ; const
+                                            firstName=owner.firstName !=="Undefined" ? owner.firstName : "" ; const
+                                            middleName=owner.middleName && owner.middleName !=="Undefined" ?
+                                            owner.middleName : "" ; const lastName=owner.lastName !=="Undefined" ?
+                                            owner.lastName : "" ; %>
+                                            <% if (ownerName) { %>
+                                                <%= ownerName %> <!-- Display ownerName if available -->
+                                                    <% } else if (firstName || middleName || lastName) { %>
+                                                        <%= firstName %>
+                                                            <%= middleName %>
+                                                                <%= lastName %>
+                                                                    <% } else { %>
+                                                                        No Data
+                                                                        <% } %>
+                                                                            <% } else { %>
+                                                                                No Data
+                                                                                <% } %>
+                                </td>
+
+
+
+                                <td class="py-2 px-2 flex flex-row items-center">
+                                    <div class="text-white font-bold w-2  h-4
+                                            <%= property.current_status === 'ForSale' ? 'bg-orange-600' : '' %>
+                                            <%= property.current_status === 'Pending' ? 'bg-primary' : '' %>
+                                            <%= property.current_status === 'ComingSoon' ? 'bg-blue-600' : '' %>">
+                                    </div>
+                                    <%= property.current_status==='ForSale' ? 'For Sale' :
+                                        property.current_status==='Pending' ? 'Pending' :
+                                        property.current_status==='ComingSoon' ? 'Coming Soon' : property.current_status
+                                        %>
+
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+
+
+                </table>
+            </div>
+        </div>
+        <!-- Add this to your existing HTML content -->
+        <div class="flex justify-end p-4">
+            <a href="/export-csv"
+                class="px-4 py-2 border border-primary font-semibold text-lg hover:cursor-pointer hover:bg-black hover:text-white rounded-md bg-green-500 text-white">
+                Export to CSV
+            </a>
+        </div>
+
+        <!----------------- END OF LISTINGS TABLE ------------------->
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Default check all checkboxes
+                document.getElementById('forsale').checked = true;
+                document.getElementById('comingsoon').checked = true;
+                document.getElementById('pending').checked = true;
+
+                // Form validation
+                const form = document.querySelector('form[action="/listings"]');
+                form.addEventListener('submit', function (event) {
+                    const dateStart = document.querySelector('input[name="date_start"]').value;
+                    const dateEnd = document.querySelector('input[name="date_end"]').value;
+                    const forSaleChecked = document.getElementById('forsale').checked;
+                    const comingSoonChecked = document.getElementById('comingsoon').checked;
+                    const pendingChecked = document.getElementById('pending').checked;
+
+                    // Check if start and end dates are filled
+                    if (!dateStart || !dateEnd) {
+                        alert('Please fill in both the starting and ending dates.');
+                        event.preventDefault();
+                        return;
+                    }
+
+                    // Check if at least one checkbox is checked
+                    if (!forSaleChecked && !comingSoonChecked && !pendingChecked) {
+                        alert('Please check at least one status.');
+                        event.preventDefault();
+                    }
+                });
+            });
+        </script>
+
+</body>
+
+</html>
