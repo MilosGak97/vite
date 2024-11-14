@@ -742,37 +742,47 @@ app.get('/filtering', async (req, res) => {
     }
 });
 
-
-
 app.get('/filtering2', async (req, res) => {
     try {
         const database = await connectDB();
-        const Property = database.collection('djallal_listings');
+        const Property = database.collection('properties');
+
+        // Define the date range (if needed for your query)
+        const startOfToday = moment().startOf('day').toDate();
+        const endOfToday = moment().endOf('day').toDate();
 
         const query = {
-            verified: null
-        }
-        const totalCount = await Property.countDocuments(query)
+            verified: null,
+        };
+        const totalCount = await Property.countDocuments(query);
 
-        const property = await Property.findOne(query);
+        // Find the latest property based on 'current_status_date'
+        const propertyCursor = await Property.find(query)
+            .sort({ current_status_date: -1 }) // Sort by 'current_status_date' in descending order
+            .limit(1); // Limit to one document
+
+        const property = await propertyCursor.next(); // Fetch the first document
 
         if (property) {
-            // Convert photo strings to arrays if needed
-            if (typeof property.photos === 'string') {
+            // Safely parse the 'photo' field if it's a string
+            if (typeof property.photo === 'string') {
                 try {
-                    property.photos = JSON.parse(property.photo);
+                    property.photo = JSON.parse(property.photo);
                 } catch (e) {
                     console.error('Error parsing photos JSON:', e);
-                    property.photos = [];
+                    property.photo = [];
                 }
             }
 
+            // Ensure 'photo' is an array before slicing
+            const photosArray = Array.isArray(property.photo) ? property.photo : [];
+
             // Extract the first 15 photos and the rest
-            const propertyFirst15 = property.photos.slice(0, 15);
-            const propertyOtherPhoto = property.photos.slice(15);
+            const propertyFirst15 = photosArray.slice(0, 15);
+            const propertyOtherPhoto = photosArray.slice(15);
 
             // Extract the zpid
-            const PropertyZpid = property.zpid;
+            const PropertyZpid = property.zpid || null;
 
             // Render the EJS template with property data
             res.render('filtering2', { propertyFirst15, propertyOtherPhoto, PropertyZpid, totalCount });
@@ -811,73 +821,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
             )
-            /*
-                        const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
-                        console.log(fullAddress);
-            
-                        // Encode the full address for the URL
-                        const encodedAddress = encodeURIComponent(fullAddress);
-            
-            
-                        // Initialize owners array
-                        let formattedOwners = [];
-                        let companyOwned = false; // Initialize the flag
-            
-                        try {
-                            // Send the request to the Precisely API
-                            const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
-                                headers: {
-                                    'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
-                                    'Content-Type': 'application/json; charset=utf-8'
-                                }
-                            });
-            
-                            console.log("API RESULT: ", response.data);
-            
-                            // Extract owner details
-                            const owners = response.data.propertyAttributes.owners;
-            
-            
-                            // Function to check if a string contains any of the keywords
-                            const containsKeywords = (str) => {
-                                const keywords = ["LLC", "BANK", "TRUST"];
-                                return keywords.some(keyword => str.toUpperCase().includes(keyword));
-                            };
-            
-                            // Format owner details and check for keywords
-                            formattedOwners = owners.map(owner => {
-                                const firstName = owner.firstName || 'Undefined';
-                                const middleName = owner.middleName || 'Undefined';
-                                const lastName = owner.lastName || 'Undefined';
-                                const ownerName = owner.ownerName || 'Undefined';
-            
-                                // Check if any of the fields contain the keywords
-                                if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
-                                    companyOwned = true;
-                                }
-            
-                                return {
-                                    firstName,
-                                    middleName,
-                                    lastName,
-                                    ownerName
-                                };
-                            });
-            
-            
-                        } catch (apiError) {
-                            console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
-            
-                            // Set default values if API request fails
-                            formattedOwners = [{
-                                firstName: 'Undefined',
-                                lastName: 'Undefined'
-                            }];
-                        }
-            
-            
-                        console.log("Formatted Owners: ", formattedOwners);
-            */
+          
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
                 { $set: { verified: verified, initial_scrape: true } }
@@ -919,32 +863,45 @@ app.post('/update-verified2/:zpid', async (req, res) => {
             console.error('Error: Verified field is undefined');
             return res.status(400).send('Invalid form submission');
         }
+        console.log("Verified: ", verified);
 
 
         const database = await connectDB();
-        const Property = database.collection('djallal_listings');
+        const Property = database.collection('properties');
+        if (verified === "Full" || verified === "NoPhotos") {
 
 
-        let companyOwned = false; // Initialize the flag
+            const getAddress = await Property.findOne(
+                { zpid: Number(zpid) }
+            )
+           
+            const updateResult = await Property.updateOne(
+                { zpid: Number(zpid) }, // Ensure zpid is a number
+                { $set: { verified: verified, initial_scrape: true } }
+                //{ $set: { owners: formattedOwners, verified: verified, companyOwned: companyOwned } }
+            );
 
-        const result = await Property.findOne({ zpid: zpid })
-        //console.log(result)
-        console.log("RES: " + result.zpid)
+            if (updateResult.modifiedCount === 0) {
+                console.error('Error updating property: No documents matched the query');
+                return res.status(404).send('Property not found');
+            }
 
-        const updateResult = await Property.updateOne(
-            { zpid: zpid }, // Ensure zpid is a number
-            { $set: { verified: verified, companyOwned: companyOwned } }
-        );
-        console.log("Updated Result: " + updateResult.zpid)
-
-
+        } else {
+            const updateResult = await Property.updateOne(
+                { zpid: Number(zpid) }, // Ensure zpid is a number
+                { $set: { verified: verified, initial_scrape: true } }
+            );
+            if (updateResult.modifiedCount === 0) {
+                console.error('Error updating property: No documents matched the query');
+                return res.status(404).send('Property not found');
+            }
+        }
         res.redirect('/filtering2');
     } catch (error) {
         console.error('Error updating property:', error);
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 app.get('/fix/:zpid', async (req, res) => {
     const { zpid } = req.params;
