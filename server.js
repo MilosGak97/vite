@@ -124,12 +124,12 @@ app.get('/export-csv', async (req, res) => {
             ],
 
 
-            /*
+            
              current_status_date: {
                               $gte: startOfLastFriday,
                               $lt: endOfToday
                           }
-              */
+            
         };
 
         /*
@@ -706,10 +706,7 @@ app.get('/filtering', async (req, res) => {
 
         const query = {
             verified: null,
-            current_status_date: {
-                $gte: startOfToday,
-                $lt: endOfToday,
-            },
+            
         } 
         const totalCount = await Property.countDocuments(query)
 
@@ -1406,6 +1403,18 @@ app.get('/listings', async (req, res) => {
 
         // Define the query to fetch listings created today
         let query = {
+            current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
+            verified: { $in: ["Full", "NoPhotos"] },
+            companyOwned: { $in: [null, false] },
+            $or: [
+                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                { current_status: "ForSale", for_sale_reachout: null },
+                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                { current_status: "ComingSoon", coming_soon_reachout: null },
+                { current_status: "Pending", pending_reachout: { $exists: false } },
+                { current_status: "Pending", pending_reachout: null }
+            ],
+         
             current_status_date: {
                 $gte: startOfToday,
                 $lt: endOfToday,
