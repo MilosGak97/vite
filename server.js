@@ -12,7 +12,7 @@ const moment = require('moment'); // To handle date operations
 const tokenManager = require('./tokenManager');
 const cron = require('node-cron');
 const { checkIfZpidExists } = require('./src/function/checkIfZpidExists');
-const { fetchData } = require('./src/function/fetchData'); 
+const { fetchData } = require('./src/function/fetchData');
 const { spawn } = require('child_process');
 const { ObjectId } = require('mongodb');
 
@@ -123,7 +123,7 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null }
             ],
 
- 
+
             /*
              current_status_date: {
                               $gte: startOfLastFriday,
@@ -455,8 +455,8 @@ app.get('/export-csv-skiptracing-ca', async (req, res) => {
         const endOfDay = moment().endOf('day').toDate();
 
         let filteringQuery = {
-          pending_status: true,
-          verified: { $in: ["Full", "NoPhotos"] },
+            pending_status: true,
+            verified: { $in: ["Full", "NoPhotos"] },
         };
 
         const properties = await propertiesCollection.find(filteringQuery).toArray();
@@ -466,7 +466,7 @@ app.get('/export-csv-skiptracing-ca', async (req, res) => {
 
         // Map properties to include only the specified fields and generate the required CSV format
         const filteredProperties = properties.map(property => {
-            return { 
+            return {
                 streetAddress: property.streetAddress,
                 city: property.city,
                 state: property.state,
@@ -700,10 +700,17 @@ app.get('/filtering', async (req, res) => {
         const database = await connectDB();
         const Property = database.collection('properties');
 
+        
+        const startOfToday = moment().startOf('day').toDate(); // Midnight of today
+        const endOfToday = moment().endOf('day').toDate(); // End of today
+
         const query = {
             verified: null,
-            initial_scrape: { $exists: false }
-        }
+            current_status_date: {
+                $gte: startOfToday,
+                $lt: endOfToday,
+            },
+        } 
         const totalCount = await Property.countDocuments(query)
 
         const property = await Property.findOne(query);
@@ -807,73 +814,73 @@ app.post('/update-verified/:zpid', async (req, res) => {
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
             )
-/*
-            const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
-            console.log(fullAddress);
-
-            // Encode the full address for the URL
-            const encodedAddress = encodeURIComponent(fullAddress);
-
-
-            // Initialize owners array
-            let formattedOwners = [];
-            let companyOwned = false; // Initialize the flag
-
-            try {
-                // Send the request to the Precisely API
-                const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
-                    headers: {
-                        'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
-                        'Content-Type': 'application/json; charset=utf-8'
-                    }
-                });
-
-                console.log("API RESULT: ", response.data);
-
-                // Extract owner details
-                const owners = response.data.propertyAttributes.owners;
-
-
-                // Function to check if a string contains any of the keywords
-                const containsKeywords = (str) => {
-                    const keywords = ["LLC", "BANK", "TRUST"];
-                    return keywords.some(keyword => str.toUpperCase().includes(keyword));
-                };
-
-                // Format owner details and check for keywords
-                formattedOwners = owners.map(owner => {
-                    const firstName = owner.firstName || 'Undefined';
-                    const middleName = owner.middleName || 'Undefined';
-                    const lastName = owner.lastName || 'Undefined';
-                    const ownerName = owner.ownerName || 'Undefined';
-
-                    // Check if any of the fields contain the keywords
-                    if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
-                        companyOwned = true;
-                    }
-
-                    return {
-                        firstName,
-                        middleName,
-                        lastName,
-                        ownerName
-                    };
-                });
-
-
-            } catch (apiError) {
-                console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
-
-                // Set default values if API request fails
-                formattedOwners = [{
-                    firstName: 'Undefined',
-                    lastName: 'Undefined'
-                }];
-            }
-
-
-            console.log("Formatted Owners: ", formattedOwners);
-*/
+            /*
+                        const fullAddress = `${getAddress.address} ${getAddress.city}, ${getAddress.state} ${getAddress.zipcode}`;
+                        console.log(fullAddress);
+            
+                        // Encode the full address for the URL
+                        const encodedAddress = encodeURIComponent(fullAddress);
+            
+            
+                        // Initialize owners array
+                        let formattedOwners = [];
+                        let companyOwned = false; // Initialize the flag
+            
+                        try {
+                            // Send the request to the Precisely API
+                            const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                                headers: {
+                                    'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
+                                    'Content-Type': 'application/json; charset=utf-8'
+                                }
+                            });
+            
+                            console.log("API RESULT: ", response.data);
+            
+                            // Extract owner details
+                            const owners = response.data.propertyAttributes.owners;
+            
+            
+                            // Function to check if a string contains any of the keywords
+                            const containsKeywords = (str) => {
+                                const keywords = ["LLC", "BANK", "TRUST"];
+                                return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                            };
+            
+                            // Format owner details and check for keywords
+                            formattedOwners = owners.map(owner => {
+                                const firstName = owner.firstName || 'Undefined';
+                                const middleName = owner.middleName || 'Undefined';
+                                const lastName = owner.lastName || 'Undefined';
+                                const ownerName = owner.ownerName || 'Undefined';
+            
+                                // Check if any of the fields contain the keywords
+                                if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                                    companyOwned = true;
+                                }
+            
+                                return {
+                                    firstName,
+                                    middleName,
+                                    lastName,
+                                    ownerName
+                                };
+                            });
+            
+            
+                        } catch (apiError) {
+                            console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+            
+                            // Set default values if API request fails
+                            formattedOwners = [{
+                                firstName: 'Undefined',
+                                lastName: 'Undefined'
+                            }];
+                        }
+            
+            
+                        console.log("Formatted Owners: ", formattedOwners);
+            */
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
                 { $set: { verified: verified, initial_scrape: true } }
@@ -888,7 +895,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
         } else {
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
-                { $set: { verified: verified, initial_scrape: true} }
+                { $set: { verified: verified, initial_scrape: true } }
             );
             if (updateResult.modifiedCount === 0) {
                 console.error('Error updating property: No documents matched the query');
@@ -972,53 +979,31 @@ app.get('/fixing', async (req, res) => {
     res.render("fixing.ejs");
 })
 
-app.post('/fixing-updateOne', async (req, res) => {
+app.get('/fixing-delete', async (req, res) => {
     let client;
     try {
-        // Convert snapshot_id to ObjectId
-        const objectId = new ObjectId('66ad0330404ca0cf27a3597b');
-
-        const filteringQuery = {
-            $or: [
-                { pending_reachout: objectId },
-                { coming_soon_reachout: objectId },
-                { for_sale_reachout: objectId }
-            ]
-        };
-
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
 
-        const properties = await propertiesCollection.find(filteringQuery).toArray();
+        // Get the start and end of the current day using moment
+        const startOfToday = moment().startOf('day').toDate(); // Midnight of today
+        const endOfToday = moment().endOf('day').toDate(); // End of today
 
-        for (const property of properties) {
-            let updateQuery = {};
-            if (property.pending_reachout && ObjectId.isValid(property.pending_reachout) && new ObjectId(property.pending_reachout).equals(objectId)) {
-                updateQuery = { $unset: { pending_reachout: "" } };
-            } else if (property.coming_soon_reachout && ObjectId.isValid(property.coming_soon_reachout) && new ObjectId(property.coming_soon_reachout).equals(objectId)) {
-                updateQuery = { $unset: { coming_soon_reachout: "" } };
-            } else if (property.for_sale_reachout && ObjectId.isValid(property.for_sale_reachout) && new ObjectId(property.for_sale_reachout).equals(objectId)) {
-                updateQuery = { $unset: { for_sale_reachout: "" } };
+        // Define the query to fetch listings created today
+        const filteringQuery = {
+            current_status_date: {
+                $gte: startOfToday,
+                $lt: endOfToday
             }
+        };
 
-            if (Object.keys(updateQuery).length > 0) {
-                try {
-                    await propertiesCollection.updateOne(
-                        { _id: property._id },
-                        updateQuery
-                    );
-                    console.log(`Updated property ${property._id}`);
-                } catch (updateError) {
-                    console.error(`Error updating property ${property._id}:`, updateError);
-                }
-            }
-        }
+        // Delete all properties that match the query
+        const deleteResult = await propertiesCollection.deleteMany(filteringQuery);
 
-        res.send('Properties updated successfully');
+        console.log(`Deleted ${deleteResult.deletedCount} properties created today`);
     } catch (error) {
-        console.error('Error updating properties:', error);
-        res.status(500).send('Internal Server Error');
+        console.error('Error deleting properties:', error);
     } finally {
         if (client) {
             client.close();
@@ -1028,10 +1013,10 @@ app.post('/fixing-updateOne', async (req, res) => {
 
 app.post('/fetchbysnapshotid', async (req, res) => {
     const { snapshot_id } = req.body;
- 
+
     console.log('Received snapshot_id:', snapshot_id);
- 
-    async function fetchData(snapshot_id ) {
+
+    async function fetchData(snapshot_id) {
         const accessToken = 'a3a53d23-02a3-4b70-93b6-09cd3eda8f39';
         const url = `https://api.brightdata.com/datasets/v3/snapshot/${snapshot_id}?format=json`;
 
@@ -1075,167 +1060,167 @@ app.post('/fetchbysnapshotid', async (req, res) => {
                         // Handle the case where the property already exists
                         continue;
                     } else {
-                            // Handle the case where the property does not exist
-                            const extractPhotoUrls = (photos) => {
-                                if (!photos || !Array.isArray(photos)) {
-                                    return [];
-                                }
-
-                                return photos.flatMap(photo =>
-                                    photo.mixedSources.jpeg
-                                        .filter(jpeg => jpeg.width === 576)
-                                        .map(jpeg => jpeg.url)
-                                );
-                            };
-
-                            const photoUrls = extractPhotoUrls(photos);
-                            const photoCount = listing.photoCount;
-                            const hdpTypeDimension = listing.hdpTypeDimension;
-                            let for_sale;
-                            let for_sale_date;
-                            let for_sale_reachout;
-                            let coming_soon;
-                            let coming_soon_date;
-                            let coming_soon_reachout;
-                            let pending;
-                            let pending_date;
-                            let pending_reachout;
-                            let verified;
-                            let companyOwned;
-                            let current_status;
-                            let current_status_date;
-                            let formattedOwners = [];
-                            let notes;
-
-                            if (hdpTypeDimension === "ForSale") {
-                                for_sale = "Yes";
-                                for_sale_date = new Date();
-                                current_status_date = for_sale_date;
+                        // Handle the case where the property does not exist
+                        const extractPhotoUrls = (photos) => {
+                            if (!photos || !Array.isArray(photos)) {
+                                return [];
                             }
 
-                            if (hdpTypeDimension === "Pending") {
-                                pending = "Yes";
-                                pending_date = new Date();
-                                current_status_date = pending_date;
-                            }
-                            if (hdpTypeDimension === "ComingSoon") {
-                                coming_soon = "Yes";
-                                coming_soon_date = new Date();
-                                current_status_date = coming_soon_date;
-                            }
-                            current_status = hdpTypeDimension;
+                            return photos.flatMap(photo =>
+                                photo.mixedSources.jpeg
+                                    .filter(jpeg => jpeg.width === 576)
+                                    .map(jpeg => jpeg.url)
+                            );
+                        };
+
+                        const photoUrls = extractPhotoUrls(photos);
+                        const photoCount = listing.photoCount;
+                        const hdpTypeDimension = listing.hdpTypeDimension;
+                        let for_sale;
+                        let for_sale_date;
+                        let for_sale_reachout;
+                        let coming_soon;
+                        let coming_soon_date;
+                        let coming_soon_reachout;
+                        let pending;
+                        let pending_date;
+                        let pending_reachout;
+                        let verified;
+                        let companyOwned;
+                        let current_status;
+                        let current_status_date;
+                        let formattedOwners = [];
+                        let notes;
+
+                        if (hdpTypeDimension === "ForSale") {
+                            for_sale = "Yes";
+                            for_sale_date = new Date();
+                            current_status_date = for_sale_date;
+                        }
+
+                        if (hdpTypeDimension === "Pending") {
+                            pending = "Yes";
+                            pending_date = new Date();
+                            current_status_date = pending_date;
+                        }
+                        if (hdpTypeDimension === "ComingSoon") {
+                            coming_soon = "Yes";
+                            coming_soon_date = new Date();
+                            current_status_date = coming_soon_date;
+                        }
+                        current_status = hdpTypeDimension;
 
 
-                            if (photoCount < 5) {
-                                verified = "NoPhotos";
+                        if (photoCount < 5) {
+                            verified = "NoPhotos";
 
-                                const fullAddress = `${listing.address.streetAddress} ${listing.city}, ${listing.state} ${listing.zipcode}`;
-                                console.log(fullAddress);
+                            const fullAddress = `${listing.address.streetAddress} ${listing.city}, ${listing.state} ${listing.zipcode}`;
+                            console.log(fullAddress);
 
-                                // Encode the full address for the URL
-                                const encodedAddress = encodeURIComponent(fullAddress);
+                            // Encode the full address for the URL
+                            const encodedAddress = encodeURIComponent(fullAddress);
 
 
-                                try {
-                                    // Send the request to the Precisely API
-                                    const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
-                                        headers: {
-                                            'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
-                                            'Content-Type': 'application/json; charset=utf-8'
-                                        }
-                                    });
+                            try {
+                                // Send the request to the Precisely API
+                                const response = await axios.get(`https://api.precisely.com/property/v2/attributes/byaddress?address=${encodedAddress}&attributes=owners`, {
+                                    headers: {
+                                        'Authorization': `Bearer ${tokenManager.accessTokenPrecisely}`, // Replace with your actual Bearer token
+                                        'Content-Type': 'application/json; charset=utf-8'
+                                    }
+                                });
 
-                                    console.log("API RESULT: ", response.data);
-                                    // Extract owner details
-                                    const owners = response.data.propertyAttributes.owners;
+                                console.log("API RESULT: ", response.data);
+                                // Extract owner details
+                                const owners = response.data.propertyAttributes.owners;
 
-                                    // Function to check if a string contains any of the keywords
-                                    const containsKeywords = (str) => {
-                                        const keywords = ["LLC", "BANK", "TRUST"];
-                                        return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                                // Function to check if a string contains any of the keywords
+                                const containsKeywords = (str) => {
+                                    const keywords = ["LLC", "BANK", "TRUST"];
+                                    return keywords.some(keyword => str.toUpperCase().includes(keyword));
+                                };
+
+                                // Format owner details and check for keywords
+                                formattedOwners = owners.map(owner => {
+                                    const firstName = owner.firstName || 'Undefined';
+                                    const middleName = owner.middleName || 'Undefined';
+                                    const lastName = owner.lastName || 'Undefined';
+                                    const ownerName = owner.ownerName || 'Undefined';
+
+                                    // Check if any of the fields contain the keywords
+                                    if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
+                                        companyOwned = true;
+                                    }
+
+                                    return {
+                                        firstName,
+                                        middleName,
+                                        lastName,
+                                        ownerName
                                     };
-
-                                    // Format owner details and check for keywords
-                                    formattedOwners = owners.map(owner => {
-                                        const firstName = owner.firstName || 'Undefined';
-                                        const middleName = owner.middleName || 'Undefined';
-                                        const lastName = owner.lastName || 'Undefined';
-                                        const ownerName = owner.ownerName || 'Undefined';
-
-                                        // Check if any of the fields contain the keywords
-                                        if (containsKeywords(firstName) || containsKeywords(middleName) || containsKeywords(lastName) || containsKeywords(ownerName)) {
-                                            companyOwned = true;
-                                        }
-
-                                        return {
-                                            firstName,
-                                            middleName,
-                                            lastName,
-                                            ownerName
-                                        };
-                                    });
+                                });
 
 
-                                } catch (apiError) {
-                                    console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
+                            } catch (apiError) {
+                                console.error('Error fetching property data from API:', apiError.response ? apiError.response.data : apiError.message);
 
-                                    // Set default values if API request fails
-                                    formattedOwners = [{
-                                        firstName: 'Undefined',
-                                        lastName: 'Undefined'
-                                    }];
-                                }
+                                // Set default values if API request fails
+                                formattedOwners = [{
+                                    firstName: 'Undefined',
+                                    lastName: 'Undefined'
+                                }];
                             }
+                        }
 
-                            const propertyData = {
-                                url: listing.url,
-                                zpid: listing.zpid,
-                                address: listing.address.streetAddress,
-                                city: listing.city,
-                                state: listing.state,
-                                zipcode: listing.zipcode,
-                                bedrooms: listing.bedrooms,
-                                bathrooms: listing.bathrooms,
-                                sqft: listing.livingArea,
-                                price: listing.price,
-                                longitude: listing.longitude,
-                                latitude: listing.latitude,
-                                hasBadGeocode: listing.hasBadGeocode,
-                                homeType: listing.homeType,
-                                isNonOwnerOccupied: listing.isNonOwnerOccupied,
-                                parcelId: listing.parcelId,
-                                daysOnZillow: listing.daysOnZillow,
-                                propertyTypeDimension: listing.propertyTypeDimension,
-                                hdpTypeDimension: listing.hdpTypeDimension,
-                                listingTypeDimension: listing.listingTypeDimension,
-                                status: listing.contingent_listing_type,
-                                is_listed_by_management_company: listing.is_listed_by_management_company,
-                                listing_provided_by_name: listing.listing_provided_by.name,
-                                listing_provided_by_phone_number: listing.listing_provided_by.phone_number,
-                                listing_provided_by_email: listing.listing_provided_by.email,
-                                listing_provided_by_company: listing.listing_provided_by.company,
-                                photoCount: photoCount,
-                                photo: photoUrls,
-                                for_sale: for_sale,
-                                for_sale_date: for_sale_date,
-                                for_sale_reachout: for_sale_reachout,
-                                coming_soon: coming_soon,
-                                coming_soon_date: coming_soon_date,
-                                coming_soon_reachout: coming_soon_reachout,
-                                pending: pending,
-                                pending_date: pending_date,
-                                pending_reachout: pending_reachout,
-                                verified: verified,
-                                owners: formattedOwners,
-                                current_status: current_status,
-                                current_status_date: current_status_date,
-                                notes: notes,
-                                companyOwned: companyOwned,
-                                snapshot_id: snapshot_id
-                            };
+                        const propertyData = {
+                            url: listing.url,
+                            zpid: listing.zpid,
+                            address: listing.address.streetAddress,
+                            city: listing.city,
+                            state: listing.state,
+                            zipcode: listing.zipcode,
+                            bedrooms: listing.bedrooms,
+                            bathrooms: listing.bathrooms,
+                            sqft: listing.livingArea,
+                            price: listing.price,
+                            longitude: listing.longitude,
+                            latitude: listing.latitude,
+                            hasBadGeocode: listing.hasBadGeocode,
+                            homeType: listing.homeType,
+                            isNonOwnerOccupied: listing.isNonOwnerOccupied,
+                            parcelId: listing.parcelId,
+                            daysOnZillow: listing.daysOnZillow,
+                            propertyTypeDimension: listing.propertyTypeDimension,
+                            hdpTypeDimension: listing.hdpTypeDimension,
+                            listingTypeDimension: listing.listingTypeDimension,
+                            status: listing.contingent_listing_type,
+                            is_listed_by_management_company: listing.is_listed_by_management_company,
+                            listing_provided_by_name: listing.listing_provided_by.name,
+                            listing_provided_by_phone_number: listing.listing_provided_by.phone_number,
+                            listing_provided_by_email: listing.listing_provided_by.email,
+                            listing_provided_by_company: listing.listing_provided_by.company,
+                            photoCount: photoCount,
+                            photo: photoUrls,
+                            for_sale: for_sale,
+                            for_sale_date: for_sale_date,
+                            for_sale_reachout: for_sale_reachout,
+                            coming_soon: coming_soon,
+                            coming_soon_date: coming_soon_date,
+                            coming_soon_reachout: coming_soon_reachout,
+                            pending: pending,
+                            pending_date: pending_date,
+                            pending_reachout: pending_reachout,
+                            verified: verified,
+                            owners: formattedOwners,
+                            current_status: current_status,
+                            current_status_date: current_status_date,
+                            notes: notes,
+                            companyOwned: companyOwned,
+                            snapshot_id: snapshot_id
+                        };
 
-                            await collection.insertOne(propertyData);
-                       
+                        await collection.insertOne(propertyData);
+
 
                     }
                     console.log("Total duplicates: ", duplicateCount)
@@ -1248,7 +1233,7 @@ app.post('/fetchbysnapshotid', async (req, res) => {
             console.log(error);
         }
     }
-    fetchData(snapshot_id );
+    fetchData(snapshot_id);
 })
 
 
@@ -1260,7 +1245,7 @@ app.get('/fixing-precisely', async (req, res) => {
         // Connect to the database
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
-       
+
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
         // Convert snapshot_id to ObjectId
@@ -1415,16 +1400,24 @@ app.get('/listings', async (req, res) => {
     try {
         const database = await connectDB();
         const propertiesCollection = database.collection('properties');
+        // Get the start and end of the current day using moment
+        const startOfToday = moment().startOf('day').toDate(); // Midnight of today
+        const endOfToday = moment().endOf('day').toDate(); // End of today
 
-        let query = {}; // Fetch all documents with an empty query
-
+        // Define the query to fetch listings created today
+        let query = {
+            current_status_date: {
+                $gte: startOfToday,
+                $lt: endOfToday,
+            },
+        };
         const properties = await propertiesCollection
-            .find(query) 
+            .find(query)
             .toArray();
-        
-        
-                
-              
+
+
+
+
 
         // Fetch filtered properties
         //const properties = await propertiesCollection.find(filteringQuery).toArray();
