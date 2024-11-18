@@ -124,12 +124,12 @@ app.get('/export-csv', async (req, res) => {
             ],
 
 
-            
-             current_status_date: {
-                              $gte: startOfLastFriday,
-                              $lt: endOfToday
-                          }
-            
+
+            current_status_date: {
+                $gte: startOfLastFriday,
+                $lt: endOfToday
+            }
+
         };
 
         /*
@@ -700,16 +700,15 @@ app.get('/filtering', async (req, res) => {
         const database = await connectDB();
         const Property = database.collection('properties');
 
-        
         const startOfToday = moment().startOf('day').toDate(); // Midnight of today
         const endOfToday = moment().endOf('day').toDate(); // End of today
 
         const query = {
             verified: null,
-            
-        } 
-        const totalCount = await Property.countDocuments(query)
 
+        }
+
+        const totalCount = await Property.countDocuments(query)
         const property = await Property.findOne(query);
 
         if (property) {
@@ -821,7 +820,7 @@ app.post('/update-verified/:zpid', async (req, res) => {
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
             )
-          
+
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
                 { $set: { verified: verified, initial_scrape: true } }
@@ -874,7 +873,7 @@ app.post('/update-verified2/:zpid', async (req, res) => {
             const getAddress = await Property.findOne(
                 { zpid: Number(zpid) }
             )
-           
+
             const updateResult = await Property.updateOne(
                 { zpid: Number(zpid) }, // Ensure zpid is a number
                 { $set: { verified: verified, initial_scrape: true } }
@@ -1358,24 +1357,30 @@ app.get('/listings', async (req, res) => {
         const startOfToday = moment().startOf('day').toDate(); // Midnight of today
         const endOfToday = moment().endOf('day').toDate(); // End of today
 
+        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate(); // Midnight of yesterday
+        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate(); // End of yesterday
+
+
         // Define the query to fetch listings created today
         let query = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
-            $or: [
-                { current_status: "ForSale", for_sale_reachout: { $exists: false } },
-                { current_status: "ForSale", for_sale_reachout: null },
-                { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
-                { current_status: "ComingSoon", coming_soon_reachout: null },
-                { current_status: "Pending", pending_reachout: { $exists: false } },
-                { current_status: "Pending", pending_reachout: null }
-            ],
-         
+            // companyOwned: { $in: [null, false] },
+             $or: [
+                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
+                 { current_status: "ForSale", for_sale_reachout: null },
+                 { current_status: "ComingSoon", coming_soon_reachout: { $exists: false } },
+                 { current_status: "ComingSoon", coming_soon_reachout: null },
+                 { current_status: "Pending", pending_reachout: { $exists: false } },
+                 { current_status: "Pending", pending_reachout: null }
+             ],
+          
             current_status_date: {
-                $gte: startOfToday,
-                $lt: endOfToday,
+                $gte: startOfYesterday,
+                $lt: endOfYesterday,
             },
+
+
         };
         const properties = await propertiesCollection
             .find(query)
@@ -1618,8 +1623,8 @@ app.post('/trigger3', async (req, res) => {
         const filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [false, null] },
-            current_status_date: { $lt: fiveDaysAgo }
+            // companyOwned: { $in: [false, null] },
+            // current_status_date: { $lt: fiveDaysAgo }
         };
 
         while (hasMore) {
