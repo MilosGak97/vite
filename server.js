@@ -103,16 +103,17 @@ app.get('/export-csv', async (req, res) => {
         // Convert snapshot_id to ObjectId
         // const objectId = new ObjectId('66f41573b49a03641d047d4f');
 
-        // Get the start of last Friday
-        const startOfLastFriday = moment().startOf('day').toDate(); // Adjusting day(-2) for last Friday
-
-        // Get the end of today
+        const startOfToday = moment().startOf('day').toDate(); // Adjusting day(-2) for last Friday
         const endOfToday = moment().endOf('day').toDate();
 
+        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate(); // Midnight of yesterday
+        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate(); // End of yesterday
+
+        
         let filteringQuery = {
             current_status: { $in: ["ForSale", "ComingSoon", "Pending"] },
             verified: { $in: ["Full", "NoPhotos"] },
-            companyOwned: { $in: [null, false] },
+        //    companyOwned: { $in: [null, false] },
 
             $or: [
                 { current_status: "ForSale", for_sale_reachout: { $exists: false } },
@@ -123,10 +124,8 @@ app.get('/export-csv', async (req, res) => {
                 { current_status: "Pending", pending_reachout: null }
             ],
 
-
-
             current_status_date: {
-                $gte: startOfLastFriday,
+                $gte: startOfToday,
                 $lt: endOfToday
             }
 
@@ -1201,6 +1200,10 @@ app.get('/fixing-precisely', async (req, res) => {
 
         const startOfDay = moment().startOf('day').toDate();
         const endOfDay = moment().endOf('day').toDate();
+
+        
+        const startOfYesterday = moment().subtract(1, 'days').startOf('day').toDate(); // Midnight of yesterday
+        const endOfYesterday = moment().subtract(1, 'days').endOf('day').toDate(); // End of yesterday
         // Convert snapshot_id to ObjectId
         //const objectIdSnapshotId = new ObjectId('66c89fc786924a180e057d9c');
         let query = {
@@ -1376,8 +1379,8 @@ app.get('/listings', async (req, res) => {
              ],
           
             current_status_date: {
-                $gte: startOfYesterday,
-                $lt: endOfYesterday,
+                $gte: startOfToday,
+                $lt: endOfToday,
             },
 
 
